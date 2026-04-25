@@ -8,16 +8,39 @@
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
 
   :root {
-    --gold: #046E39;
-    --gold-light: #00A253;
-    --dark: #09100b;
-    --dark-2: #0f1812;
-    --dark-3: #141f17;
-    --dark-4: #1a2820;
-    --text: #e2ebe4;
-    --text-muted: #7a8a7e;
-    --text-dim: #4a5a4e;
-    --accent: #00A253;
+    /* Guarani brand greens */
+    --green-dark:  #004A25;
+    --green:       #046E39;
+    --green-mid:   #00A253;
+    --green-light: #97D0A0;
+
+    /* Guarani grays */
+    --gray-dark:  #747474;
+    --gray-mid:   #9e9e9e;
+    --gray-light: #f1f1f1;
+
+    /* Guarani accent colors */
+    --blue:       #1192cb;
+    --blue-dark:  #1254c9;
+    --yellow:     #ffc107;
+    --red:        #ff4444;
+
+    /* Backgrounds */
+    --dark:   #0a0f0b;
+    --dark-2: #0f1810;
+    --dark-3: #141f16;
+    --dark-4: #1a2a1c;
+
+    /* Text — Guarani gray scale */
+    --text:       #f1f1f1;
+    --text-muted: #9e9e9e;
+    --text-dim:   #747474;
+
+    /* Legacy aliases usados no CSS */
+    --gold:       #00A253;
+    --gold-light: #97D0A0;
+    --accent:     #046E39;
+
     --sidebar-w: 270px;
   }
 
@@ -122,7 +145,7 @@
   /* ── COVER ── */
   #cover {
     min-height: 100vh;
-    background: linear-gradient(160deg, #060d08 0%, #0a1a0d 50%, #09100b 100%);
+    background: linear-gradient(160deg, #000000 0%, #00200e 40%, #0a0f0b 100%);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -146,7 +169,7 @@
     position: absolute;
     bottom: 0; left: 0; right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    background: linear-gradient(90deg, transparent, var(--green-mid), var(--blue), transparent);
   }
 
   .cover-eyebrow {
@@ -203,7 +226,7 @@
   .cover-line {
     width: 60px;
     height: 2px;
-    background: linear-gradient(90deg, var(--gold), transparent);
+    background: linear-gradient(90deg, var(--green-mid), var(--blue), transparent);
     margin-bottom: 32px;
   }
 
@@ -261,8 +284,8 @@
 
   /* ── HIGHLIGHT BOX ── */
   .highlight {
-    background: rgba(4,110,57,0.07);
-    border-left: 3px solid var(--gold);
+    background: rgba(17,146,203,0.07);
+    border-left: 3px solid var(--blue);
     padding: 20px 24px;
     margin: 24px 0;
     border-radius: 0 6px 6px 0;
@@ -358,11 +381,11 @@
     font-size: 13px;
   }
 
-  .hier-level.top { border-left-color: var(--gold); color: var(--gold-light); font-weight: 600; }
-  .hier-level.sr { border-left-color: #1a5a30; color: var(--text); }
-  .hier-level.pl { border-left-color: #0f3a1e; color: var(--text-muted); }
-  .hier-level.jr { border-left-color: #0a2a14; color: var(--text-muted); }
-  .hier-level.base { border-left-color: #0a1a0e; color: var(--text-dim); }
+  .hier-level.top  { border-left-color: var(--green-mid);  color: var(--green-light); font-weight: 600; }
+  .hier-level.sr   { border-left-color: var(--blue);       color: var(--text); }
+  .hier-level.pl   { border-left-color: var(--green);      color: var(--text-muted); }
+  .hier-level.jr   { border-left-color: var(--blue-dark);  color: var(--text-muted); }
+  .hier-level.base { border-left-color: var(--gray-dark);  color: var(--text-dim); }
 
   .hier-badge {
     font-size: 9px;
@@ -458,9 +481,9 @@
     font-size: 10px;
     letter-spacing: 2.5px;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--blue);
     padding: 8px 16px;
-    background: rgba(4,110,57,0.08);
+    background: rgba(17,146,203,0.08);
     border-radius: 4px;
     margin-bottom: 8px;
     display: inline-block;
@@ -494,12 +517,12 @@
 
   .dialogue-header {
     padding: 14px 20px;
-    background: rgba(4,110,57,0.08);
+    background: rgba(17,146,203,0.08);
     border-bottom: 1px solid #1a2a1e;
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--blue);
   }
 
   .dialogue-body { padding: 20px; }
@@ -525,9 +548,9 @@
     flex-shrink: 0;
   }
 
-  .dialogue-line.vendedor .speaker { color: var(--gold); }
-  .dialogue-line.secretaria .speaker { color: #6a8a9a; }
-  .dialogue-line.gerente .speaker { color: #4a9a6a; }
+  .dialogue-line.vendedor .speaker { color: var(--green-mid); }
+  .dialogue-line.secretaria .speaker { color: var(--blue); }
+  .dialogue-line.gerente .speaker { color: var(--yellow); }
   .dialogue-line.obs .speaker { color: var(--text-dim); }
 
   .dialogue-line .text { color: var(--text-muted); }
@@ -556,7 +579,7 @@
   .task-item .task-icon {
     width: 20px;
     height: 20px;
-    border: 1px solid var(--gold);
+    border: 1px solid var(--blue);
     border-radius: 4px;
     flex-shrink: 0;
     margin-top: 1px;
@@ -615,8 +638,8 @@
 
   /* ── IMPORTANT NOTICE ── */
   .notice {
-    background: rgba(4,110,57,0.06);
-    border: 1px solid rgba(4,110,57,0.2);
+    background: rgba(255,193,7,0.06);
+    border: 1px solid rgba(255,193,7,0.25);
     border-radius: 8px;
     padding: 20px 24px;
     margin: 28px 0;
@@ -626,7 +649,7 @@
     font-size: 9px;
     letter-spacing: 2.5px;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--yellow);
     margin-bottom: 8px;
     font-weight: 600;
   }
@@ -673,7 +696,7 @@
   .product-card .prod-name {
     font-size: 14px;
     font-weight: 600;
-    color: var(--gold-light);
+    color: var(--blue);
     margin-bottom: 6px;
   }
 
@@ -716,7 +739,7 @@
     left: var(--sidebar-w);
     right: 0;
     height: 2px;
-    background: var(--gold);
+    background: linear-gradient(90deg, var(--green) 0%, var(--green-mid) 50%, var(--blue) 100%);
     transform-origin: left;
     transform: scaleX(0);
     z-index: 200;
