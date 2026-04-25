@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory
 
 BASE_DIR = Path(__file__).resolve().parent
 TEMPLATE_DIR = BASE_DIR / "guarani" / "templates"
@@ -44,6 +44,14 @@ def pagina_precos():
         secoes=secoes,
         total_itens=total_itens,
         erro=erro,
+    )
+
+
+@app.route("/guarani/rh/integracao/manual-vendedor")
+def manual_vendedor():
+    return send_from_directory(
+        str(BASE_DIR / "guarani" / "rh" / "integracao"),
+        "manual-vendedor.html"
     )
 
 
