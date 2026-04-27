@@ -11,3 +11,6 @@ build/
 ~$*
 biblioteca/
 dados/*.docx
+
+# Arquivos de material de apoio — hospedados no Google Drive
+guarani/rh/integracao/material_de_apoio/

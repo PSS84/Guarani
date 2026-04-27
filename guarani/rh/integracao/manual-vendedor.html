@@ -618,6 +618,31 @@
   .question-item:hover { border-left-color: var(--gold); color: var(--text); }
   .question-item { transition: all 0.2s; }
 
+  /* ── FEATURE ITEM LINK ── */
+  .feature-item a {
+    color: var(--gold-light);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .feature-item a::before {
+    content: '↗';
+    font-size: 11px;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .feature-item a:hover {
+    color: var(--green-mid);
+    text-decoration: underline;
+  }
+
+  .feature-item.has-link {
+    border-left-color: var(--green);
+  }
+
   /* ── AFV FEATURES ── */
   .feature-grid {
     display: grid;
@@ -779,6 +804,61 @@
     .principles-grid, .competencies-grid { grid-template-columns: 1fr; }
     .feature-grid, .products-grid { grid-template-columns: 1fr; }
   }
+
+  /* ── PRINT / PDF ── */
+  @media print {
+    :root { --sidebar-w: 0px; }
+
+    #progress-bar { display: none; }
+
+    #sidebar {
+      position: static;
+      width: 100%;
+      height: auto;
+      border-right: none;
+      border-bottom: 2px solid var(--green);
+      flex-direction: row;
+      align-items: center;
+      padding: 16px 40px;
+      page-break-after: avoid;
+    }
+    #sidebar nav { display: none; }
+    .sidebar-brand {
+      padding: 0;
+      border-bottom: none;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .sidebar-brand .brand-label { margin-bottom: 0; }
+
+    #main, footer { margin-left: 0; }
+
+    #cover {
+      min-height: auto;
+      padding: 60px 60px 48px;
+      page-break-after: always;
+    }
+
+    section {
+      padding: 40px 60px;
+      max-width: 100%;
+      page-break-inside: avoid;
+    }
+
+    .principles-grid { grid-template-columns: repeat(3, 1fr); }
+    .competencies-grid { grid-template-columns: repeat(2, 1fr); }
+    .feature-grid, .products-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .dialogue, .callout, .notice, .highlight {
+      page-break-inside: avoid;
+    }
+
+    footer {
+      margin-left: 0;
+      padding: 24px 60px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -817,6 +897,17 @@
     <a href="#qualificacao"><span class="nav-num">15</span> Formulário</a>
     <a href="#perguntas"><span class="nav-num">16</span> Perguntas SPIN</a>
     <a href="#afv"><span class="nav-num">17</span> Apresentação AFV</a>
+
+    <div class="nav-section">Conhecimento</div>
+    <a href="#metas"><span class="nav-num">18</span> Metas</a>
+    <a href="#qualificacao-lead"><span class="nav-num">19</span> Qualificação de Lead</a>
+    <a href="#pic"><span class="nav-num">20</span> PIC — Perfil Ideal do Cliente</a>
+    <a href="#persona"><span class="nav-num">21</span> Persona Guarani</a>
+    <a href="#estrutura-vendas"><span class="nav-num">22</span> Estrutura de Vendas</a>
+    <a href="#arvore-produtos"><span class="nav-num">23</span> Árvore de Produtos</a>
+    <a href="#descritivo-produtos"><span class="nav-num">24</span> Descritivo dos Produtos</a>
+    <a href="#funcionalidades"><span class="nav-num">25</span> Funcionalidades dos Produtos</a>
+    <a href="#apresentacoes"><span class="nav-num">26</span> Apresentações e Proposta</a>
   </nav>
 </aside>
 
@@ -858,7 +949,7 @@
       <div class="checklist-item">PIC — Perfil Ideal de Cliente e Personas</div>
       <div class="checklist-item">Apresentação Institucional dos produtos e empresa</div>
       <div class="checklist-item">Modelos de Propostas</div>
-      <div class="checklist-item">Ferramentas: Pipedrive · Meetime · Sales Navigator · Apollo</div>
+      <div class="checklist-item">Ferramentas: Leads2b</div>
       <div class="checklist-item">Apresentação do app Força de Vendas</div>
       <div class="checklist-item">Instalação do AFV no computador do Vendedor</div>
       <div class="checklist-item">Metas, Tabela de Preço e Apresentação do B2B</div>
@@ -956,17 +1047,21 @@
     <h2 class="section-title">Atividades e Responsabilidades</h2>
     <p>Cada colaborador dentro do setor comercial terá acesso às informações do seu cargo: área de atuação, setor, supervisor imediato, atividades, requisitos e comportamentos esperados.</p>
     <div class="activity-list">
-      <div class="activity-item"><span class="num">01</span>Executar o planejamento operacional de vendas, conduzindo apresentações, negociações e fechamentos, visando cumprir as metas definidas e a expansão do negócio.</div>
-      <div class="activity-item"><span class="num">02</span>Receber os leads qualificados pela equipe de pré-vendas e conduzir apresentações completas das soluções, demonstrando valor e alinhando a solução às necessidades do cliente.</div>
-      <div class="activity-item"><span class="num">03</span>Aprofundar o diagnóstico do cliente, identificando necessidades específicas e personalizando a apresentação da solução para maximizar as chances de fechamento.</div>
-      <div class="activity-item"><span class="num">04</span>Conduzir reuniões comerciais com potenciais clientes, realizando demonstrações das soluções e apresentando propostas alinhadas ao perfil e necessidades identificados.</div>
-      <div class="activity-item"><span class="num">05</span>Realizar follow-up periódico com os prospects ao longo do ciclo de vendas, avaliando objeções, amadurecendo a negociação e conduzindo para o fechamento do contrato.</div>
-      <div class="activity-item"><span class="num">06</span>Atualizar periodicamente o sistema CRM com as informações das negociações e indicadores de desempenho para a adequada análise dos resultados da área.</div>
-      <div class="activity-item"><span class="num">07</span>Realizar a abertura, fechamento e/ou cancelamento de negócios no sistema CRM, mantendo os registros atualizados constantemente.</div>
-      <div class="activity-item"><span class="num">08</span>Acompanhar o alcance de metas da equipe de vendas, reportando os resultados através da elaboração de relatórios gerenciais.</div>
-      <div class="activity-item"><span class="num">09</span>Emitir contratos comerciais, submetendo-os ao processo de assinaturas eletrônicas e realizando interface com o Jurídico do cliente e da Guarani Sistemas.</div>
-      <div class="activity-item"><span class="num">10</span>Executar rotinas administrativas para o início do faturamento: cadastro no Guarani ERP, encaminhamento ao Financeiro, abertura de ticket de implantação e encaminhamento do projeto assinado à equipe de projetos.</div>
-      <div class="activity-item"><span class="num">11</span>Auxiliar na organização de ações de marketing e eventos visando cumprir o planejamento estratégico da empresa.</div>
+      <div class="activity-item"><span class="num">01</span>Atender a oportunidade prontamente assim que ela entrar no funil de vendas — não deixe o negócio esfriar. O atendimento deve ocorrer em no máximo 5 minutos após o conhecimento da oportunidade; se for o primeiro contato, fazê-lo obrigatoriamente por ligação.</div>
+      <div class="activity-item"><span class="num">02</span>Executar o planejamento operacional de vendas, conduzindo apresentações, negociações e fechamentos, visando cumprir as metas definidas e a expansão do negócio.</div>
+      <div class="activity-item"><span class="num">03</span>Realizar prospecção ativa, criar ações e novas oportunidades de vendas, cumprir as metas todos os meses e atender e solucionar de forma rápida e eficaz toda e qualquer solicitação do cliente.</div>
+      <div class="activity-item"><span class="num">04</span>Receber os leads qualificados pela equipe de pré-vendas e conduzir apresentações completas das soluções, demonstrando valor e alinhando a solução às necessidades do cliente.</div>
+      <div class="activity-item"><span class="num">05</span>Aprofundar o diagnóstico do cliente, identificando necessidades específicas e personalizando a apresentação da solução para maximizar as chances de fechamento.</div>
+      <div class="activity-item"><span class="num">06</span>Conduzir reuniões comerciais com potenciais clientes, realizando demonstrações das soluções e apresentando propostas alinhadas ao perfil e necessidades identificados.</div>
+      <div class="activity-item"><span class="num">07</span>Realizar follow-up periódico com os prospects ao longo do ciclo de vendas, avaliando objeções, amadurecendo a negociação e conduzindo para o fechamento do contrato.</div>
+      <div class="activity-item"><span class="num">08</span>Montar e manter uma agenda de relacionamento com sua carteira de clientes. Faça visitas regularmente — desta forma conseguirá ter novas indicações e realizar novas vendas. Aproxime-se do cliente.</div>
+      <div class="activity-item"><span class="num">09</span>Manter o CRM atualizado — faça dele seu melhor amigo. Será através dele que seu desempenho será medido. Realizar a abertura, fechamento e/ou cancelamento de negócios, mantendo os registros atualizados constantemente.</div>
+      <div class="activity-item"><span class="num">10</span>Acompanhar o alcance de metas da equipe de vendas, reportando os resultados através da elaboração de relatórios gerenciais.</div>
+      <div class="activity-item"><span class="num">11</span>Ser autoridade no que faz: aprender sobre negócio, empresas, processos de vendas e produtos comercializados, estudando continuamente para enriquecer o repertório e se tornar um vendedor profissional de referência.</div>
+      <div class="activity-item"><span class="num">12</span>Realizar todas as tarefas com maestria — entenda que quando você não executa o que lhe compete, seu colega, a empresa e, principalmente, a venda são prejudicados.</div>
+      <div class="activity-item"><span class="num">13</span>Emitir contratos comerciais, submetendo-os ao processo de assinaturas eletrônicas e realizando interface com o Jurídico do cliente e da Guarani Sistemas.</div>
+      <div class="activity-item"><span class="num">14</span>Executar rotinas administrativas para o início do faturamento: cadastro no Guarani ERP, encaminhamento ao Financeiro, abertura de ticket de implantação e encaminhamento do projeto assinado à equipe de projetos.</div>
+      <div class="activity-item"><span class="num">15</span>Auxiliar na organização de ações de marketing e eventos visando cumprir o planejamento estratégico da empresa.</div>
     </div>
   </section>
 
@@ -1146,18 +1241,16 @@
     <h2 class="section-title">Material de Apoio</h2>
     <p>Utilize o material abaixo para estudos e roteiro de abordagem referente à Unidade de Negócio Força de Vendas.</p>
     <div class="feature-grid">
-      <div class="feature-item">Encaixe Problema-Solução (PSF)</div>
-      <div class="feature-item">Spin Selling</div>
-      <div class="feature-item">Qualificação Pré-Vendas</div>
-      <div class="feature-item">Objeções</div>
-      <div class="feature-item">Livro: Spin Selling — Alcançando Excelência em Vendas</div>
-      <div class="feature-item">Kickoff Enablement</div>
-      <div class="feature-item">4 pilares da estrutura da ligação</div>
-      <div class="feature-item">Investigação (Spin Selling)</div>
-      <div class="feature-item">Demonstração de Capacidade</div>
-      <div class="feature-item">Link do arquivo Cold Call</div>
-      <div class="feature-item">Processo de Follow-Up</div>
-      <div class="feature-item">Vídeos de referência</div>
+      <div class="feature-item has-link"><a href="https://drive.google.com/file/d/19g1mDUb7tHlPH2aK5cymFJ51imBbFLXf/view" target="_blank">Encaixe Problema-Solução (PSF)</a></div>
+      <div class="feature-item has-link"><a href="https://drive.google.com/file/d/1NS2yYk7mOBdcwDtokcbDICosxXCdlquE/view" target="_blank">Spin Selling</a></div>
+      <div class="feature-item has-link"><a href="https://drive.google.com/file/d/1fAERq4W9Dx2aw8BEtSjIpQWCkF-dBm60/view" target="_blank">Qualificação Pré-Vendas</a></div>
+      <div class="feature-item has-link"><a href="https://drive.google.com/file/d/18lHKNc16_lpM3BqMa6wTn0s3lFc28ziF/view" target="_blank">Objeções</a></div>
+      <div class="feature-item has-link"><a href="https://drive.google.com/file/d/197ydY9sJBNcVHBi761ILnYjaCKFdesye/view" target="_blank">Livro: Spin Selling — Alcançando Excelência em Vendas</a></div>
+      <div class="feature-item has-link"><a href="https://drive.google.com/file/d/1RFtzBSahc7RU5B63Z_V9gX_d3yjP_Szp/view" target="_blank">4 pilares da estrutura da ligação</a></div>
+      <div class="feature-item has-link"><a href="https://drive.google.com/file/d/1sgJtiKNDZXKSbKBkWMdS55h8wE0WeUrY/view" target="_blank">Investigação (Spin Selling)</a></div>
+      <div class="feature-item has-link"><a href="https://drive.google.com/file/d/1o5vCKQUNZsCRygUKNVfW7z7I2aDoKNEc/view" target="_blank">Demonstração de Capacidade</a></div>
+      <div class="feature-item has-link"><a href="https://drive.google.com/file/d/1ORnnfpEgB8BJ1N2VtSZqSsFMbFcZQXim/view" target="_blank">Script de Cold Call</a></div>
+      <div class="feature-item has-link"><a href="https://drive.google.com/file/d/1iFvNrxUpPU_GG3rq50zMu6nlwMIP1PE8/view" target="_blank">Processo de Follow-Up</a></div>
     </div>
   </section>
 
@@ -1358,21 +1451,21 @@
 
     <h4 class="mini-title">Produtos — Fase Inicial</h4>
     <div class="values-tags">
-      <span class="tag gold">Guarani AFV</span>
-      <span class="tag gold">Guarani B2B</span>
+      <span class="tag gold"><a href="https://drive.google.com/file/d/1fmeJ_FVXV2UBRnvIQbK64ag1gAkheXfs/view" target="_blank" style="color:inherit;text-decoration:none;">Guarani AFV</a></span>
+      <span class="tag gold"><a href="https://drive.google.com/file/d/1nptzKWpl8WTUqQ9D7k-7akUSBbcd9yVY/view" target="_blank" style="color:inherit;text-decoration:none;">Guarani B2B</a></span>
     </div>
 
     <h4 class="mini-title" style="margin-top: 28px;">Arquivos de Apoio Disponíveis</h4>
     <div class="checklist">
-      <div class="checklist-item">Arquivo PDF: Meta</div>
-      <div class="checklist-item">Planilha de Qualificação de Lead</div>
-      <div class="checklist-item">Arquivo PDF: PIC — Perfil Ideal de Cliente</div>
-      <div class="checklist-item">Arquivo Persona Guarani</div>
-      <div class="checklist-item">Arquivo Dominando a Arte da Venda</div>
-      <div class="checklist-item">Estrutura de Vendas — Todo o fluxo de vendas atual</div>
-      <div class="checklist-item">Árvore de Produtos — Todos os produtos no mercado</div>
-      <div class="checklist-item">Hierarquia & Organograma — Distribuição dos setores</div>
-      <div class="checklist-item">Atribuições de Papel — Tarefas esperadas pelo colaborador</div>
+      <div class="checklist-item"><a href="#metas" style="color: var(--gold-light); text-decoration: none;">Metas</a></div>
+      <div class="checklist-item"><a href="#qualificacao-lead" style="color: var(--gold-light); text-decoration: none;">Qualificação de Lead</a></div>
+      <div class="checklist-item"><a href="#pic" style="color: var(--gold-light); text-decoration: none;">PIC — Perfil Ideal de Cliente</a></div>
+      <div class="checklist-item"><a href="#persona" style="color: var(--gold-light); text-decoration: none;">Persona Guarani</a></div>
+
+      <div class="checklist-item"><a href="#estrutura-vendas" style="color: var(--gold-light); text-decoration: none;">Estrutura de Vendas</a></div>
+      <div class="checklist-item"><a href="#arvore-produtos" style="color: var(--gold-light); text-decoration: none;">Árvore de Produtos</a></div>
+      <div class="checklist-item"><a href="#descritivo-produtos" style="color: var(--gold-light); text-decoration: none;">Descritivo dos Produtos</a></div>
+      <div class="checklist-item"><a href="#funcionalidades" style="color: var(--gold-light); text-decoration: none;">Funcionalidades dos Produtos Guarani</a></div>
     </div>
   </section>
 
@@ -1572,6 +1665,892 @@
       <div class="feature-item">Produtos Inativos</div>
       <div class="feature-item">Cortes em Ordens</div>
       <div class="feature-item">Sincronizador</div>
+    </div>
+  </section>
+
+  <!-- METAS -->
+  <section id="metas">
+    <div class="section-eyebrow">18 · Metas</div>
+    <h2 class="section-title">Objetivos do Vendedor</h2>
+    <p>As metas são divididas em secundárias — que sustentam a atividade comercial — e principais, que medem diretamente os resultados e o crescimento do negócio.</p>
+
+    <h4 class="mini-title" style="margin-top: 36px;">Metas Secundárias</h4>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 12px;">
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--blue); border-radius: 8px; padding: 20px 24px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;">Leads para Prospectar</div>
+        <div style="font-family: 'Playfair Display', serif; font-size: 36px; color: var(--text); font-weight: 700;">150</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">leads selecionados / mês</div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--blue); border-radius: 8px; padding: 20px 24px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;">Agendas</div>
+        <div style="font-family: 'Playfair Display', serif; font-size: 36px; color: var(--text); font-weight: 700;">16</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">agendamentos / mês</div>
+      </div>
+    </div>
+
+    <h4 class="mini-title" style="margin-top: 36px;">Metas Principais</h4>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 12px;">
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--green-mid); border-radius: 8px; padding: 20px 24px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;">Apresentações</div>
+        <div style="font-family: 'Playfair Display', serif; font-size: 36px; color: var(--green-light); font-weight: 700;">12</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">apresentações / mês</div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--green-mid); border-radius: 8px; padding: 20px 24px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;">Propostas</div>
+        <div style="font-family: 'Playfair Display', serif; font-size: 36px; color: var(--green-light); font-weight: 700;">15</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">propostas enviadas / mês</div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--gold); border-radius: 8px; padding: 20px 24px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;">Recorrente</div>
+        <div style="font-family: 'Playfair Display', serif; font-size: 36px; color: var(--gold-light); font-weight: 700;">R$ 10.000</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">meta cheia / mês</div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--gold); border-radius: 8px; padding: 20px 24px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;">Projeto</div>
+        <div style="font-family: 'Playfair Display', serif; font-size: 36px; color: var(--gold-light); font-weight: 700;">R$ 90.000</div>
+        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">meta cheia / mês</div>
+      </div>
+    </div>
+
+    <div class="notice" style="margin-top: 32px;">
+      <div class="notice-label">Ramping — Recorrente para Iniciantes</div>
+      <p>O vendedor iniciante começa com <strong>R$ 6.000</strong> e vai aumentando gradualmente <strong>R$ 500,00 por mês</strong> até atingir a meta cheia de <strong>R$ 10.000</strong>. Cada mês de evolução representa um passo no processo de maturidade comercial.</p>
+    </div>
+  </section>
+
+  <!-- QUALIFICAÇÃO DE LEAD -->
+  <section id="qualificacao-lead">
+    <div class="section-eyebrow">19 · Qualificação de Lead</div>
+    <h2 class="section-title">Formulário de Qualificação AFV</h2>
+    <p>Preencha este formulário durante ou após a abordagem inicial. A pontuação orienta o potencial do lead — se igual ou inferior a <strong>14 pontos</strong>, consulte o gestor comercial antes de avançar.</p>
+
+    <!-- DADOS DA EMPRESA -->
+    <h3 class="sub-title">Dados da Empresa</h3>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px;">
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;">Nome Fantasia</div>
+        <div style="height: 1px; background: #1a2a1e; margin-top: 8px;"></div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;">CNPJ</div>
+        <div style="height: 1px; background: #1a2a1e; margin-top: 8px;"></div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;">Cidade / UF</div>
+        <div style="height: 1px; background: #1a2a1e; margin-top: 8px;"></div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;">Telefone</div>
+        <div style="height: 1px; background: #1a2a1e; margin-top: 8px;"></div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;">WhatsApp</div>
+        <div style="height: 1px; background: #1a2a1e; margin-top: 8px;"></div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;">E-mail</div>
+        <div style="height: 1px; background: #1a2a1e; margin-top: 8px;"></div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;">Pessoa de Contato</div>
+        <div style="height: 1px; background: #1a2a1e; margin-top: 8px;"></div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;">Site da Empresa</div>
+        <div style="height: 1px; background: #1a2a1e; margin-top: 8px;"></div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px; grid-column: span 2;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px;">Por que está mudando de sistema?</div>
+        <div style="height: 1px; background: #1a2a1e; margin-top: 20px;"></div>
+      </div>
+    </div>
+
+    <!-- PONTUAÇÃO -->
+    <h3 class="sub-title">Pontuação</h3>
+    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Selecione a opção que melhor descreve o lead em cada critério. A pontuação total orienta a prioridade de avanço.</p>
+
+    <!-- Segmento de Mercado -->
+    <div style="margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold);">Segmento de Mercado</div>
+        <span style="font-size: 10px; color: var(--text-dim); background: var(--dark-4); padding: 2px 8px; border-radius: 3px;">10 pts</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <span class="tag">Distribuidor</span>
+        <span class="tag">Indústria</span>
+        <span class="tag">Importadora</span>
+        <span class="tag">Outros</span>
+      </div>
+    </div>
+
+    <!-- Possui Equipe de Vendas -->
+    <div style="margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold);">Possui Equipe de Vendas</div>
+        <span style="font-size: 10px; color: var(--text-dim); background: var(--dark-4); padding: 2px 8px; border-radius: 3px;">1 pt</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <span class="tag">Sim</span>
+        <span class="tag">Não</span>
+      </div>
+    </div>
+
+    <!-- Tipo de Equipe -->
+    <div style="margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold);">Tipo de Equipe</div>
+        <span style="font-size: 10px; color: var(--text-dim); background: var(--dark-4); padding: 2px 8px; border-radius: 3px;">10 pts</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <span class="tag">Externa</span>
+        <span class="tag">Interna</span>
+        <span class="tag">Ambos</span>
+      </div>
+    </div>
+
+    <!-- Número de RCA/Vendedores -->
+    <div style="margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold);">Número de RCA / Vendedores</div>
+        <span style="font-size: 10px; color: var(--text-dim); background: var(--dark-4); padding: 2px 8px; border-radius: 3px;">20 pts</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <span class="tag">Até 10</span>
+        <span class="tag">Até 30</span>
+        <span class="tag">Até 60</span>
+        <span class="tag">100+</span>
+      </div>
+    </div>
+
+    <!-- Qual ERP -->
+    <div style="margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold);">Qual ERP utiliza atualmente</div>
+        <span style="font-size: 10px; color: var(--text-dim); background: var(--dark-4); padding: 2px 8px; border-radius: 3px;">20 pts</span>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <span class="tag">Totvs</span>
+        <span class="tag">SAP</span>
+        <span class="tag">Sênior</span>
+        <span class="tag">Sankhya</span>
+        <span class="tag">Outro</span>
+      </div>
+    </div>
+
+    <!-- COMPLEMENTO -->
+    <h3 class="sub-title">Complemento de Informação</h3>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 16px;">
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px;">Número de SKUs</div>
+        <div style="height: 1px; background: #1a2a1e; margin-top: 8px;"></div>
+      </div>
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px;">Regime de Tributação</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Simples Nacional</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Lucro Presumido</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Lucro Real</span>
+        </div>
+      </div>
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px;">Média de Faturamento</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">&gt; R$ 500 mil</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">&gt; R$ 1 mi</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">&gt; R$ 3 mi</span>
+        </div>
+      </div>
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px;">Ramo de Atividade</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Utilidade Doméstica</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Alimentos</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Papelaria</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Outros</span>
+        </div>
+      </div>
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 6px; padding: 14px 18px; grid-column: span 2;">
+        <div style="font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px;">Concorrentes identificados</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Mercus</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Máxima</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Polibras</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">WMW</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Acácia</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">Landix</span>
+          <span class="tag" style="font-size: 11px; padding: 2px 10px;">ION</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PONTUAÇÃO RESUMO -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 32px;">
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--green-mid); border-radius: 8px; padding: 20px 24px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;">Pontuação Referência</div>
+        <div style="font-family: 'Playfair Display', serif; font-size: 36px; color: var(--green-light); font-weight: 700;">40 pts</div>
+      </div>
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--blue); border-radius: 8px; padding: 20px 24px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;">Pontuação Atingida</div>
+        <div style="font-family: 'Playfair Display', serif; font-size: 36px; color: var(--text); font-weight: 700;">61 pts</div>
+      </div>
+    </div>
+
+    <div class="notice" style="margin-top: 24px;">
+      <div class="notice-label">Atenção</div>
+      <p>Se a pontuação atingida for igual a <strong>14 ou menor</strong>, o vendedor deve consultar o gestor comercial antes de avançar com o lead.</p>
+    </div>
+  </section>
+
+  <!-- PIC — PERFIL IDEAL DO CLIENTE -->
+  <section id="pic">
+    <div class="section-eyebrow">20 · PIC — Perfil Ideal do Cliente</div>
+    <h2 class="section-title">Perfil Ideal de Cliente</h2>
+    <p>O PIC define onde o pré-vendedor e o vendedor devem concentrar sua energia. Conhecer o perfil ideal aumenta as chances de fechamento e reduz o ciclo de vendas.</p>
+
+    <!-- SEGMENTOS DE CLIENTES -->
+    <h3 class="sub-title">Segmentos de Clientes — Energia a ser dedicada</h3>
+    <div class="activity-list" style="margin-top: 20px;">
+
+      <div class="activity-item" style="border-left: 3px solid var(--green-mid); align-items: flex-start;">
+        <span class="num" style="font-size: 18px; font-family: 'Playfair Display', serif; color: var(--green-light); min-width: 52px;">40%</span>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px;">Indústrias</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Locais de transformação de qualquer matéria-prima em objetos prontos para o consumo.</div>
+        </div>
+      </div>
+
+      <div class="activity-item" style="border-left: 3px solid var(--green-mid); align-items: flex-start;">
+        <span class="num" style="font-size: 18px; font-family: 'Playfair Display', serif; color: var(--green-light); min-width: 52px;">40%</span>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px;">Importadores</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Negócio que visa a atividade de intermediação, oferecendo produtos nacionais ao exterior e produtos do exterior junto ao mercado nacional.</div>
+        </div>
+      </div>
+
+      <div class="activity-item" style="border-left: 3px solid var(--blue); align-items: flex-start;">
+        <span class="num" style="font-size: 18px; font-family: 'Playfair Display', serif; color: var(--blue); min-width: 52px;">10%</span>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px;">Distribuidores</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Adquirem em larga quantidade os produtos dos fabricantes, providenciando a logística e a venda para sua carteira de clientes — normalmente pequenos negócios que não conseguem comprar diretamente dos fabricantes.</div>
+        </div>
+      </div>
+
+      <div class="activity-item" style="border-left: 3px solid var(--gray-dark); align-items: flex-start;">
+        <span class="num" style="font-size: 18px; font-family: 'Playfair Display', serif; color: var(--text-dim); min-width: 52px;">5%</span>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px;">Atacadistas</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Vendem seu produto em grandes quantidades aos varejistas, permitindo que o varejista tire vantagem de um preço mais baixo do que se comprasse itens individuais.</div>
+        </div>
+      </div>
+
+      <div class="activity-item" style="border-left: 3px solid var(--gray-dark); align-items: flex-start;">
+        <span class="num" style="font-size: 18px; font-family: 'Playfair Display', serif; color: var(--text-dim); min-width: 52px;">5%</span>
+        <div>
+          <div style="font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px;">Varejo</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Venda de produtos ou comercialização de serviços em pequena quantidade diretamente ao consumidor final, sem a presença de intermediários.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RAMO DE ATIVIDADE -->
+    <h3 class="sub-title">Ramo de Atividade</h3>
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 52px; font-size: 12px; font-weight: 600; color: var(--green-light); text-align: right; flex-shrink: 0;">50%</div>
+        <div style="flex: 1; background: var(--dark-3); border-radius: 4px; overflow: hidden; height: 28px;">
+          <div style="width: 50%; background: var(--green); height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 12px; color: var(--text);">Utilidade Doméstica</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 52px; font-size: 12px; font-weight: 600; color: var(--green-light); text-align: right; flex-shrink: 0;">20%</div>
+        <div style="flex: 1; background: var(--dark-3); border-radius: 4px; overflow: hidden; height: 28px;">
+          <div style="width: 20%; background: var(--green-mid); height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 12px; color: var(--text);">Generalistas</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 52px; font-size: 12px; font-weight: 600; color: var(--blue); text-align: right; flex-shrink: 0;">12%</div>
+        <div style="flex: 1; background: var(--dark-3); border-radius: 4px; overflow: hidden; height: 28px;">
+          <div style="width: 12%; background: var(--blue); height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 12px; color: var(--text); white-space: nowrap;">Alimentos</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 52px; font-size: 12px; font-weight: 600; color: var(--blue); text-align: right; flex-shrink: 0;">12%</div>
+        <div style="flex: 1; background: var(--dark-3); border-radius: 4px; overflow: hidden; height: 28px;">
+          <div style="width: 12%; background: var(--blue); height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 12px; color: var(--text); white-space: nowrap;">Cosméticos</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 52px; font-size: 12px; font-weight: 600; color: var(--blue); text-align: right; flex-shrink: 0;">12%</div>
+        <div style="flex: 1; background: var(--dark-3); border-radius: 4px; overflow: hidden; height: 28px;">
+          <div style="width: 12%; background: var(--blue); height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 12px; color: var(--text); white-space: nowrap;">Higiene Pessoal</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 52px; font-size: 12px; font-weight: 600; color: var(--blue); text-align: right; flex-shrink: 0;">12%</div>
+        <div style="flex: 1; background: var(--dark-3); border-radius: 4px; overflow: hidden; height: 28px;">
+          <div style="width: 12%; background: var(--blue); height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 12px; color: var(--text); white-space: nowrap;">Metal</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 52px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: right; flex-shrink: 0;">8%</div>
+        <div style="flex: 1; background: var(--dark-3); border-radius: 4px; overflow: hidden; height: 28px;">
+          <div style="width: 8%; background: var(--blue-dark); height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 12px; color: var(--text); white-space: nowrap;">Farmácos</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="width: 52px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-align: right; flex-shrink: 0;">5%</div>
+        <div style="flex: 1; background: var(--dark-3); border-radius: 4px; overflow: hidden; height: 28px;">
+          <div style="width: 5%; background: var(--blue-dark); height: 100%; min-width: 160px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; color: var(--text); white-space: nowrap;">Decoração / Mesa Posta / Presentes</div>
+        </div>
+      </div>
+
+      <!-- 2% group -->
+      <h4 class="mini-title" style="margin-top: 16px;">Ramos com 2% cada</h4>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;">
+        <span class="tag">Têxtil</span>
+        <span class="tag">Técnico</span>
+        <span class="tag">Mel</span>
+        <span class="tag">Brinquedos</span>
+        <span class="tag">Autopeças / Automotivo</span>
+        <span class="tag">Genética</span>
+        <span class="tag">Químico</span>
+        <span class="tag">Papelaria / Escritório</span>
+        <span class="tag">Fertilizantes</span>
+        <span class="tag">Sorvetes</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- PERSONA GUARANI -->
+  <section id="persona">
+    <div class="section-eyebrow">21 · Persona Guarani</div>
+    <h2 class="section-title">Perfil de Clientes por Produto</h2>
+    <p>Conheça em profundidade o perfil de empresa, o perfil de pessoa e as principais dores de cada produto Guarani. Essa informação orienta o discurso e aumenta a assertividade na abordagem.</p>
+
+    <!-- GUARANI ERP -->
+    <h3 class="sub-title">Guarani ERP</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px;">
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-top: 3px solid var(--green-mid); border-radius: 8px; padding: 20px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green-mid); margin-bottom: 12px;">Empresa</div>
+        <div class="checklist">
+          <div class="checklist-item">Distribuidores, indústrias, importadores</div>
+          <div class="checklist-item">Faturamento acima de R$ 600 mil/mês</div>
+          <div class="checklist-item">3 a 4 anos de operação</div>
+          <div class="checklist-item">Região Sul e Sudeste (SP, RJ, SC, PR)</div>
+          <div class="checklist-item">Segmento: artigos para o lar, generalistas, alimentícios</div>
+        </div>
+      </div>
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-top: 3px solid var(--blue); border-radius: 8px; padding: 20px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 12px;">Pessoa</div>
+        <div class="checklist">
+          <div class="checklist-item">Diretor, Presidente, CEO, Controller</div>
+          <div class="checklist-item">Acima de 35 anos</div>
+        </div>
+      </div>
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-top: 3px solid var(--red); border-radius: 8px; padding: 20px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 12px;">Dores</div>
+        <div class="checklist">
+          <div class="checklist-item">Crescimento rápido sem estrutura</div>
+          <div class="checklist-item">Falta de controle operacional e comercial</div>
+          <div class="checklist-item">Falta de políticas e processos definidos</div>
+          <div class="checklist-item">Falta de tempo</div>
+          <div class="checklist-item">Necessita de agilidade</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- GUARANI AFV -->
+    <h3 class="sub-title">Guarani AFV — Força de Vendas</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px;">
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-top: 3px solid var(--green-mid); border-radius: 8px; padding: 20px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green-mid); margin-bottom: 12px;">Empresa</div>
+        <div class="checklist">
+          <div class="checklist-item">Distribuidores, indústrias, importadores</div>
+          <div class="checklist-item">Possuem força de vendas externa (equipe offline)</div>
+          <div class="checklist-item">Acima de 10 vendedores ou RCAs</div>
+          <div class="checklist-item">Usam ERPs de mercado: SAP, Totvs, Sênior, Sankhya</div>
+          <div class="checklist-item">Qualquer região do Brasil</div>
+          <div class="checklist-item">Segmento: artigos para o lar, eletrodomésticos portáteis, generalistas, alimentícios</div>
+        </div>
+      </div>
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-top: 3px solid var(--blue); border-radius: 8px; padding: 20px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 12px;">Pessoa</div>
+        <div class="checklist">
+          <div class="checklist-item">Diretor Comercial, CEO, Presidente</div>
+          <div class="checklist-item">Acima de 30 anos</div>
+        </div>
+      </div>
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-top: 3px solid var(--red); border-radius: 8px; padding: 20px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 12px;">Dores</div>
+        <div class="checklist">
+          <div class="checklist-item">Falta de política comercial</div>
+          <div class="checklist-item">Necessita agilidade</div>
+          <div class="checklist-item">Necessita informações rápidas e confiáveis</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- GUARANI B2B -->
+    <h3 class="sub-title">Guarani B2B — E-commerce B2B</h3>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px;">
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-top: 3px solid var(--green-mid); border-radius: 8px; padding: 20px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green-mid); margin-bottom: 12px;">Empresa</div>
+        <div class="checklist">
+          <div class="checklist-item">Indústrias, importadores, distribuidores</div>
+          <div class="checklist-item">Faturamento acima de R$ 600 mil/mês</div>
+          <div class="checklist-item">Acima de 2 anos de operação</div>
+          <div class="checklist-item">Qualquer região do Brasil</div>
+          <div class="checklist-item">Segmento: artigos para o lar, autopeças, pet, alimentação, cosméticos, estética (beauty)</div>
+        </div>
+      </div>
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-top: 3px solid var(--blue); border-radius: 8px; padding: 20px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 12px;">Pessoa</div>
+        <div class="checklist">
+          <div class="checklist-item">Diretor Comercial, Diretor de Marketing, CEO, Presidente</div>
+        </div>
+      </div>
+
+      <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-top: 3px solid var(--red); border-radius: 8px; padding: 20px;">
+        <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 12px;">Dores</div>
+        <div class="checklist">
+          <div class="checklist-item">Aumentar raio de ação</div>
+          <div class="checklist-item">Aumentar capilaridade</div>
+          <div class="checklist-item">Aumentar margem de lucro</div>
+          <div class="checklist-item">Reduzir clientes inativos</div>
+          <div class="checklist-item">Favorecer a primeira compra</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ESTRUTURA DE VENDAS -->
+  <section id="estrutura-vendas">
+    <div class="section-eyebrow">22 · Estrutura de Vendas</div>
+    <h2 class="section-title">Fluxo Completo de Vendas</h2>
+    <p>Visão completa da estrutura comercial da Guarani Sistemas — ciclo de novas vendas, etapas do funil e oportunidades de base (upselling).</p>
+    <div style="margin-top: 28px; background: var(--dark-3); border: 1px solid #1a2a1e; border-radius: 8px; padding: 16px; text-align: center;">
+      <a href="https://drive.google.com/file/d/1CuZVTyjqxnPt9FTXEdGA3VR7cTXwLGpS/view" target="_blank">
+        <img
+          src="https://drive.google.com/uc?export=view&id=1kM6tOhXLyMOYWiOgqKhaBiYlU0UZPmmy"
+          alt="Estrutura de Vendas — Guarani Sistemas"
+          style="width: 100%; max-width: 100%; border-radius: 4px; display: block; margin: 0 auto; cursor: pointer;"
+        >
+      </a>
+      <div style="margin-top: 8px; font-size: 11px; color: var(--text-dim);">Clique na imagem para abrir o PDF</div>
+    </div>
+  </section>
+
+  <!-- ÁRVORE DE PRODUTOS -->
+  <section id="arvore-produtos">
+    <div class="section-eyebrow">23 · Árvore de Produtos</div>
+    <h2 class="section-title">Árvore de Produtos Guarani</h2>
+    <p>Portfólio completo de produtos e módulos adicionais disponíveis na Guarani Sistemas.</p>
+
+    <!-- GUARANI ERP -->
+    <h3 class="sub-title">Guarani ERP — Sistema de Gestão Empresarial</h3>
+
+    <h4 class="mini-title">Adicionais Direto</h4>
+    <div class="values-tags" style="margin-top: 10px;">
+      <span class="tag">Telemarketing</span>
+      <span class="tag">Manifestação do Destinatário</span>
+      <span class="tag">MDF-e — Manifestação Eletrônico de Documentos Fiscais</span>
+      <span class="tag">CTe — Conhecimento de Transporte</span>
+      <span class="tag">WMS</span>
+      <span class="tag">PCP</span>
+      <span class="tag">Importação XML</span>
+      <span class="tag">Contábil</span>
+      <span class="tag">Ciap e Ativo Imobilizado</span>
+      <span class="tag">Envio de Boleto via WhatsApp</span>
+      <span class="tag">Qualidade</span>
+      <span class="tag">Comex</span>
+    </div>
+
+    <h4 class="mini-title" style="margin-top: 28px;">Adicionais Dependente</h4>
+    <div class="values-tags" style="margin-top: 10px;">
+      <span class="tag">Concil</span>
+      <span class="tag">Koncili</span>
+      <span class="tag">Routeasy</span>
+      <span class="tag">Link de Pagamento</span>
+      <span class="tag">SSW</span>
+      <span class="tag">ZNIA</span>
+      <span class="tag">Intelipost</span>
+      <span class="tag">CRM — RD Station, Bitrix, Vortex</span>
+      <span class="tag">Hub — Plugg.to, Tray, Jetcommerce, Lexos, Maggis5</span>
+      <span class="tag">PDV</span>
+    </div>
+
+    <!-- GUARANI AFV -->
+    <h3 class="sub-title">Guarani AFV — Força de Vendas</h3>
+
+    <h4 class="mini-title">Adicionais</h4>
+    <div class="values-tags" style="margin-top: 10px;">
+      <span class="tag">Multilojas</span>
+      <span class="tag">Pesquisa de Mercado</span>
+      <span class="tag">Orçamento WEB</span>
+      <span class="tag">Proposta WEB</span>
+      <span class="tag">Agenda e Roteiro de Visita</span>
+      <span class="tag">Iara</span>
+      <span class="tag">Loja B2B Vendedor</span>
+    </div>
+
+    <!-- GUARANI B2B -->
+    <h3 class="sub-title">Guarani B2B — Vendas Online</h3>
+    <p style="font-size: 13px; color: var(--text-muted);">Produto principal sem adicionais vinculados.</p>
+
+    <!-- GUARANI BI -->
+    <h3 class="sub-title">Guarani BI — Inteligência de Negócio</h3>
+
+    <h4 class="mini-title">Adicionais</h4>
+    <div class="values-tags" style="margin-top: 10px;">
+      <span class="tag">Pacote Personalizado</span>
+    </div>
+
+    <!-- GUARANI CLOUD -->
+    <h3 class="sub-title">Guarani Cloud — Servidor Nuvem</h3>
+    <p style="font-size: 13px; color: var(--text-muted);">Infraestrutura em nuvem para os produtos Guarani Sistemas.</p>
+
+  </section>
+
+  <!-- DESCRITIVO DOS PRODUTOS -->
+  <section id="descritivo-produtos">
+    <div class="section-eyebrow">24 · Descritivo dos Produtos</div>
+    <h2 class="section-title">Descritivo dos Produtos</h2>
+    <p>Conheça em profundidade cada produto e módulo adicional do portfólio Guarani Sistemas.</p>
+
+    <!-- PRODUTOS PRINCIPAIS -->
+    <h3 class="sub-title">Produtos Principais</h3>
+    <div class="activity-list">
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="color: var(--green-light); min-width: 110px; font-weight: 700;">ERP</span>
+        <div><strong style="color: var(--text);">Guarani ERP</strong> — <em>Enterprise Resource Planning.</em> Plataforma para gestão empresarial que serve para automatizar processos manuais, armazenar dados e unificar a visualização de resultados.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="color: var(--green-light); min-width: 110px; font-weight: 700;">AFV</span>
+        <div><strong style="color: var(--text);">Guarani AFV</strong> — <em>Automação de Força de Vendas.</em> Software que gerencia as informações comerciais de equipes de vendas externas. Automatiza o processo de vendas, aumenta a produtividade dos vendedores e organiza a forma com que os pedidos chegam até a empresa.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="color: var(--green-light); min-width: 110px; font-weight: 700;">B2B</span>
+        <div><strong style="color: var(--text);">Guarani B2B</strong> — Solução de e-commerce B2B: lojistas comprando de indústrias, importadores ou distribuidores de maneira digital, podendo pagar com cartão de crédito, boleto antecipado, faturamento ou Pix.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="color: var(--green-light); min-width: 110px; font-weight: 700;">BI</span>
+        <div><strong style="color: var(--text);">Guarani BI</strong> — Plataforma com ferramentas de descoberta de dados, análises de autoatendimento, relatórios e dashboards. Promove integração entre colaboradores e dados através de indicadores de desempenho (KPIs). Solução em nuvem que atua como gestão dos agentes de venda.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="color: var(--blue); min-width: 110px; font-weight: 700;">CLOUD</span>
+        <div><strong style="color: var(--text);">Guarani Cloud</strong> — Infraestrutura em nuvem com escalonamento automático, alta disponibilidade, segurança, backup e acessibilidade. Fácil acesso de qualquer lugar em ambiente confiável e ágil.</div>
+      </div>
+    </div>
+
+    <!-- MÓDULOS ERP -->
+    <h3 class="sub-title">Módulos e Adicionais — ERP</h3>
+    <div class="activity-list">
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">PCP</span>
+        <div><strong style="color: var(--text);">Guarani PCP</strong> — <em>Planejamento e Controle de Produção.</em> Módulo adicional do ERP que auxilia o gerenciamento da produção de uma indústria: quando, quanto, onde e em que ordem produzir.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">WMS</span>
+        <div><strong style="color: var(--text);">Guarani WMS</strong> — <em>Warehouse Management System.</em> Módulo adicional do ERP que auxilia e simplifica as tarefas de movimentação de mercadorias, otimiza o fluxo de trabalho e organiza a equipe.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Contábil</span>
+        <div><strong style="color: var(--text);">Guarani Contábil</strong> — Módulo adicional do ERP que garante a efetividade da Gestão Contábil. Integra os valores dos movimentos de outros módulos para gerar balancetes, balanços e demonstrativos. Atende todas as obrigações legais e fiscais/tributárias.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Manifest.</span>
+        <div><strong style="color: var(--text);">Manifestação do Destinatário</strong> — Software que realiza a captação de XMLs de NF-e emitidas contra a empresa. Permite, dentro do ERP, interceptar documentos, dar ciência, negar ou aceitar, com integração a pedidos de compra e entradas de notas fiscais.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">MDF-e</span>
+        <div><strong style="color: var(--text);">Guarani MDF-e</strong> — Manifesto Eletrônico de Documentos Fiscais. Documento digital para vincular os documentos fiscais transportados na unidade de carga. Geração rápida e fácil dentro do ERP.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">CT-e</span>
+        <div><strong style="color: var(--text);">Guarani CT-e</strong> — Conhecimento de Transporte Eletrônico. Documento digital para registrar e documentar a prestação de serviços de transporte de cargas. Geração rápida e fácil dentro do ERP.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Telemarketing</span>
+        <div><strong style="color: var(--text);">Guarani Telemarketing</strong> — Canal que aproxima a empresa de seus clientes, promovendo venda interna e atendimento. Permite criar campanhas, agenda automática dos operadores, envio de orçamento web e controle da eficiência do setor.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Link Pgto</span>
+        <div><strong style="color: var(--text);">Link de Pagamento</strong> — Envio de link personalizado via WhatsApp ou e-mail para o cliente efetuar pagamento com cartão de crédito. Inclui painel de controle do status dos recebimentos e baixa financeira automática. Integrado com CIELO SUPER LINK e SAFRAPAY.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Import. XML</span>
+        <div><strong style="color: var(--text);">Importação XML — Mercado Livre Full</strong> — Integração dos XMLs de operação Full do Mercado Livre dentro do ERP, ajustando toda a escrituração fiscal de saída, ordens de venda, cadastro de cliente e contas a receber.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Boleto WA</span>
+        <div><strong style="color: var(--text);">Envio de Boleto via WhatsApp</strong> — Software que realiza o envio de boletos através do WhatsApp, facilitando o pagamento e reduzindo a inadimplência.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">CIAP</span>
+        <div><strong style="color: var(--text);">CIAP — Controle de Crédito do ICMS do Ativo Permanente</strong> — Solução para creditar valores de ICMS decorrentes das aquisições de mercadorias destinadas ao ativo imobilizado. Controla os bens e gerencia a depreciação mensal.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">CNPJ Adic.</span>
+        <div><strong style="color: var(--text);">CNPJ Adicional</strong> — Quando a empresa possui outros CNPJs no grupo econômico e deseja incluí-los no sistema.</div>
+      </div>
+    </div>
+
+    <!-- MÓDULOS AFV -->
+    <h3 class="sub-title">Módulos e Adicionais — AFV</h3>
+    <div class="activity-list">
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Pesquisa</span>
+        <div><strong style="color: var(--text);">Pesquisa de Mercado</strong> — Permite ao RCA coletar o estoque do cliente para saber o que deve ser reposto, usando o giro de mercadoria para sugerir a reposição.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Orç. WEB</span>
+        <div><strong style="color: var(--text);">Orçamento WEB</strong> — Permite ao RCA enviar um orçamento web para o cliente via WhatsApp, para que ele realize o pedido de forma digital e devolva ao RCA.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Agenda</span>
+        <div><strong style="color: var(--text);">Agenda e Roteiro de Visita</strong> — Permite ao RCA organizar suas visitas através de uma agenda estruturada.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Iara</span>
+        <div><strong style="color: var(--text);">Iara</strong> — Assistente virtual que auxilia o RCA a vender mais. Realiza sugestões de vendas considerando variáveis como produtos em lançamento, promoção e mais comprados na região.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Multilojas</span>
+        <div><strong style="color: var(--text);">Multilojas</strong> — Permite ao RCA realizar um pedido para redes de lojas, inserindo o mesmo produto para várias lojas ao mesmo tempo, gerando agilidade na digitação.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Loja B2B</span>
+        <div><strong style="color: var(--text);">Loja B2B Vendedor</strong> — Permite ao RCA gerar uma loja e-commerce própria com o cliente. O cliente realiza pedidos pelo link e obedece todas as políticas comerciais da empresa.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Proposta WEB</span>
+        <div><strong style="color: var(--text);">Proposta WEB</strong> — Permite negociações digitais entre Cliente, RCA e Supervisor. Se o cliente quer um desconto que o RCA não possui, ele submete o pedido ao supervisor digitalmente para aprovação ou negativa.</div>
+      </div>
+    </div>
+
+    <!-- INTEGRAÇÕES -->
+    <h3 class="sub-title">Integrações e Parceiros</h3>
+    <div class="activity-list">
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Concil</span>
+        <div><strong style="color: var(--text);">Concil</strong> — Plataforma de conciliação de cartões de crédito.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">RoutEasy</span>
+        <div><strong style="color: var(--text);">RoutEasy</strong> — Solução de roteirização, acompanhamento e captação de eventos de entregas. Painel para exportar e importar os pontos (entregas) roteirizados.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">PDV</span>
+        <div><strong style="color: var(--text);">PDV</strong> — Software de frente de caixa com autonomia de trabalhar offline, atendendo redes de lojas e franquias principalmente.</div>
+      </div>
+      <div class="activity-item" style="align-items: flex-start;">
+        <span class="num" style="min-width: 110px;">Hub</span>
+        <div><strong style="color: var(--text);">Plugg.to / Tray / Lexos / Jetcommerce</strong> — Hubs de integração com mais de 30 Marketplaces renomados como Mercado Livre, Leroy Merlin, B2W, Amazon e outros.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FUNCIONALIDADES DOS PRODUTOS -->
+  <section id="funcionalidades">
+    <div class="section-eyebrow">25 · Funcionalidades dos Produtos</div>
+    <h2 class="section-title">Funcionalidades dos Produtos Guarani</h2>
+    <p>Conheça em detalhe as funcionalidades de cada produto. Este material é essencial para conduzir apresentações com profundidade e responder objeções técnicas com segurança.</p>
+
+    <!-- GUARANI ERP -->
+    <h3 class="sub-title">Guarani ERP</h3>
+
+    <h4 class="mini-title">Fiscal / Contábil</h4>
+    <div class="checklist">
+      <div class="checklist-item">Geração automática de SPED Fiscal (ICMS e IPI)</div>
+      <div class="checklist-item">Geração automática de SPED de Contribuições (PIS/Cofins)</div>
+      <div class="checklist-item">Geração automática de escriturações obrigatórias</div>
+      <div class="checklist-item">Geração automática de ECD — Escritura Contábil Digital</div>
+      <div class="checklist-item">Geração automática de ECF — Escritura Contábil Financeira</div>
+      <div class="checklist-item">Conformidade fiscal: federal, estadual e municipal</div>
+      <div class="checklist-item">Previsão de créditos de ICMS (via eCredAc e Portaria CAT 17/99)</div>
+      <div class="checklist-item">Avisos em tempo real sobre mudanças em regras tributárias</div>
+      <div class="checklist-item">Previsão de recolhimentos em qualquer dia do mês</div>
+      <div class="checklist-item">Partidas dobradas: partilha fiscal e financeira automática</div>
+      <div class="checklist-item">Balancete, Razão, Balanço Patrimonial, Demonstrativo Gerencial e DRE — Contábil e SPEDs prontos</div>
+      <div class="checklist-item">Verificação de tributação e não conformidades: relatório diário</div>
+      <div class="checklist-item">Otimização da estratégia de investimento em cada centavo recebido dia a dia</div>
+    </div>
+
+    <h4 class="mini-title" style="margin-top: 28px;">Financeiro</h4>
+    <div class="checklist">
+      <div class="checklist-item">Demonstrativos Financeiros através do Fluxo de Caixa e Contas a Pagar</div>
+      <div class="checklist-item">Projeções e gráficos que preveem gargalos financeiros futuros</div>
+      <div class="checklist-item">Inclusão de pedidos de compra (parcelados) e previsão de vendas nas projeções</div>
+    </div>
+
+    <h4 class="mini-title" style="margin-top: 28px;">Comercial</h4>
+    <div class="checklist">
+      <div class="checklist-item">Comissionamento flexível por item</div>
+      <div class="checklist-item">Gestão de valores em diferentes negociações</div>
+      <div class="checklist-item">Comissionamento com base em descontos e acréscimos</div>
+      <div class="checklist-item">Comissionamento por margem de contribuição</div>
+      <div class="checklist-item">Comissionamento manual caso a caso</div>
+      <div class="checklist-item">Baseado em valor negociado ou maiores volumes</div>
+      <div class="checklist-item">Otimização da margem de contribuição por produto, loja ou representante</div>
+      <div class="checklist-item">Campanha de Vendas com diversos indicadores de desempenho</div>
+    </div>
+
+    <h4 class="mini-title" style="margin-top: 28px;">Compras</h4>
+    <div class="checklist">
+      <div class="checklist-item">Posições reais de estoque em tempo real</div>
+      <div class="checklist-item">Previsão de vendas integrada ao módulo de compras</div>
+      <div class="checklist-item">Histórico de compras para tomada de decisão</div>
+      <div class="checklist-item">Pontuação de fornecedores</div>
+    </div>
+
+    <!-- GUARANI WMS -->
+    <h3 class="sub-title">Guarani WMS — Warehouse Management System</h3>
+    <div class="checklist">
+      <div class="checklist-item">Separação, transferência e emissão de etiquetas</div>
+      <div class="checklist-item">Conferência de volumes no ato do carregamento</div>
+      <div class="checklist-item">Rastreabilidade de produtos em clientes internos e externos</div>
+      <div class="checklist-item">UEPS — Último a Entrar, Primeiro a Sair</div>
+      <div class="checklist-item">PEPS — Primeiro a Entrar, Primeiro a Sair</div>
+      <div class="checklist-item">PVPS — Primeiro a Vencer, Primeiro a Sair</div>
+      <div class="checklist-item">Redução de tempos e custos de armazenagem e distribuição em todo o processo</div>
+    </div>
+
+    <!-- GUARANI PCP -->
+    <h3 class="sub-title">Guarani PCP — Planejamento e Controle de Produção</h3>
+    <div class="checklist">
+      <div class="checklist-item">Planos Mestres de Produção com base em Estoque, Sazonalidade, Margem de Segurança, Lançamento de Produto, Promoção e Estouro de Vendas</div>
+      <div class="checklist-item">Planos Mestres de Produção baseados em históricos anteriores</div>
+      <div class="checklist-item">Administração automática de estoques de insumos e Compras</div>
+      <div class="checklist-item">Previsão em tempo real da produção dos próximos meses</div>
+      <div class="checklist-item">Controle total da produção em tempo real, focado na otimização dos recursos</div>
+      <div class="checklist-item">Totalmente flexível e adaptável à realidade de chão de fábrica</div>
+      <div class="checklist-item">Integração com softwares de apontamento de terceiros</div>
+      <div class="checklist-item">Pode se integrar facilmente a sistemas APS</div>
+    </div>
+
+    <!-- GUARANI BI -->
+    <h3 class="sub-title">Guarani BI — Business Intelligence</h3>
+    <div class="checklist">
+      <div class="checklist-item">Ferramentas de descoberta de dados e análises de autoatendimento</div>
+      <div class="checklist-item">Relatórios e dashboards com indicadores de desempenho (KPIs)</div>
+      <div class="checklist-item">Integração entre colaboradores e dados da operação</div>
+      <div class="checklist-item">Solução em nuvem com visualização de dados em formato de KPIs</div>
+      <div class="checklist-item">Gestão dos agentes de venda com dados atualizados em tempo real</div>
+      <div class="checklist-item">Transformando dados em impacto imediato para o negócio</div>
+    </div>
+
+    <!-- GUARANI AFV -->
+    <h3 class="sub-title">Guarani AFV — Força de Vendas</h3>
+
+    <h4 class="mini-title">Gestão de Campo</h4>
+    <div class="checklist">
+      <div class="checklist-item">Funciona on-line ou off-line</div>
+      <div class="checklist-item">Gerencia a rota de cada vendedor</div>
+      <div class="checklist-item">Acompanhamento em tempo real da equipe comercial</div>
+      <div class="checklist-item">Acompanha a venda do Mix Ideal de produtos por cliente</div>
+      <div class="checklist-item">Permite pesquisas dentro do ponto de venda</div>
+      <div class="checklist-item">Analisa giro, quantidade e preço no local e na região</div>
+      <div class="checklist-item">Fundamenta estratégias para maximizar valores em toda a cadeia, diferenciando cliente, bairro ou cidade</div>
+    </div>
+
+    <h4 class="mini-title" style="margin-top: 28px;">Catálogo Digital</h4>
+    <div class="checklist">
+      <div class="checklist-item">Fácil atualização de preços e mix de produtos sem custos de impressão</div>
+      <div class="checklist-item">Permite lançar e comercializar um produto ainda não produzido</div>
+    </div>
+
+  </section>
+
+  <!-- APRESENTAÇÕES E PROPOSTA -->
+  <section id="apresentacoes">
+    <div class="section-eyebrow">26 · Apresentações e Proposta</div>
+    <h2 class="section-title">Apresentações e Proposta</h2>
+    <p>Acesse os materiais de apresentação e proposta comercial de cada produto. Utilize estes documentos nas reuniões com clientes.</p>
+
+    <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 32px;">
+
+      <a href="https://drive.google.com/file/d/1TAXxxnzP_cFklsnB80s10iOPeYGmzSyc/view" target="_blank" style="text-decoration: none;">
+        <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--green-mid); border-radius: 8px; padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s;">
+          <div>
+            <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green-mid); margin-bottom: 6px;">Proposta Comercial</div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text);">Guarani ERP</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Sistema de Gestão Empresarial · Proposta 2026</div>
+          </div>
+          <div style="font-size: 22px; color: var(--green-mid);">↗</div>
+        </div>
+      </a>
+
+      <a href="https://drive.google.com/file/d/1fmeJ_FVXV2UBRnvIQbK64ag1gAkheXfs/view" target="_blank" style="text-decoration: none;">
+        <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--green-mid); border-radius: 8px; padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s;">
+          <div>
+            <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green-mid); margin-bottom: 6px;">Apresentação</div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text);">Guarani AFV</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Força de Vendas</div>
+          </div>
+          <div style="font-size: 22px; color: var(--green-mid);">↗</div>
+        </div>
+      </a>
+
+      <a href="https://drive.google.com/file/d/1nptzKWpl8WTUqQ9D7k-7akUSBbcd9yVY/view" target="_blank" style="text-decoration: none;">
+        <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--green-mid); border-radius: 8px; padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s;">
+          <div>
+            <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green-mid); margin-bottom: 6px;">Apresentação</div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text);">Guarani B2B</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Vendas Online — E-commerce B2B</div>
+          </div>
+          <div style="font-size: 22px; color: var(--green-mid);">↗</div>
+        </div>
+      </a>
+
+      <a href="https://drive.google.com/file/d/1Xt2qMjpHg3-vTI7EZuGJYbLyd9C0mFKC/view" target="_blank" style="text-decoration: none;">
+        <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--green-mid); border-radius: 8px; padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s;">
+          <div>
+            <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--green-mid); margin-bottom: 6px;">Apresentação</div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text);">Guarani BI</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Inteligência de Negócio</div>
+          </div>
+          <div style="font-size: 22px; color: var(--green-mid);">↗</div>
+        </div>
+      </a>
+
+      <a href="https://drive.google.com/file/d/19zKMRHCZ2sEZ_bD3RjlmwWhFSjG3aagw/view" target="_blank" style="text-decoration: none;">
+        <div style="background: var(--dark-3); border: 1px solid #1a2a1e; border-left: 3px solid var(--blue); border-radius: 8px; padding: 24px 28px; display: flex; align-items: center; justify-content: space-between; transition: border-color 0.2s;">
+          <div>
+            <div style="font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 6px;">Proposta Comercial</div>
+            <div style="font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text);">Guarani Cloud</div>
+            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Servidor Nuvem</div>
+          </div>
+          <div style="font-size: 22px; color: var(--blue);">↗</div>
+        </div>
+      </a>
+
     </div>
   </section>
 
