@@ -4,183 +4,263 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tabela de Preços 2026 — Guarani Sistemas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --green:        #046E39;
+      --green-light:  #00A253;
+      --green-muted:  #e8f4ed;
+      --navy:         #0f1f2e;
+      --text:         #1a2433;
+      --text-muted:   #6b7a8d;
+      --border:       #e2e8f0;
+      --border-light: #f1f5f9;
+      --bg:           #f7f9fb;
+      --white:        #ffffff;
+      --shadow:       0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:    0 4px 20px rgba(0,0,0,0.09);
+    }
+
     body {
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      font-size: 14px;
-      background: #f5f4f0;
-      color: #1a1a1a;
-      padding: 2rem 1.5rem;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      font-size: 13.5px;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .page { max-width: 1100px; margin: 0 auto; }
-
-    .header {
+    /* ── Top bar ── */
+    .topbar {
+      background: var(--navy);
+      border-bottom: 3px solid var(--green);
+      padding: 0 2.5rem;
+      height: 56px;
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-    .header h1 {
-      font-size: 20px;
-      font-weight: 600;
-      color: #1a1a1a;
+    .topbar-brand { display: flex; align-items: center; gap: 12px; }
+    .topbar-logo {
+      width: 30px; height: 30px;
+      background: var(--green);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700;
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      letter-spacing: -0.5px;
     }
-    .header .sub {
-      font-size: 12px;
-      color: #666;
-      margin-top: 3px;
-      line-height: 1.45;
-    }
-
-    .search-wrap {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #fff;
-      border: 1px solid #d8d6ce;
-      border-radius: 8px;
-      padding: 6px 12px;
-      min-width: 240px;
-    }
-    .search-wrap input {
-      border: none;
-      outline: none;
-      font-size: 13px;
-      background: transparent;
-      width: 100%;
-      color: #1a1a1a;
-    }
-    .search-icon { color: #999; font-size: 14px; }
-
-    .secao {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      margin-bottom: 1rem;
-      overflow: hidden;
-    }
-
-    summary {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 16px;
-      cursor: pointer;
-      background: #fafaf8;
-      border-bottom: 1px solid #e8e6df;
-      list-style: none;
-      user-select: none;
-    }
-    summary::-webkit-details-marker { display: none; }
-    summary:hover { background: #f0eeea; }
-
-    .badge {
-      font-size: 11px;
-      font-weight: 600;
-      padding: 3px 10px;
-      border-radius: 20px;
-      white-space: nowrap;
+    .topbar-name {
+      font-size: 13px; font-weight: 500;
+      color: rgba(255,255,255,0.88);
       letter-spacing: 0.02em;
     }
-    .count {
-      font-size: 11px;
-      color: #888;
+    .topbar-tag {
+      font-size: 10px;
+      color: rgba(255,255,255,0.38);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .topbar-search {
+      display: flex; align-items: center; gap: 9px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 8px;
+      padding: 7px 14px;
+      min-width: 260px;
+    }
+    .topbar-search input {
+      background: transparent; border: none; outline: none;
+      font-size: 13px; color: rgba(255,255,255,0.82); width: 100%;
+      font-family: 'Inter', sans-serif;
+    }
+    .topbar-search input::placeholder { color: rgba(255,255,255,0.3); }
+    .topbar-search svg { flex-shrink: 0; opacity: 0.38; }
+
+    /* ── Page layout ── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+    /* ── Page header ── */
+    .page-header {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 27px; font-weight: 600;
+      color: var(--navy);
+      letter-spacing: -0.3px;
+      margin-bottom: 10px;
+    }
+    .page-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .pill-green {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--green-muted); color: var(--green);
+      font-size: 11px; font-weight: 600;
+      padding: 3px 11px; border-radius: 20px;
+      letter-spacing: 0.02em;
+    }
+    .pill-green .dot { font-size: 8px; }
+    .meta-sep { color: var(--border); font-size: 13px; margin: 0 4px; }
+    .meta-item { font-size: 12px; color: var(--text-muted); }
+
+    /* ── Section cards ── */
+    .secao {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+    .secao:hover { box-shadow: var(--shadow-md); }
+
+    summary {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px;
+      cursor: pointer; list-style: none; user-select: none;
+      background: var(--white);
+      transition: background 0.15s;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary:hover { background: var(--border-light); }
+    details[open] > summary { border-bottom: 1px solid var(--border); }
+
+    .section-bar {
+      width: 3px; height: 28px;
+      border-radius: 2px; flex-shrink: 0;
+    }
+    .section-title {
       flex: 1;
+      font-size: 13px; font-weight: 600;
+      color: var(--navy); letter-spacing: 0.01em;
     }
-    .chevron {
-      font-size: 11px;
-      color: #aaa;
-      transition: transform 0.2s;
+    .section-count {
+      font-size: 11px; color: var(--text-muted);
+      background: var(--border-light);
+      border: 1px solid var(--border);
+      padding: 2px 10px; border-radius: 10px;
     }
+    .chevron { color: var(--text-muted); font-size: 10px; transition: transform 0.2s; }
     details[open] .chevron { transform: rotate(180deg); }
 
+    /* ── Table ── */
     .table-wrap { overflow-x: auto; }
 
     table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12.5px;
-      min-width: 980px;
+      width: 100%; border-collapse: collapse;
+      font-size: 12.5px; min-width: 980px;
     }
     thead th {
-      padding: 8px 12px;
-      font-size: 11px;
-      font-weight: 600;
-      color: #666;
+      padding: 9px 16px;
+      font-size: 10.5px; font-weight: 600;
+      color: var(--text-muted);
       text-align: left;
-      border-bottom: 1px solid #eee;
-      background: #fff;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
       white-space: nowrap;
-      position: sticky;
-      top: 0;
-      z-index: 1;
     }
     th.r, td.num { text-align: right; }
 
-    tbody tr { border-bottom: 1px solid #f0eeea; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #fafaf8; }
-
-    td {
-      padding: 9px 12px;
-      color: #1a1a1a;
-      vertical-align: top;
+    tbody tr {
+      border-bottom: 1px solid var(--border-light);
+      transition: background 0.1s;
     }
-    td.produto { font-weight: 500; min-width: 180px; }
-    td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
-    td.info { color: #666; font-size: 11.5px; max-width: 320px; line-height: 1.5; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f5f9ff; }
+
+    td { padding: 10px 16px; color: var(--text); vertical-align: middle; }
+    td.produto { font-weight: 500; min-width: 200px; color: var(--navy); }
+    td.num { font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 12px; }
+    td.info { color: var(--text-muted); font-size: 11.5px; max-width: 300px; line-height: 1.55; }
 
     tr.subtitulo td {
-      font-weight: 700;
-      color: #2f3f55;
-      background: #f7f9ff;
+      font-size: 10.5px; font-weight: 700;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      color: var(--green);
+      background: var(--green-muted);
+      padding: 7px 16px;
     }
 
-    .muted { color: #bbb; }
-    .proj { font-style: italic; color: #999; font-size: 11px; }
-
+    .muted { color: #c8d3de; }
+    .proj { font-style: italic; color: var(--text-muted); font-size: 11px; }
     tr.hidden { display: none; }
 
+    /* ── Error ── */
     .no-data {
-      background: #fff6f6;
-      border: 1px solid #ffd8d8;
-      color: #9a3535;
-      border-radius: 12px;
-      padding: 13px 14px;
-      margin-bottom: 16px;
+      background: #fff5f5; border: 1px solid #fecaca;
+      color: #9b2c2c; border-radius: 10px;
+      padding: 14px 18px; margin-bottom: 20px; font-size: 13px;
     }
 
+    /* ── Footer ── */
     footer {
-      margin-top: 2rem;
-      font-size: 11px;
-      color: #aaa;
-      text-align: right;
+      margin-top: 3rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 8px;
     }
+    .footer-brand {
+      font-size: 11px; font-weight: 600;
+      color: var(--text-muted); letter-spacing: 0.04em; text-transform: uppercase;
+    }
+    .footer-meta { font-size: 11px; color: #c8d3de; }
 
     @media (max-width: 768px) {
-      body { padding: 1.25rem 1rem; }
-      .search-wrap { width: 100%; min-width: 0; }
+      .topbar { padding: 0 1.25rem; }
+      .topbar-search { display: none; }
+      .page { padding: 1.5rem 1rem 3rem; }
+      .page-header h1 { font-size: 22px; }
     }
   </style>
 </head>
 <body>
-<div class="page">
-  <div class="header">
+
+<!-- Top bar -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">G</div>
     <div>
-      <h1>Tabela de Preços 2026</h1>
-      <div class="sub">
-        Guarani Sistemas do Brasil · {{ total_itens }} itens · {{ secoes|length }} categorias<br />
-        Origem: {{ planilha_relativa }}
-      </div>
+      <div class="topbar-name">Guarani Sistemas</div>
+      <div class="topbar-tag">Tabela Comercial</div>
     </div>
-    <div class="search-wrap" aria-label="Buscar produto">
-      <span class="search-icon">&#128269;</span>
-      <input type="text" id="busca" placeholder="Buscar produto..." oninput="filtrar()" {% if erro %}disabled{% endif %} />
+  </div>
+  <div class="topbar-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input
+      type="text" id="busca"
+      placeholder="Buscar produto..."
+      oninput="filtrar()"
+      {% if erro %}disabled{% endif %}
+    />
+  </div>
+</header>
+
+<!-- Page -->
+<div class="page">
+
+  <!-- Page header -->
+  <div class="page-header">
+    <h1>Tabela de Preços 2026</h1>
+    <div class="page-meta">
+      <span class="pill-green"><span class="dot">●</span> Vigência 2026</span>
+      <span class="meta-sep">·</span>
+      <span class="meta-item">{{ total_itens }} itens</span>
+      <span class="meta-sep">·</span>
+      <span class="meta-item">{{ secoes|length }} categorias</span>
+      <span class="meta-sep">·</span>
+      <span class="meta-item">{{ planilha_relativa }}</span>
     </div>
   </div>
 
@@ -188,15 +268,15 @@
     <div class="no-data">{{ erro }}</div>
   {% endif %}
 
+  <!-- Sections -->
   <div id="conteudo">
     {% for secao in secoes %}
       {% set paleta = secao.paleta %}
       <details class="secao" {% if loop.first %}open{% endif %}>
-        <summary style="--fill: {{ paleta.fill }}; --txt: {{ paleta.text }}; --bdr: {{ paleta.border }}">
-          <span class="badge" style="background: {{ paleta.fill }}; color: {{ paleta.text }}; border: 1px solid {{ paleta.border }}">
-            {{ secao.titulo }}
-          </span>
-          <span class="count">{{ secao.itens|length }} item{% if secao.itens|length != 1 %}s{% endif %}</span>
+        <summary>
+          <div class="section-bar" style="background: {{ paleta.border }};"></div>
+          <span class="section-title">{{ secao.titulo }}</span>
+          <span class="section-count">{{ secao.itens|length }} item{% if secao.itens|length != 1 %}s{% endif %}</span>
           <span class="chevron">▼</span>
         </summary>
         <div class="table-wrap">
@@ -235,14 +315,18 @@
     {% endfor %}
   </div>
 
-  <footer>Gerado automaticamente a partir da planilha · Flask</footer>
+  <!-- Footer -->
+  <footer>
+    <span class="footer-brand">Guarani Sistemas do Brasil</span>
+    <span class="footer-meta">Gerado automaticamente · Flask · {{ planilha_relativa }}</span>
+  </footer>
+
 </div>
 
 <script>
 function filtrar() {
   const input = document.getElementById("busca");
   if (!input || input.disabled) return;
-
   const q = input.value.toLowerCase().trim();
   document.querySelectorAll(".secao").forEach((sec) => {
     let visiveis = 0;
