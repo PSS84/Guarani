@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acompanhamento Vendedor — Instagram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.3.0/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; font-size: 14px; background: #f5f4f0; color: #1a1a18; padding: 32px; min-height: 100vh; }
+  .page { max-width: 960px; margin: 0 auto; }
+
+  /* header */
+  .header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .header-dot { font-size: 18px; color: #888780; }
+  .header-label { font-size: 12px; font-weight: 500; color: #73726c; letter-spacing: .07em; text-transform: uppercase; }
+
+  /* vendedor selector */
+  .selector-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: #fff; border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 12px; padding: 12px 16px; margin-bottom: 20px;
+  }
+  .selector-bar label { font-size: 12px; font-weight: 500; color: #73726c; white-space: nowrap; }
+  .selector-bar select {
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+    color: #1a1a18; border: 0.5px solid rgba(0,0,0,0.15); border-radius: 8px;
+    padding: 6px 12px; background: #fafaf8; outline: none; cursor: pointer; flex: 1; max-width: 320px;
+  }
+  .selector-bar select:focus { border-color: #185FA5; }
+  .selector-info { font-size: 11px; color: #b4b2a9; margin-left: auto; }
+
+  /* cards base */
+  .card { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 12px; padding: 16px 20px; }
+  .card-title { font-size: 13px; font-weight: 500; color: #1a1a18; margin-bottom: 3px; }
+  .card-sub   { font-size: 11px; color: #b4b2a9; margin-bottom: 14px; }
+  .section-gap { margin-bottom: 16px; }
+
+  /* kpi grid */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .kpi-card { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 12px; padding: 14px 16px; }
+  .kpi-label { font-size: 11px; color: #73726c; margin-bottom: 6px; line-height: 1.4; }
+  .kpi-value { font-size: 28px; font-weight: 500; color: #1a1a18; line-height: 1; }
+  .kpi-value.blue  { color: #185FA5; }
+  .kpi-value.red   { color: #A32D2D; }
+  .kpi-value.amber { color: #854F0B; }
+  .kpi-value.green { color: #3B6D11; }
+  .kpi-value.muted { color: #888780; }
+  .kpi-sub { font-size: 10px; color: #b4b2a9; margin-top: 5px; }
+
+  /* duas colunas */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* ranking */
+  .ranking-table { display: flex; flex-direction: column; gap: 6px; }
+  .rank-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; background: #fafaf8; border: 0.5px solid #eeede7; }
+  .rank-row:hover { background: #f2f1eb; }
+  .rank-num { font-size: 11px; font-weight: 600; color: #b4b2a9; min-width: 18px; text-align: center; flex-shrink: 0; }
+  .rank-num.top { color: #888780; }
+  .rank-label { font-size: 12px; color: #1a1a18; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .rank-bar-wrap { width: 90px; height: 6px; background: #e8e7e0; border-radius: 99px; flex-shrink: 0; overflow: hidden; }
+  .rank-bar { height: 100%; border-radius: 99px; }
+  .rank-count { font-size: 13px; font-weight: 600; color: #1a1a18; min-width: 22px; text-align: right; flex-shrink: 0; }
+  .rank-pct { font-size: 11px; color: #888780; min-width: 34px; text-align: right; flex-shrink: 0; }
+
+  /* eficiência comercial */
+  .efic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .efic-card { background: #fafaf8; border: 0.5px solid #eeede7; border-radius: 10px; padding: 14px 16px; text-align: center; }
+  .efic-icon { font-size: 20px; margin-bottom: 8px; }
+  .efic-value { font-size: 26px; font-weight: 500; color: #1a1a18; line-height: 1; margin-bottom: 4px; }
+  .efic-label { font-size: 11px; color: #73726c; line-height: 1.4; }
+  .efic-sub   { font-size: 10px; color: #b4b2a9; margin-top: 4px; }
+
+  /* pipeline de etapas */
+  .pipeline { display: flex; align-items: stretch; overflow-x: auto; border: 0.5px solid #eeede7; border-radius: 8px; }
+  .pipeline-stage {
+    flex: 1; min-width: 110px;
+    padding: 14px 12px;
+    border-right: 0.5px solid #eeede7;
+    position: relative;
+    transition: background .15s;
+  }
+  .pipeline-stage:last-child { border-right: none; }
+  .pipeline-stage:hover { background: #fafaf8; }
+  .pipeline-stage.active { background: #fafaf8; }
+  .pipeline-stage-pct {
+    font-size: 9px; font-weight: 600; color: #b4b2a9;
+    text-transform: uppercase; letter-spacing: .06em;
+    margin-bottom: 6px;
+  }
+  .pipeline-stage-name {
+    font-size: 11px; font-weight: 600; color: #73726c;
+    text-transform: uppercase; letter-spacing: .04em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 10px;
+  }
+  .pipeline-stage.active .pipeline-stage-name { color: #1a1a18; }
+  .pipeline-count { font-size: 22px; font-weight: 500; color: #b4b2a9; line-height: 1; margin-bottom: 3px; }
+  .pipeline-stage.active .pipeline-count { color: #1a1a18; }
+  .pipeline-neg { font-size: 11px; color: #b4b2a9; }
+  .pipeline-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-bottom: 8px;
+  }
+  .pipeline-connector {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-width: 42px; flex-shrink: 0;
+    padding: 0 2px; gap: 4px;
+  }
+  .pipeline-conv-pct {
+    font-size: 10px; font-weight: 600; color: #b4b2a9;
+    white-space: nowrap;
+  }
+  .pipeline-conv-pct.good { color: #3B6D11; }
+  .pipeline-conv-pct.med  { color: #854F0B; }
+  .pipeline-conv-pct.bad  { color: #A32D2D; }
+  .pipeline-conv-arrow { font-size: 14px; color: #e8e7e0; line-height: 1; }
+  .pipeline-conv-arrow.good { color: #3B6D11; }
+  .pipeline-conv-arrow.med  { color: #EF9F27; }
+  .pipeline-conv-arrow.bad  { color: #A32D2D; }
+
+  /* legenda */
+  .pipeline-legenda {
+    display: flex; flex-wrap: wrap; gap: 8px 16px;
+    margin-top: 14px; padding-top: 12px;
+    border-top: 0.5px solid rgba(0,0,0,0.07);
+  }
+  .pipeline-legenda-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #73726c; }
+  .pipeline-legenda-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  /* evolução semanal */
+  .semanas-section { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+  .ev-title { font-size: 14px; font-weight: 600; color: #1a1a18; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 16px; }
+  .ev-kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 14px; }
+  .ev-kpi-card { background: #fafaf8; border: 0.5px solid #eeede7; border-radius: 10px; padding: 12px 14px; }
+  .ev-kpi-icon-label { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: #73726c; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+  .ev-kpi-value { font-size: 22px; font-weight: 500; line-height: 1; margin-bottom: 6px; }
+  .ev-kpi-vs { font-size: 10.5px; color: #888780; }
+  .ev-kpi-vs .ev-up   { color: #3B6D11; font-weight: 600; }
+  .ev-kpi-vs .ev-down { color: #A32D2D; font-weight: 600; }
+  .ev-filter { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; padding: 8px 12px; background: #fafaf8; border: 0.5px solid #eeede7; border-radius: 8px; }
+  .ev-filter-label { font-size: 11px; color: #73726c; font-weight: 500; }
+  .ev-filter input[type="date"] { font-family: 'Inter', sans-serif; font-size: 11px; color: #1a1a18; border: 0.5px solid rgba(0,0,0,0.15); border-radius: 6px; padding: 5px 8px; background: #fff; outline: none; cursor: pointer; }
+  .ev-filter input[type="date"]:focus { border-color: #185FA5; }
+  .ev-filter-reset { font-size: 11px; color: #73726c; background: none; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 6px; padding: 5px 10px; cursor: pointer; font-family: 'Inter', sans-serif; margin-left: auto; }
+  .ev-filter-reset:hover { background: #f1efe8; }
+  .ev-filter-quick { font-size: 11px; font-weight: 500; color: #73726c; background: none; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 6px; padding: 5px 10px; cursor: pointer; font-family: 'Inter', sans-serif; }
+  .ev-filter-quick:hover { background: #f1efe8; }
+  .ev-filter-quick.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+  .ev-charts-grid { display: grid; grid-template-columns: 1fr 280px; gap: 12px; margin-bottom: 18px; }
+  .ev-chart-card { background: #fafaf8; border: 0.5px solid #eeede7; border-radius: 10px; padding: 14px 16px; }
+  .ev-section-label { font-size: 11px; font-weight: 600; color: #444441; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+  .ev-source { font-size: 10px; color: #b4b2a9; margin-top: 6px; }
+  .semanas-table { width: 100%; border-collapse: collapse; }
+  .semanas-table th { font-size: 11px; font-weight: 500; color: #73726c; text-align: right; padding: 0 10px 10px; letter-spacing: .04em; white-space: nowrap; }
+  .semanas-table th:first-child { text-align: left; padding-left: 0; }
+  .semanas-table td { font-size: 13px; color: #1a1a18; text-align: right; padding: 7px 10px; border-top: 0.5px solid rgba(0,0,0,0.06); white-space: nowrap; }
+  .semanas-table td:first-child { text-align: left; padding-left: 0; font-size: 11.5px; color: #73726c; font-weight: 500; }
+  .semanas-table tr:hover td { background: #fafaf8; }
+  .semanas-table td.cell-novos    { background: rgba(55,138,221,0.09); color: #185FA5; font-weight: 600; }
+  .semanas-table td.cell-apres    { background: rgba(29,158,117,0.09); color: #155c41; font-weight: 600; }
+  .semanas-table td.cell-prop     { background: rgba(239,159,39,0.09); color: #854F0B; font-weight: 600; }
+  .semanas-table td.cell-contrato { background: rgba(59,109,17,0.09);  color: #3B6D11; font-weight: 600; }
+  .semanas-table td.cell-zero     { color: #c8c6be; }
+  .fit-badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 20px; }
+  .fit-badge.bom  { background: #e6f0db; color: #3B6D11; }
+  .fit-badge.med  { background: #fef3e2; color: #854F0B; }
+  .fit-badge.ruim { background: #fde8e8; color: #A32D2D; }
+  .chart-toggles { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .chart-toggle-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-family: 'Inter', sans-serif; font-weight: 500; color: #fff; padding: 3px 10px 3px 8px; border-radius: 20px; border: none; cursor: pointer; transition: opacity .2s; }
+  .chart-toggle-btn.off { opacity: 0.3; text-decoration: line-through; }
+  .chart-toggle-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.6); }
+  .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  .insight-item { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; background: #fafaf8; border: 0.5px solid #eeede7; border-radius: 10px; }
+  .insight-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+  .insight-icon.blue   { background: rgba(55,138,221,0.12);  color: #185FA5; }
+  .insight-icon.green  { background: rgba(29,158,117,0.12);  color: #155c41; }
+  .insight-icon.amber  { background: rgba(239,159,39,0.12);  color: #854F0B; }
+  .insight-icon.dgreen { background: rgba(59,109,17,0.12);   color: #3B6D11; }
+  .insight-icon.red    { background: rgba(163,45,45,0.12);   color: #A32D2D; }
+  .insight-title { font-size: 12.5px; font-weight: 600; color: #1a1a18; margin-bottom: 3px; }
+  .insight-body  { font-size: 11.5px; color: #5f5e5a; line-height: 1.5; }
+
+  /* propostas ativas */
+  .prop-table { width: 100%; border-collapse: collapse; }
+  .prop-table th { font-size: 10px; font-weight: 500; color: #b4b2a9; text-align: left; padding: 0 10px 10px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+  .prop-table td { font-size: 12.5px; color: #1a1a18; padding: 8px 10px; border-top: 0.5px solid rgba(0,0,0,0.06); vertical-align: middle; }
+  .prop-table tr:hover td { background: #fafaf8; }
+  .dias-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .dias-badge.ok     { background: rgba(29,158,117,0.1);  color: #155c41; }
+  .dias-badge.alerta { background: rgba(239,159,39,0.1);  color: #854F0B; }
+  .dias-badge.critico{ background: rgba(163,45,45,0.1);   color: #A32D2D; }
+  .feedback-input { font-family: 'Inter', sans-serif; font-size: 12px; color: #1a1a18; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 6px; padding: 5px 9px; background: #fafaf8; outline: none; width: 100%; min-width: 160px; resize: none; }
+  .feedback-input:focus { border-color: #185FA5; background: #fff; }
+  .feedback-saved { border-color: #1D9E75 !important; }
+
+  /* perfis */
+  .perfil-filtros { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .perfil-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; padding: 5px 14px; border-radius: 20px; border: 0.5px solid rgba(0,0,0,0.15); background: #fafaf8; color: #73726c; cursor: pointer; transition: all .15s; }
+  .perfil-btn:hover { background: #f1efe8; }
+  .perfil-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+  .perfil-grid { display: flex; flex-direction: column; gap: 10px; }
+  .perfil-row { display: grid; grid-template-columns: 160px 1fr auto auto auto; align-items: center; gap: 12px; padding: 10px 14px; background: #fafaf8; border: 0.5px solid #eeede7; border-radius: 10px; }
+  .perfil-row:hover { background: #f2f1eb; }
+  .perfil-tag { font-size: 12px; font-weight: 600; color: #1a1a18; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .perfil-bar-wrap { height: 8px; background: #e8e7e0; border-radius: 99px; overflow: hidden; }
+  .perfil-bar { height: 100%; border-radius: 99px; transition: width .3s; }
+  .perfil-stat { text-align: right; white-space: nowrap; }
+  .perfil-stat-n { font-size: 15px; font-weight: 600; color: #1a1a18; }
+  .perfil-stat-pct { font-size: 10px; color: #b4b2a9; }
+
+  /* grid de leads do perfil */
+  .leads-grid { margin-top: 14px; border-top: 0.5px solid rgba(0,0,0,0.07); padding-top: 14px; display: none; }
+  .leads-grid.visible { display: block; }
+  .leads-grid-title { font-size: 11px; font-weight: 600; color: #73726c; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+  .leads-table { width: 100%; border-collapse: collapse; }
+  .leads-table th { font-size: 10px; font-weight: 500; color: #b4b2a9; text-align: left; padding: 0 10px 8px; letter-spacing: .04em; text-transform: uppercase; }
+  .leads-table th:last-child { text-align: right; }
+  .leads-table td { font-size: 12px; color: #1a1a18; padding: 7px 10px; border-top: 0.5px solid rgba(0,0,0,0.05); }
+  .leads-table td:last-child { text-align: right; font-weight: 600; color: #73726c; white-space: nowrap; }
+  .leads-table tr:hover td { background: #fafaf8; }
+  .leads-status-badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+  .leads-status-badge.ativo   { background: rgba(55,138,221,0.1);  color: #185FA5; }
+  .leads-status-badge.perdido { background: rgba(163,45,45,0.1);   color: #A32D2D; }
+  .leads-status-badge.ganho   { background: rgba(59,109,17,0.1);   color: #3B6D11; }
+
+  /* estado */
+  .estado { text-align: center; padding: 60px 20px; color: #888780; font-size: 13px; }
+  .estado-vazio { text-align: center; padding: 30px 0; color: #b4b2a9; font-size: 12px; }
+
+  /* motivos de perda — referência */
+  .motivos-ref { margin-top: 32px; padding-top: 24px; border-top: 0.5px solid rgba(0,0,0,0.08); }
+  .motivos-ref-title { font-size: 16px; font-weight: 600; color: #1a1a18; margin-bottom: 4px; }
+  .motivos-ref-sub { font-size: 12px; color: #73726c; margin-bottom: 20px; }
+  .motivos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .motivo-card { background: #fff; border: 0.5px solid rgba(0,0,0,0.10); border-radius: 12px; padding: 16px 18px; }
+  .motivo-card:hover { border-color: rgba(163,45,45,0.25); background: #fdfcfc; }
+  .motivo-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .motivo-icon { width: 36px; height: 36px; border-radius: 50%; background: rgba(163,45,45,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #A32D2D; font-size: 16px; }
+  .motivo-name { font-size: 12.5px; font-weight: 600; color: #1a1a18; line-height: 1.4; flex: 1; }
+  .motivo-badge { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 20px; background: rgba(29,158,117,0.12); color: #155c41; letter-spacing: .04em; text-transform: uppercase; margin-left: 4px; vertical-align: middle; white-space: nowrap; }
+  .motivo-desc { font-size: 11.5px; color: #5f5e5a; line-height: 1.55; margin-bottom: 10px; }
+  .motivo-quando { font-size: 11px; font-weight: 600; color: #73726c; margin-bottom: 5px; }
+  .motivo-quando-item { font-size: 11px; color: #73726c; line-height: 1.5; padding-left: 10px; position: relative; }
+  .motivo-quando-item::before { content: '•'; position: absolute; left: 0; color: #A32D2D; }
+
+  @media print {
+    body { background: #fff; padding: 16px; }
+    .card, .semanas-section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <span class="header-dot" aria-hidden="true">◈</span>
+    <span class="header-label">CRM · Instagram · Acompanhamento por Vendedor</span>
+    <span style="margin-left:auto; background:#1a1a18; color:#fff; font-size:10px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.05em;">V1</span>
+  </div>
+
+  <!-- Seletor de vendedor -->
+  <div class="selector-bar">
+    <label for="vendedorSelect"><i class="ti ti-user" style="margin-right:4px;"></i> Vendedor:</label>
+    <select id="vendedorSelect">
+      <option value="">— selecione o vendedor —</option>
+    </select>
+    <span class="selector-info" id="selectorInfo">Carregando vendedores…</span>
+  </div>
+
+  <div id="conteudo">
+    <div class="estado">Selecione um vendedor para visualizar os dados.</div>
+  </div>
+
+</div>
+
+<script>
+// ── Utilitários ─────────────────────────────────────────────────────────────
+function dias(n) {
+  if (n === null || n === undefined) return '—';
+  return `${n}d`;
+}
+
+function buildRanking(containerId, data, total, barColor) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!data.length) {
+    el.innerHTML = '<div class="estado-vazio">Sem dados de perda.</div>';
+    return;
+  }
+  const maxVal = data[0].n;
+  data.forEach((d, i) => {
+    const pct  = Math.round(d.n / total * 100);
+    const barW = Math.round(d.n / maxVal * 100);
+    const row  = document.createElement('div');
+    row.className = 'rank-row';
+    row.title = d.label;
+    row.innerHTML = `
+      <span class="rank-num ${i < 3 ? 'top' : ''}">${i + 1}</span>
+      <span class="rank-label">${d.label}</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${barW}%;background:${barColor};"></div></div>
+      <span class="rank-count">${d.n}</span>
+      <span class="rank-pct">${pct}%</span>`;
+    el.appendChild(row);
+  });
+}
+
+// ── Propostas Ativas ────────────────────────────────────────────────────────
+const FEEDBACK_KEY = id => `feedback_prop_${id}`;
+
+function diasBadge(dias) {
+  if (dias === null || dias === undefined) return '—';
+  const cls = dias <= 7 ? 'ok' : dias <= 15 ? 'alerta' : 'critico';
+  return `<span class="dias-badge ${cls}">${dias}d</span>`;
+}
+
+function renderPropostasAtivas(lista) {
+  const el = document.getElementById('propostasAtivasBody');
+  if (!el) return;
+  if (!lista || !lista.length) {
+    el.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#b4b2a9;padding:20px;">Nenhuma proposta ativa no momento.</td></tr>';
+    return;
+  }
+  el.innerHTML = lista.map(p => {
+    const feedback = localStorage.getItem(FEEDBACK_KEY(p.id)) || '';
+    const ultCls   = !p.ult_contato ? 'color:#b4b2a9;' : '';
+    return `<tr>
+      <td style="font-weight:500;">${p.titulo}</td>
+      <td style="white-space:nowrap;color:#73726c;">${p.data_proposta}</td>
+      <td>${diasBadge(p.dias_proposta)}</td>
+      <td style="white-space:nowrap;${ultCls}">${p.ult_contato || '—'}</td>
+      <td><textarea class="feedback-input${feedback ? ' feedback-saved' : ''}" rows="1"
+        data-id="${p.id}" placeholder="Anotação do vendedor…">${feedback}</textarea></td>
+    </tr>`;
+  }).join('');
+
+  el.querySelectorAll('.feedback-input').forEach(ta => {
+    ta.addEventListener('input', () => {
+      localStorage.setItem(FEEDBACK_KEY(ta.dataset.id), ta.value);
+      ta.classList.toggle('feedback-saved', ta.value.length > 0);
+    });
+  });
+}
+
+// ── Evolução Semanal ─────────────────────────────────────────────────────────
+let _allSemanas = [], _chartLine = null, _chartBar = null;
+
+function fitBadge(novos, apres, prop) {
+  if (novos === 0) return '<span class="fit-badge ruim">fit baixo</span>';
+  const score = (apres + prop * 2) / (novos * 3);
+  if (score >= 0.25) return '<span class="fit-badge bom">bom fit</span>';
+  if (score >= 0.08) return '<span class="fit-badge med">fit médio</span>';
+  return '<span class="fit-badge ruim">fit baixo</span>';
+}
+
+function evDelta(atual, prev) {
+  if (prev === null) return '';
+  const d = atual - prev;
+  if (d === 0) return '<span style="color:#b4b2a9;"> — 0 (0%)</span>';
+  const pct = prev > 0 ? Math.round(d / prev * 100) : 100;
+  const cls = d > 0 ? 'ev-up' : 'ev-down';
+  return ` <span class="${cls}">${d > 0 ? '↑' : '↓'}${Math.abs(d)} (${pct > 0 ? '+' : ''}${pct}%)</span>`;
+}
+
+function renderEvKpis(semanas) {
+  const el = document.getElementById('evKpis');
+  if (!el) return;
+  const last = semanas[semanas.length - 1] || null;
+  const prev = semanas.length > 1 ? semanas[semanas.length - 2] : null;
+  const nSem = semanas.length;
+  const periodo = nSem > 0 ? `${semanas[0].label.split('–')[0]} – ${semanas[nSem-1].label.split('–')[1] || ''}` : '—';
+  function card(icon, color, label, key) {
+    const val = last ? last[key] : 0;
+    const pv  = prev ? prev[key] : null;
+    return `<div class="ev-kpi-card">
+      <p class="ev-kpi-icon-label"><i class="ti ${icon}" style="color:${color}"></i> ${label}</p>
+      <p class="ev-kpi-value" style="color:${color}">${val}</p>
+      <p class="ev-kpi-vs">vs semana anterior${evDelta(val, pv)}</p>
+    </div>`;
+  }
+  el.innerHTML =
+    card('ti-user-plus',    '#378ADD', 'Leads Novos',   'novos') +
+    card('ti-presentation', '#1D9E75', 'Apresentações', 'apresentacoes') +
+    card('ti-file-text',    '#EF9F27', 'Propostas',     'propostas') +
+    card('ti-check',        '#3B6D11', 'Contratos',     'ganhos') +
+    `<div class="ev-kpi-card">
+       <p class="ev-kpi-icon-label"><i class="ti ti-calendar" style="color:#73726c"></i> Período</p>
+       <p class="ev-kpi-value" style="font-size:13px;color:#1a1a18;margin-top:4px;">${periodo}</p>
+       <p class="ev-kpi-vs">${nSem} semana${nSem !== 1 ? 's' : ''}</p>
+     </div>`;
+}
+
+function renderEvTable(semanas) {
+  const tbody = document.getElementById('evTableBody');
+  if (!tbody) return;
+  const inv = [...semanas].reverse();
+  tbody.innerHTML = inv.map((s, i) => {
+    const badge = fitBadge(s.novos, s.apresentacoes, s.propostas);
+    function cell(val, cls) { return `<td class="${val === 0 ? 'cell-zero' : cls}">${val}</td>`; }
+    return `<tr><td>${s.label}</td>${cell(s.novos,'cell-novos')}${cell(s.apresentacoes,'cell-apres')}${cell(s.propostas,'cell-prop')}${cell(s.ganhos,'cell-contrato')}<td>${badge}</td></tr>`;
+  }).join('');
+}
+
+function renderEvInsights(semanas) {
+  const el = document.getElementById('evInsights');
+  if (!el || !semanas.length) return;
+  const totNovos = semanas.reduce((a,s) => a+s.novos, 0);
+  const totApres = semanas.reduce((a,s) => a+s.apresentacoes, 0);
+  const totProp  = semanas.reduce((a,s) => a+s.propostas, 0);
+  const totGanho = semanas.reduce((a,s) => a+s.ganhos, 0);
+  const nSem     = semanas.length;
+  const pico     = semanas.reduce((mx,s) => s.novos > mx.novos ? s : mx, semanas[0]);
+  const convPct  = totNovos > 0 ? (totApres/totNovos*100).toFixed(1) : '0';
+  const avgProp  = (totProp/nSem).toFixed(1);
+  function insight(iconCls, icon, titleColor, title, body) {
+    return `<div class="insight-item"><div class="insight-icon ${iconCls}"><i class="ti ${icon}"></i></div><div><p class="insight-title" style="color:${titleColor}">${title}</p><p class="insight-body">${body}</p></div></div>`;
+  }
+  el.innerHTML =
+    insight('blue',  'ti-chart-bar',    '#185FA5', 'Pico de leads novos',  `Semana ${pico.label} — ${pico.novos} leads.`) +
+    insight('green', 'ti-trending-up',  '#155c41', 'Conversão média',      `Taxa leads → apresentações: ${convPct}%.`) +
+    insight('amber', 'ti-file-invoice', '#854F0B', 'Propostas',            `Média de ${avgProp} proposta${avgProp!=='1.0'?'s':''}/semana · ${totProp} no total.`) +
+    insight(totGanho>0?'dgreen':'red', totGanho>0?'ti-check-circle':'ti-circle-x', totGanho>0?'#3B6D11':'#A32D2D',
+      totGanho>0?`${totGanho} contrato${totGanho>1?'s':''} fechado${totGanho>1?'s':''}`:'Contratos ainda baixos',
+      totGanho>0?`Canal converteu ${totGanho} contrato${totGanho>1?'s':''} no período.`:'Nenhum contrato fechado no período.');
+}
+
+function buildEvCharts(semanas) {
+  if (_chartLine) { _chartLine.destroy(); _chartLine = null; }
+  if (_chartBar)  { _chartBar.destroy();  _chartBar  = null; }
+  if (!semanas.length) return;
+  const FONT = { family: 'Inter', size: 10 };
+  const TT   = { backgroundColor: '#1a1a18', titleFont: {family:'Inter',size:11}, bodyFont: {family:'Inter',size:12}, padding:10, cornerRadius:8 };
+  const ctxLine = document.getElementById('chartSemanasLine');
+  if (ctxLine) {
+    _chartLine = new Chart(ctxLine, {
+      type: 'line',
+      data: { labels: semanas.map(s=>s.label), datasets: [
+        {label:'Leads novos',   data:semanas.map(s=>s.novos),         borderColor:'#378ADD',borderWidth:2,pointRadius:3,tension:0.3,fill:false},
+        {label:'Apresentações', data:semanas.map(s=>s.apresentacoes), borderColor:'#1D9E75',borderWidth:2,pointRadius:3,tension:0.3,fill:false},
+        {label:'Propostas',     data:semanas.map(s=>s.propostas),     borderColor:'#EF9F27',borderWidth:2,pointRadius:3,tension:0.3,fill:false},
+        {label:'Contratos',     data:semanas.map(s=>s.ganhos),        borderColor:'#3B6D11',borderWidth:2,pointRadius:3,tension:0.3,fill:false},
+      ]},
+      options: { responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+        plugins: { legend:{position:'bottom',labels:{font:FONT,color:'#73726c',boxWidth:12,boxHeight:2,padding:14}}, tooltip:TT },
+        scales: { x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:FONT,color:'#b4b2a9',maxRotation:45}}, y:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:FONT,color:'#b4b2a9',stepSize:1}} }
+      }
+    });
+    const tEl = document.getElementById('chartLineToggles');
+    if (tEl) {
+      const series = [{label:'Leads novos',color:'#378ADD'},{label:'Apresentações',color:'#1D9E75'},{label:'Propostas',color:'#EF9F27'},{label:'Contratos',color:'#3B6D11'}];
+      tEl.innerHTML = series.map((s,i)=>`<button class="chart-toggle-btn" data-idx="${i}" style="background:${s.color}"><span class="chart-toggle-dot"></span>${s.label}</button>`).join('');
+      tEl.querySelectorAll('.chart-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const meta = _chartLine.getDatasetMeta(+btn.dataset.idx);
+          meta.hidden = !meta.hidden; btn.classList.toggle('off'); _chartLine.update();
+        });
+      });
+    }
+  }
+  const ctxBar = document.getElementById('chartSemanasBar');
+  if (ctxBar) {
+    const n = semanas.length;
+    const avg = key => +(semanas.reduce((a,s)=>a+s[key],0)/n).toFixed(1);
+    document.getElementById('evAvgLabel').textContent = `Média por Semana (${n} semanas)`;
+    _chartBar = new Chart(ctxBar, {
+      type:'bar',
+      data:{labels:['Leads novos','Apresentações','Propostas','Contratos'],datasets:[{
+        data:[avg('novos'),avg('apresentacoes'),avg('propostas'),avg('ganhos')],
+        backgroundColor:['rgba(55,138,221,0.75)','rgba(29,158,117,0.75)','rgba(239,159,39,0.75)','rgba(59,109,17,0.75)'],
+        borderRadius:4,borderSkipped:false
+      }]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>` ${ctx.raw} por semana`}}},
+        scales:{x:{beginAtZero:true,grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:FONT,color:'#b4b2a9'}},y:{grid:{display:false},ticks:{font:{family:'Inter',size:11},color:'#73726c'}}}
+      }
+    });
+  }
+}
+
+function renderSemanas(semanas) {
+  if (!semanas || !semanas.length) return '<div class="card section-gap"><p class="card-title">Evolução Semanal</p><div class="estado-vazio">Sem dados semanais suficientes.</div></div>';
+  _allSemanas = semanas;
+  const min = semanas[0].inicio, max = semanas[semanas.length-1].inicio;
+  return `
+    <div class="semanas-section section-gap">
+      <p class="ev-title">Evolução Semanal – Funil de Vendas</p>
+      <div class="ev-kpi-grid" id="evKpis"></div>
+      <div class="ev-filter">
+        <span class="ev-filter-label">Período:</span>
+        <input type="date" id="filtroInicio" min="${min}" max="${max}" value="${min}">
+        <span class="ev-filter-label">até</span>
+        <input type="date" id="filtroFim" min="${min}" max="${max}" value="${max}">
+        <button class="ev-filter-quick" id="filtro7d">7 dias</button>
+        <button class="ev-filter-quick" id="filtro30d">30 dias</button>
+        <button class="ev-filter-reset" id="filtroReset">Limpar filtro</button>
+      </div>
+      <div class="ev-charts-grid">
+        <div class="ev-chart-card">
+          <p class="ev-section-label">Evolução Semanal</p>
+          <div class="chart-toggles" id="chartLineToggles"></div>
+          <div style="position:relative;height:186px;"><canvas id="chartSemanasLine"></canvas></div>
+          <p class="ev-source">Fonte: Dados internos do CRM</p>
+        </div>
+        <div class="ev-chart-card">
+          <p class="ev-section-label" id="evAvgLabel">Média por Semana</p>
+          <div style="position:relative;height:200px;"><canvas id="chartSemanasBar"></canvas></div>
+          <p class="ev-source">Fonte: Dados internos do CRM</p>
+        </div>
+      </div>
+      <p class="ev-section-label">Desempenho Semanal Detalhado</p>
+      <div style="max-height:300px;overflow-y:auto;">
+        <table class="semanas-table">
+          <thead><tr><th style="text-align:left;padding-left:0;">Semana</th><th>Leads novos</th><th>Apresentações</th><th>Propostas</th><th>Contratos</th><th>Performance</th></tr></thead>
+          <tbody id="evTableBody"></tbody>
+        </table>
+      </div>
+      <p class="ev-source" style="margin-top:6px;">Fonte: Dados internos do CRM</p>
+      <p class="ev-section-label" style="margin-top:20px;">Insights do Período</p>
+      <div class="insights-grid" id="evInsights"></div>
+    </div>`;
+}
+
+function setupSemanas(semanas) {
+  function filtrados() {
+    const ini = document.getElementById('filtroInicio')?.value || '';
+    const fim = document.getElementById('filtroFim')?.value    || '';
+    return _allSemanas.filter(s => (!ini||s.inicio>=ini) && (!fim||s.inicio<=fim));
+  }
+  function atualizar() { const f=filtrados(); renderEvKpis(f); renderEvTable(f); renderEvInsights(f); buildEvCharts(f); }
+  function setActive(id) { ['filtro7d','filtro30d'].forEach(b=>document.getElementById(b)?.classList.remove('active')); if(id) document.getElementById(id)?.classList.add('active'); }
+  function janela(dias) {
+    const hoje=new Date(); hoje.setHours(0,0,0,0);
+    const ini=new Date(hoje); ini.setDate(hoje.getDate()-dias+1);
+    const iso=d=>d.toISOString().slice(0,10);
+    document.getElementById('filtroInicio').value=iso(ini);
+    document.getElementById('filtroFim').value=iso(hoje);
+    atualizar();
+  }
+  document.getElementById('filtroInicio')?.addEventListener('change',()=>{setActive(null);atualizar();});
+  document.getElementById('filtroFim')?.addEventListener('change',()=>{setActive(null);atualizar();});
+  document.getElementById('filtro7d')?.addEventListener('click',()=>{setActive('filtro7d');janela(7);});
+  document.getElementById('filtro30d')?.addEventListener('click',()=>{setActive('filtro30d');janela(30);});
+  document.getElementById('filtroReset')?.addEventListener('click',()=>{
+    setActive(null);
+    document.getElementById('filtroInicio').value=_allSemanas[0]?.inicio||'';
+    document.getElementById('filtroFim').value=_allSemanas[_allSemanas.length-1]?.inicio||'';
+    atualizar();
+  });
+  atualizar();
+}
+
+// ── Perfis de lead ──────────────────────────────────────────────────────────
+let _perfisData = [];
+let _perfilFiltro = 'todos';
+
+const PERFIL_CORES = {
+  'Dentro Perfil':     '#1D9E75',
+  'Fora Perfil':       '#A32D2D',
+  'Perfil Indefinido': '#EF9F27',
+};
+
+function corPerfil(tag) {
+  return PERFIL_CORES[tag] || '#73726c';
+}
+
+function renderLeadsGrid(filtro) {
+  const el = document.getElementById('perfilLeadsGrid');
+  if (!el) return;
+
+  if (filtro === 'todos') {
+    el.classList.remove('visible');
+    return;
+  }
+
+  const statusLabel = { ativo: 'Ativos', perdido: 'Perdidos', ganho: 'Ganhos' };
+  const leads = _perfisData.flatMap(p =>
+    (p.leads || []).filter(l => l.status.toLowerCase() === filtro)
+      .map(l => ({ ...l, perfil: p.tag, cor: corPerfil(p.tag) }))
+  );
+
+  if (!leads.length) {
+    el.innerHTML = '<div class="estado-vazio">Nenhum lead neste filtro.</div>';
+    el.classList.add('visible');
+    return;
+  }
+
+  const badgeCls = filtro;
+  const rows = leads.map(l => `
+    <tr>
+      <td>${l.titulo}</td>
+      <td><span class="leads-status-badge ${badgeCls}">${l.status}</span></td>
+      <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${l.cor};margin-right:5px;"></span>${l.perfil}</td>
+      <td>${l.tempo !== null ? l.tempo + 'd' : '—'}</td>
+    </tr>`).join('');
+
+  el.innerHTML = `
+    <p class="leads-grid-title">${leads.length} lead${leads.length !== 1 ? 's' : ''} — ${statusLabel[filtro] || filtro}</p>
+    <div style="max-height:320px;overflow-y:auto;">
+      <table class="leads-table">
+        <thead><tr><th>Título do lead</th><th>Status</th><th>Perfil</th><th style="text-align:right;">Tempo oport.</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  el.classList.add('visible');
+}
+
+function renderPerfis() {
+  const el = document.getElementById('perfilGrid');
+  if (!el) return;
+  const filtro = _perfilFiltro;
+  const total = _perfisData.reduce((a, p) => a + (filtro === 'todos' ? p.total : p[filtro] || 0), 0) || 1;
+
+  const rows = _perfisData.map(p => {
+    const n   = filtro === 'todos' ? p.total : (p[filtro] || 0);
+    const pct = Math.round(n / total * 100);
+    const cor = corPerfil(p.tag);
+    return `
+      <div class="perfil-row">
+        <span class="perfil-tag" title="${p.tag}">${p.tag}</span>
+        <div class="perfil-bar-wrap"><div class="perfil-bar" style="width:${pct}%;background:${cor};"></div></div>
+        <span class="perfil-stat"><span class="perfil-stat-n" style="color:${cor};">${n}</span></span>
+        <span class="perfil-stat-pct">${pct}%</span>
+        <div style="display:flex;gap:6px;font-size:10px;color:#b4b2a9;white-space:nowrap;">
+          <span style="color:#185FA5;">A:${p.ativo}</span>
+          <span style="color:#A32D2D;">P:${p.perdido}</span>
+          <span style="color:#3B6D11;">G:${p.ganho}</span>
+        </div>
+      </div>`;
+  }).join('');
+
+  el.innerHTML = rows || '<div class="estado-vazio">Sem dados de perfil.</div>';
+  renderLeadsGrid(filtro);
+}
+
+function setupPerfis(perfis) {
+  _perfisData = perfis;
+  _perfilFiltro = 'todos';
+  renderPerfis();
+
+  document.querySelectorAll('.perfil-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.perfil-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _perfilFiltro = btn.dataset.filtro;
+      renderPerfis();
+    });
+  });
+}
+
+// ── Pipeline de etapas ──────────────────────────────────────────────────────
+const PIPELINE_ETAPAS = [
+  { pct: '0%',   cor: '#b4b2a9', label: 'Agendamento' },
+  { pct: '25%',  cor: '#73b0e0', label: 'Qualificação' },
+  { pct: '35%',  cor: '#378ADD', label: 'Apresentar Solução' },
+  { pct: '50%',  cor: '#EF9F27', label: 'Apresentar Proposta' },
+  { pct: '75%',  cor: '#1D9E75', label: 'Em Negociação' },
+  { pct: '90%',  cor: '#3B6D11', label: 'Em Fechamento' },
+  { pct: '100%', cor: '#3B6D11', label: 'Ganho' },
+];
+
+function pctDaEtapa(nome) {
+  const m = nome.match(/\((\d+)%\)/);
+  return m ? m[1] + '%' : null;
+}
+
+function renderPipeline(funil_etapas) {
+  const mapa = {};
+  (funil_etapas || []).forEach(et => {
+    const pct = pctDaEtapa(et.etapa);
+    if (pct) mapa[pct] = (mapa[pct] || 0) + et.n;
+    else {
+      const def = PIPELINE_ETAPAS.find(p => et.etapa.toLowerCase().includes(p.label.toLowerCase()));
+      if (def) mapa[def.pct] = (mapa[def.pct] || 0) + et.n;
+    }
+  });
+
+  const stagesHtml = PIPELINE_ETAPAS.map(ep => {
+    const n      = mapa[ep.pct] || 0;
+    const active = n > 0 ? 'active' : '';
+    const cor    = n > 0 ? ep.cor : '#e8e7e0';
+    return `
+      <div class="pipeline-stage ${active}" title="${ep.label} (${ep.pct})">
+        <div class="pipeline-dot" style="background:${cor};"></div>
+        <p class="pipeline-stage-pct">${ep.pct}</p>
+        <p class="pipeline-stage-name">${ep.label}</p>
+        <p class="pipeline-count" style="${n > 0 ? 'color:' + ep.cor : ''}">${n}</p>
+        <p class="pipeline-neg">${n === 1 ? '1 negócio' : n + ' negócios'}</p>
+      </div>`;
+  }).join('');
+
+  const legenda = PIPELINE_ETAPAS.map(ep => `
+    <div class="pipeline-legenda-item">
+      <span class="pipeline-legenda-dot" style="background:${ep.cor};"></span>
+      <span><strong>${ep.pct}</strong> — ${ep.label}</span>
+    </div>`).join('');
+
+  return `
+    <div class="pipeline">${stagesHtml}</div>
+    <div class="pipeline-legenda">${legenda}</div>`;
+}
+
+function renderConversao(k) {
+  const steps = [
+    { label: 'Leads captados',      n: k.total,            cor: '#378ADD' },
+    { label: 'Apresentações',        n: k.apresentacoes,    cor: '#1D9E75' },
+    { label: 'Propostas enviadas',   n: k.propostas,        cor: '#EF9F27' },
+    { label: 'Em negociação ativa',  n: k.negociacao_ativa, cor: '#D85A30' },
+    { label: 'Contratos assinados',  n: k.ganhos,           cor: '#3B6D11' },
+  ];
+
+  const base = steps[0].n || 1;
+
+  return steps.map((s, i) => {
+    const pctTotal = base > 0 ? Math.round(s.n / base * 100) : 0;
+    const barW     = pctTotal;
+
+    // Taxa de conversão da etapa anterior
+    let convHtml = '';
+    if (i > 0) {
+      const prev    = steps[i - 1].n;
+      const convPct = prev > 0 ? Math.round(s.n / prev * 100) : 0;
+      const cls     = convPct >= 50 ? '#3B6D11' : convPct >= 20 ? '#854F0B' : '#A32D2D';
+      convHtml = `
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 0 4px 148px;">
+          <span style="font-size:11px;color:#b4b2a9;">↓</span>
+          <span style="font-size:11px;font-weight:600;color:${cls};">${convPct}% converteram</span>
+          <span style="font-size:10px;color:#b4b2a9;">da etapa anterior</span>
+        </div>`;
+    }
+
+    return `${convHtml}
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px;">
+        <span style="font-size:12px;color:#73726c;min-width:140px;flex-shrink:0;">${s.label}</span>
+        <div style="flex:1;height:28px;background:#f1efe8;border-radius:4px;overflow:hidden;">
+          <div style="width:${barW}%;height:100%;background:${s.cor};border-radius:4px;min-width:${s.n > 0 ? '4px' : '0'};"></div>
+        </div>
+        <span style="font-size:13px;font-weight:600;color:#1a1a18;min-width:28px;text-align:right;">${s.n}</span>
+        <span style="font-size:11px;color:#b4b2a9;min-width:36px;text-align:right;">${pctTotal}%</span>
+      </div>`;
+  }).join('');
+}
+
+// ── Render principal ────────────────────────────────────────────────────────
+function renderDashboard(d) {
+  const k = d.kpis;
+  const e = d.eficiencia;
+
+  // Taxa de conversão
+  const taxaApres = k.total > 0 ? Math.round(k.apresentacoes / k.total * 100) : 0;
+  const taxaProp  = k.apresentacoes > 0 ? Math.round(k.propostas / k.apresentacoes * 100) : 0;
+  const taxaFech  = k.propostas > 0 ? Math.round(k.ganhos / k.propostas * 100) : 0;
+
+  const totalEt = (d.funil_etapas || []).reduce((a, et) => a + et.n, 0);
+
+  document.getElementById('conteudo').innerHTML = `
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <p class="kpi-label">Total de leads</p>
+        <p class="kpi-value">${k.total}</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Leads ativos</p>
+        <p class="kpi-value blue">${k.ativos}</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Leads perdidos</p>
+        <p class="kpi-value red">${k.perdidos}</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Apresentações</p>
+        <p class="kpi-value">${k.apresentacoes}</p>
+        <p class="kpi-sub">${taxaApres}% dos leads</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Propostas</p>
+        <p class="kpi-value amber">${k.propostas}</p>
+        <p class="kpi-sub">${taxaProp}% das apresentações</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Em negociação</p>
+        <p class="kpi-value amber">${k.negociacao_ativa}</p>
+        <p class="kpi-sub">proposta + ativo</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Contratos</p>
+        <p class="kpi-value green">${k.ganhos}</p>
+        <p class="kpi-sub">${taxaFech}% das propostas</p>
+      </div>
+    </div>
+
+    <!-- 1. Etapa do funil -->
+    <div class="card section-gap">
+      <p class="card-title">Etapa do Funil — onde estão os leads agora</p>
+      <p class="card-sub">${totalEt} leads distribuídos por etapa · fonte: ${d.csv}</p>
+      ${renderPipeline(d.funil_etapas)}
+    </div>
+
+    <!-- Propostas ativas -->
+    <div class="card section-gap">
+      <p class="card-title">Propostas em Aberto</p>
+      <p class="card-sub">${k.negociacao_ativa} oportunidade${k.negociacao_ativa !== 1 ? 's' : ''} com proposta ativa · ordenado por dias aguardando</p>
+      <div style="overflow-x:auto;">
+        <table class="prop-table">
+          <thead><tr>
+            <th>Título do negócio</th>
+            <th>Data proposta</th>
+            <th>Dias aguardando</th>
+            <th>Último contato</th>
+            <th>Feedback do vendedor</th>
+          </tr></thead>
+          <tbody id="propostasAtivasBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 2. Taxa de conversão -->
+    <div class="card section-gap">
+      <p class="card-title">Taxa de Conversão</p>
+      <p class="card-sub">Leads → apresentação → proposta → negociação → contrato assinado</p>
+      <div style="margin-top:8px;">${renderConversao(k)}</div>
+    </div>
+
+    <!-- Eficiência comercial -->
+    <div class="card section-gap">
+      <p class="card-title">Eficiência Comercial</p>
+      <p class="card-sub">Tempo médio entre etapas · baseado em datas registradas no CRM</p>
+      <div class="efic-grid">
+        <div class="efic-card">
+          <div class="efic-icon"><i class="ti ti-clock" style="color:#73726c;font-size:22px;"></i></div>
+          <p class="efic-value">${dias(e.tempo_medio_oportunidade)}</p>
+          <p class="efic-label">Tempo médio como oportunidade</p>
+          <p class="efic-sub">Desde a criação</p>
+        </div>
+        <div class="efic-card">
+          <div class="efic-icon"><i class="ti ti-calendar-event" style="color:#378ADD;font-size:22px;"></i></div>
+          <p class="efic-value" style="color:#185FA5;">${dias(e.dias_ate_apresentacao)}</p>
+          <p class="efic-label">Até a apresentação</p>
+          <p class="efic-sub">Da criação à 1ª apresentação</p>
+        </div>
+        <div class="efic-card">
+          <div class="efic-icon"><i class="ti ti-file-text" style="color:#EF9F27;font-size:22px;"></i></div>
+          <p class="efic-value" style="color:#854F0B;">${dias(e.dias_ate_proposta)}</p>
+          <p class="efic-label">Até a proposta</p>
+          <p class="efic-sub">Da apresentação à proposta</p>
+        </div>
+        <div class="efic-card">
+          <div class="efic-icon"><i class="ti ti-check-circle" style="color:#3B6D11;font-size:22px;"></i></div>
+          <p class="efic-value" style="color:#3B6D11;">${dias(e.dias_ate_fechamento)}</p>
+          <p class="efic-label">Até o fechamento</p>
+          <p class="efic-sub">Da proposta ao ganho/perda</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Motivos de perda -->
+    <div class="card section-gap">
+      <p class="card-title">Motivos de perda — todos</p>
+      <p class="card-sub">${d.total_perdidos} perdidos · fonte: ${d.csv}</p>
+      <div class="ranking-table" id="rankingTodos"></div>
+    </div>
+    <div class="card section-gap">
+      <p class="card-title">Motivos de perda — com proposta</p>
+      <p class="card-sub">${d.total_perdidos_proposta} perdidos após proposta</p>
+      <div class="ranking-table" id="rankingProposta"></div>
+    </div>
+
+    <!-- Evolução semanal -->
+    ${renderSemanas(d.semanas)}
+
+    <!-- Perfil de leads Instagram -->
+    <div class="card section-gap">
+      <p class="card-title">Perfil dos Leads — Instagram</p>
+      <p class="card-sub">Leads com tag de perfil dentro/fora · fonte: ${d.csv}</p>
+      <div class="perfil-filtros">
+        <button class="perfil-btn active" data-filtro="todos">Todos</button>
+        <button class="perfil-btn" data-filtro="ativo">Ativo</button>
+        <button class="perfil-btn" data-filtro="perdido">Perdido</button>
+        <button class="perfil-btn" data-filtro="ganho">Ganho</button>
+      </div>
+      <div class="perfil-grid" id="perfilGrid"></div>
+      <div class="leads-grid" id="perfilLeadsGrid"></div>
+    </div>
+  `;
+
+  // Pós-render
+  buildRanking('rankingTodos',    d.ranking_todos,    d.total_perdidos || 1,          '#F09595');
+  buildRanking('rankingProposta', d.ranking_proposta, d.total_perdidos_proposta || 1,  '#AFA9EC');
+  if (d.semanas?.length) setupSemanas(d.semanas);
+  if (d.perfis?.length)  setupPerfis(d.perfis);
+  renderPropostasAtivas(d.propostas_ativas || []);
+}
+
+// ── Bootstrap ────────────────────────────────────────────────────────────────
+function carregarVendedor(vendedor) {
+  document.getElementById('conteudo').innerHTML = '<div class="estado">Carregando…</div>';
+  fetch(`/api/instagram-vendedor?vendedor=${encodeURIComponent(vendedor)}`)
+    .then(r => r.json())
+    .then(d => {
+      if (d.erro) { document.getElementById('conteudo').innerHTML = `<div class="estado">Erro: ${d.erro}</div>`; return; }
+      renderDashboard(d);
+    })
+    .catch(err => { document.getElementById('conteudo').innerHTML = `<div class="estado">Falha: ${err.message}</div>`; });
+}
+
+// Carrega lista de vendedores
+fetch('/api/instagram-vendedor')
+  .then(r => r.json())
+  .then(d => {
+    if (d.erro) { document.getElementById('selectorInfo').textContent = 'Erro ao carregar.'; return; }
+    const sel = document.getElementById('vendedorSelect');
+    d.vendedores.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v; opt.textContent = v;
+      sel.appendChild(opt);
+    });
+    document.getElementById('selectorInfo').textContent = `${d.vendedores.length} vendedores com leads Instagram`;
+    sel.addEventListener('change', () => {
+      if (sel.value) carregarVendedor(sel.value);
+      else document.getElementById('conteudo').innerHTML = '<div class="estado">Selecione um vendedor para visualizar os dados.</div>';
+    });
+  })
+  .catch(err => { document.getElementById('selectorInfo').textContent = `Erro: ${err.message}`; });
+</script>
+
+<!-- ── Referência: Motivos de Perda ─────────────────────────────────────── -->
+<div class="page" style="margin-top:0;">
+  <div class="motivos-ref">
+    <p class="motivos-ref-title">Motivos de Perda — Descritivo e Quando Utilizar</p>
+    <p class="motivos-ref-sub">Utilize o motivo que melhor representa o principal fator que levou o cliente a não avançar com a negociação.</p>
+    <div class="motivos-grid">
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-currency-dollar"></i></div>
+          <p class="motivo-name">Preço muito alto – fora do budget de investimento</p>
+        </div>
+        <p class="motivo-desc">O cliente demonstrou interesse, mas o valor da solução/proposta está acima do orçamento disponível ou da faixa esperada para o projeto.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">O preço foi o fator decisivo para o cliente não seguir com a compra.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-users"></i></div>
+          <p class="motivo-name">Fechou com o concorrente – preço</p>
+        </div>
+        <p class="motivo-desc">O cliente optou por um concorrente principalmente por oferecer um preço mais baixo ou condições comerciais mais vantajosas.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">O preço foi o diferencial determinante para a escolha do concorrente.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-trending-up"></i></div>
+          <p class="motivo-name">Não houve aprovação financeira</p>
+        </div>
+        <p class="motivo-desc">A solução foi bem avaliada, mas não houve liberação de orçamento ou aprovação financeira interna.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">A negociação parou por falta de orçamento aprovado.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-lock"></i></div>
+          <p class="motivo-name">Cliente não quer contato LGPD</p>
+        </div>
+        <p class="motivo-desc">O cliente não autorizou o contato ou solicitou a exclusão de seus dados conforme a LGPD.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">O cliente pediu para não ser mais contatado por qualquer canal.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-puzzle"></i></div>
+          <p class="motivo-name">Nossa solução não atende – falta funcionalidade</p>
+        </div>
+        <p class="motivo-desc">A solução apresentada não atende aos requisitos técnicos ou funcionais essenciais do cliente.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">A falta de funcionalidades ou recursos impediu o avanço.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-refresh-off"></i></div>
+          <p class="motivo-name">Não quer mudar a solução atual</p>
+        </div>
+        <p class="motivo-desc">O cliente está satisfeito com a solução atual que utiliza e não tem intenção de migrar ou trocar.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">Não há necessidade ou interesse do cliente em mudar.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-calendar-off"></i></div>
+          <p class="motivo-name">Projeto adiado / sem prazo definido</p>
+        </div>
+        <p class="motivo-desc">O cliente gostou da solução, mas o projeto foi adiado ou não há previsão de quando será realizado.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">O projeto não será realizado no curto/médio prazo.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-building"></i></div>
+          <p class="motivo-name">Fora do porte mínimo (sem fit estrutural)</p>
+        </div>
+        <p class="motivo-desc">A empresa do cliente não atende aos critérios de porte, segmento ou perfil definidos para nossa solução.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">Não há alinhamento com o ICP ou critérios mínimos.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-user-off"></i></div>
+          <p class="motivo-name">Não era o decisor – sem acesso</p>
+        </div>
+        <p class="motivo-desc">Você não tinha acesso ao decisor ou a negociação não avançou por falta de contato com quem decide.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">Não foi possível chegar ao decisor ou influenciador chave.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-headset"></i></div>
+          <p class="motivo-name">Já cliente, com dúvida – direcionado ao suporte <span class="motivo-badge">Novo</span></p>
+        </div>
+        <p class="motivo-desc">O cliente já é ativo e a demanda apresentada é uma dúvida, ajuste ou solicitação de suporte.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">O contato não é uma oportunidade comercial nova.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-users-group"></i></div>
+          <p class="motivo-name">Fechou com o concorrente – funcionalidade <span class="motivo-badge">Novo</span></p>
+        </div>
+        <p class="motivo-desc">O cliente escolheu outro fornecedor porque a solução oferecida atende melhor às necessidades funcionais.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">A funcionalidade/aderência foi o fator decisivo.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-clock-off"></i></div>
+          <p class="motivo-name">Fora do segmento atendido <span class="motivo-badge">Novo</span></p>
+        </div>
+        <p class="motivo-desc">A empresa não atua no segmento/vertical atendido pela solução.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">O segmento de atuação não está dentro do foco.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-phone-off"></i></div>
+          <p class="motivo-name">Sem qualificação — contato não atende ligações nem responde msg <span class="motivo-badge">Novo</span></p>
+        </div>
+        <p class="motivo-desc">O contato não responde às tentativas de conexão por ligação, e-mail ou mensagens.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">Não houve retorno para avançar na qualificação.</p>
+      </div>
+
+      <div class="motivo-card">
+        <div class="motivo-header">
+          <div class="motivo-icon"><i class="ti ti-ban"></i></div>
+          <p class="motivo-name">Inválido – empresa não existe / dados errados <span class="motivo-badge">Novo</span></p>
+        </div>
+        <p class="motivo-desc">Os dados da empresa/contato estavam incorretos ou a empresa não existe/encerrou atividades.</p>
+        <p class="motivo-quando">Use quando:</p>
+        <p class="motivo-quando-item">O lead não é válido ou não existe.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

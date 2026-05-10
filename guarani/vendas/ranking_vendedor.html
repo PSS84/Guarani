@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking de Vendedores — Guarani</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green: #0f766e;
+  --green-soft: #ecfdf5;
+  --green-icon: #10b981;
+  --muted: #64748b;
+  --surface: #f8fafc;
+  --card: #ffffff;
+  --border: rgba(15, 23, 42, 0.08);
+  --gold: #b45309;
+  --gold-soft: #fffbeb;
+  --silver: #1d4ed8;
+  --silver-soft: #eff6ff;
+  --bronze: #c2410c;
+  --bronze-soft: #fff7ed;
+}
+
+body {
+  font-family: Inter, system-ui, sans-serif;
+  background: var(--surface);
+  color: #0f172a;
+  min-height: 100vh;
+  line-height: 1.45;
+}
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 18px 48px;
+}
+
+.panel {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 28px 28px 32px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 12px 40px rgba(15, 23, 42, 0.06);
+}
+
+.hdr {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.hdr-left {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex: 1;
+  min-width: 260px;
+}
+
+.trophy-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--green-soft);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trophy-box svg { width: 28px; height: 28px; color: var(--green-icon); }
+
+.hdr-titles h1 {
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+}
+
+.hdr-titles .sub {
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.hdr-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.hdr-legend .leg-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-icon);
+}
+
+.hdr-legend .info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--green);
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 800;
+  cursor: help;
+  text-decoration: none;
+}
+
+.month-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.month-wrap .cal { font-size: 18px; opacity: 0.85; }
+
+.month-wrap select {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #0f172a;
+  appearance: none;
+  padding-right: 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  min-width: 140px;
+}
+
+/* Pódio */
+.podium-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(12px, 2.5vw, 20px);
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.podium-card {
+  flex: 1 1 0;
+  min-width: 200px;
+  max-width: 340px;
+  background: var(--card);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 20px 18px 22px;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06);
+  position: relative;
+}
+
+.podium-card.first {
+  transform: scale(1.04);
+  z-index: 2;
+  padding-top: 24px;
+  padding-bottom: 26px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
+}
+
+.podium-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.place-badge {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.place-badge.gold { background: var(--gold-soft); color: var(--gold); border: 1px solid rgba(180, 83, 9, 0.2); }
+.place-badge.silver { background: var(--silver-soft); color: var(--silver); border: 1px solid rgba(29, 78, 216, 0.15); }
+.place-badge.bronze { background: var(--bronze-soft); color: var(--bronze); border: 1px solid rgba(194, 65, 12, 0.2); }
+
+.crown-icon {
+  color: #ca8a04;
+  opacity: 0.95;
+}
+.podium-card:not(.first) .crown-icon { visibility: hidden; }
+
+.avatar-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.driver-ring {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  padding: 3px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1);
+}
+
+.podium-card.first .driver-ring {
+  width: 88px;
+  height: 88px;
+  padding: 4px;
+  background: linear-gradient(145deg, #fde68a, #d97706 50%, #b45309);
+}
+
+.driver-ring img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.driver-ph {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #94a3b8, #475569);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.podium-pct {
+  text-align: center;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.podium-pct.gold { color: #b45309; }
+.podium-pct.silver { color: #1d4ed8; }
+.podium-pct.bronze { color: #c2410c; }
+
+.podium-name {
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  margin-top: 10px;
+}
+
+.podium-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.podium-stat {
+  flex: 1;
+  text-align: center;
+}
+
+.podium-stat svg {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.podium-stat .sv { font-size: 15px; font-weight: 800; color: #0f172a; display: block; }
+.podium-stat .sl {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* Tabela */
+.table-section {
+  margin-bottom: 28px;
+}
+
+.table-section h2 {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+.table-card {
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
+}
+
+.table-scroll { overflow-x: auto; }
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: #f8fafc;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover { background: #fafafa; }
+
+.cell-rank { font-weight: 800; color: var(--muted); width: 48px; }
+
+.cell-seller {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.cell-seller .mini-ring {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid #e2e8f0;
+}
+
+.cell-seller .mini-ring img { width: 100%; height: 100%; object-fit: cover; }
+.cell-seller .mini-ph {
+  width: 100%;
+  height: 100%;
+  background: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.cov-cell { min-width: 140px; }
+.cov-pct { font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+
+.bar-track {
+  height: 6px;
+  border-radius: 99px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #10b981, #059669);
+  max-width: 100%;
+}
+
+.num-cell { font-weight: 700; color: #334155; text-align: center; }
+
+.rank-note {
+  margin: 0 0 20px;
+  padding: 14px 18px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+  background: #f1f5f9;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+.evo-cell { white-space: nowrap; }
+.evo-up { color: #059669; font-weight: 700; }
+.evo-down { color: #dc2626; font-weight: 700; }
+.evo-flat { color: var(--muted); font-weight: 600; }
+
+.table-footer {
+  padding: 18px;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  background: #fafafa;
+}
+
+.btn-full-rank {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 10px;
+  transition: background 0.15s;
+}
+.btn-full-rank:hover { background: var(--green-soft); }
+
+/* Highlights */
+.highlights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.hl-card {
+  border-radius: 16px;
+  padding: 18px 18px 16px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.hl-card .hl-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.hl-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hl-icon svg { width: 20px; height: 20px; }
+
+.hl-icon.ev { background: #ecfdf5; color: #059669; }
+.hl-icon.cv { background: #f5f3ff; color: #7c3aed; }
+.hl-icon.ct { background: #eff6ff; color: #2563eb; }
+.hl-icon.st { background: #fffbeb; color: #d97706; }
+
+.hl-title {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hl-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.hl-detail {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.meta-row a {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  text-decoration: none;
+}
+.meta-row a:hover { text-decoration: underline; }
+
+.footer-ts { font-size: 12px; color: var(--muted); }
+
+.estado {
+  text-align: center;
+  padding: 56px 16px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .podium-wrap { flex-direction: column; align-items: stretch; }
+  .podium-card { max-width: none; }
+  .podium-card.first { transform: none; order: -1; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="panel">
+    <header class="hdr">
+      <div class="hdr-left">
+        <div class="trophy-box" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 21h8M12 17v4M6 3h12l1 3H5l1-3z"/>
+            <path d="M6 6v5a6 6 0 0012 0V6"/>
+            <path d="M5 6H3a2 2 0 000 4h2M19 6h2a2 2 0 010 4h-2"/>
+          </svg>
+        </div>
+        <div class="hdr-titles">
+          <h1 id="hdrTitle">Ranking de Vendedores</h1>
+          <p class="sub">Maior cobertura individual</p>
+          <div class="hdr-legend">
+            <span class="leg-dot" aria-hidden="true"></span>
+            <span>Cobertura individual</span>
+            <abbr class="info-btn" title="Cobertura no mês = (OBI × Meta Individual) ÷ Meta Individual × 100 (aba QtdeMetas). OBI é a fração de meta batida. Evolução = cobertura deste mês menos a do mês civil anterior.">i</abbr>
+          </div>
+        </div>
+      </div>
+      <div class="month-wrap">
+        <span class="cal" aria-hidden="true">📅</span>
+        <select id="mesSel" aria-label="Mês e ano"></select>
+      </div>
+    </header>
+
+    <div id="raceArea" class="estado">Carregando…</div>
+
+    <div class="meta-row">
+      <p class="footer-ts" id="footerTs"></p>
+      <a href="/guarani/vendas/metas">Dashboard metas →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const MESES_NOME = ['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+const FOTO_MAP = {
+  rayssa: '/dados/img/rayssa.png',
+  junior: '/dados/img/junior.png',
+  paulo:  '/dados/img/paulo.png',
+  ronaldo:'/dados/img/ronaldo.png',
+  meta:   '/dados/img/meta.png',
+};
+
+const ICON_MON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 22h8M12 18v4"/></svg>';
+const ICON_DOC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 4h8l4 4v14a2 2 0 01-2 2H8a2 2 0 01-2-2V6a2 2 0 012-2z"/><path d="M14 4v4h4"/></svg>';
+const ICON_HAND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 14V9a2 2 0 114 0v5"/><path d="M12 14V8a2 2 0 114 0v6"/><path d="M16 14v-3a2 2 0 114 2v4a6 6 0 01-6 6h-1a4 4 0 01-4-4v-6"/></svg>';
+
+const ICON_CROWN = '<svg class="crown-icon" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 16L3 7l5 3 4-6 4 6 5-3-2 9H5zm2.6 2h8.8l.4 2H7.2l.4-2z"/></svg>';
+const ICON_CHART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 12l4-4 4 4 6-6"/></svg>';
+const ICON_PCT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9h.01M15 15h.01"/></svg>';
+const ICON_DOCPLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>';
+const ICON_STAR = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 7h7l-5.5 4.2L18 21l-6-4.3L6 21l1.5-7.8L2 9h7z"/></svg>';
+
+function fotoVendedor(nome) {
+  const k = (nome || '').split(' ')[0].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  return FOTO_MAP[k] || null;
+}
+
+function fmtPct(x) {
+  const n = typeof x === 'number' ? x : 0;
+  const d = n % 1 === 0 ? 0 : 1;
+  return n.toFixed(d).replace('.', ',') + '%';
+}
+
+function fmtConv(x) {
+  const n = typeof x === 'number' ? x : 0;
+  const d = n % 1 === 0 ? 0 : 1;
+  return n.toFixed(d).replace('.', ',') + '%';
+}
+
+function fmtMeta(v) {
+  if (v == null || v === '') return '—';
+  const n = Number(v);
+  if (Number.isNaN(n)) return '—';
+  return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function evoHtml(evol) {
+  if (evol === null || evol === undefined) {
+    return '<span class="evo-flat">—</span>';
+  }
+  if (evol > 0) {
+    return `<span class="evo-up">↑ ${Math.abs(evol).toFixed(1).replace('.', ',')}%</span>`;
+  }
+  if (evol < 0) {
+    return `<span class="evo-down">↓ ${Math.abs(evol).toFixed(1).replace('.', ',')}%</span>`;
+  }
+  return '<span class="evo-flat">— 0%</span>';
+}
+
+function miniAvatar(nome) {
+  const foto = fotoVendedor(nome);
+  const ini = (nome || '?').charAt(0).toUpperCase();
+  if (foto) {
+    return `<div class="mini-ring"><img src="${foto}" alt=""></div>`;
+  }
+  return `<div class="mini-ring"><div class="mini-ph">${ini}</div></div>`;
+}
+
+function podiumCardHtml(r, rank, cls) {
+  const foto = fotoVendedor(r.vendedor);
+  const ini = (r.vendedor || '?').charAt(0).toUpperCase();
+  const cov = Number(r.cobertura_individual) || 0;
+  const dispName = (r.vendedor || '').trim();
+  const pctClass = cls === 'first' ? 'gold' : (cls === 'second' ? 'silver' : 'bronze');
+  const badgeClass = cls === 'first' ? 'gold' : (cls === 'second' ? 'silver' : 'bronze');
+  const label = rank + 'º LUGAR';
+
+  return `
+    <div class="podium-card ${cls === 'first' ? 'first' : ''}">
+      <div class="podium-top-row">
+        <span class="place-badge ${badgeClass}">${label}</span>
+        ${ICON_CROWN}
+      </div>
+      <div class="avatar-wrap">
+        <div class="driver-ring">
+          ${foto ? `<img src="${foto}" alt="">` : `<div class="driver-ph">${ini}</div>`}
+        </div>
+      </div>
+      <div class="podium-pct ${pctClass}">${fmtPct(cov)}</div>
+      <div class="podium-name">${dispName}</div>
+      <div class="podium-stats">
+        <div class="podium-stat">${ICON_MON}<span class="sv">${r.apresentacoes}</span><span class="sl">Apres.</span></div>
+        <div class="podium-stat">${ICON_DOC}<span class="sv">${r.propostas}</span><span class="sl">Prop.</span></div>
+        <div class="podium-stat">${ICON_HAND}<span class="sv">${r.contratos}</span><span class="sl">Contr.</span></div>
+      </div>
+    </div>`;
+}
+
+/** Ordem: 2º | 1º | 3º */
+function buildPodium(top3) {
+  if (top3.length === 0) return '';
+  if (top3.length === 1) {
+    return `<div class="podium-wrap">${podiumCardHtml(top3[0], 1, 'first')}</div>`;
+  }
+  if (top3.length === 2) {
+    return `<div class="podium-wrap">
+      ${podiumCardHtml(top3[1], 2, 'second')}
+      ${podiumCardHtml(top3[0], 1, 'first')}
+    </div>`;
+  }
+  return `<div class="podium-wrap">
+    ${podiumCardHtml(top3[1], 2, 'second')}
+    ${podiumCardHtml(top3[0], 1, 'first')}
+    ${podiumCardHtml(top3[2], 3, 'third')}
+  </div>`;
+}
+
+function buildTable(rows) {
+  const body = rows.map((r, i) => {
+    const cov = Number(r.cobertura_individual) || 0;
+    const conv = r.conversao_pct != null ? r.conversao_pct : 0;
+    const barW = Math.min(100, Math.max(0, cov));
+    return `<tr>
+      <td class="cell-rank">${i + 1}</td>
+      <td><div class="cell-seller">${miniAvatar(r.vendedor)}<span>${(r.vendedor || '').trim()}</span></div></td>
+      <td class="num-cell" style="text-align:right;white-space:nowrap">${fmtMeta(r.meta_individual)}</td>
+      <td class="cov-cell">
+        <div class="cov-pct">${fmtPct(cov)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${barW}%"></div></div>
+      </td>
+      <td class="num-cell">${r.apresentacoes}</td>
+      <td class="num-cell">${r.propostas}</td>
+      <td class="num-cell">${r.contratos}</td>
+      <td class="num-cell">${fmtConv(conv)}</td>
+      <td class="evo-cell">${evoHtml(r.evolucao_pp)}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div class="table-section" id="classificacao">
+      <h2>Classificação geral</h2>
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Vendedor</th>
+                <th>Meta ind.</th>
+                <th>Cobertura</th>
+                <th>Apres.</th>
+                <th>Prop.</th>
+                <th>Contr.</th>
+                <th>Conversão</th>
+                <th>Evolução</th>
+              </tr>
+            </thead>
+            <tbody>${body}</tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <button type="button" class="btn-full-rank" id="btnFullRank">
+            Ver ranking completo
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function pickHighlights(rows, mesRef, anoRef) {
+  const withEvo = rows.filter(r => r.evolucao_pp != null);
+  const subidas = withEvo.filter(r => r.evolucao_pp > 0);
+  let maiorEvo = null;
+  if (subidas.length) {
+    maiorEvo = subidas.reduce((a, b) => {
+      if (b.evolucao_pp !== a.evolucao_pp) return b.evolucao_pp > a.evolucao_pp ? b : a;
+      return (Number(b.cobertura_individual) || 0) >= (Number(a.cobertura_individual) || 0) ? b : a;
+    });
+  }
+  const convOf = (r) => (r.conversao_pct != null ? r.conversao_pct : 0);
+  let melhorConv = rows.length ? rows.reduce((a, b) => (convOf(b) > convOf(a) ? b : a)) : null;
+  let maisContr = rows.length ? rows.reduce((a, b) => (b.contratos > a.contratos ? b : a)) : null;
+  const lider = rows[0] || null;
+
+  const refLabel = mesRef && anoRef
+    ? `${MESES_NOME[mesRef].slice(0, 3)}/${anoRef}`
+    : '';
+
+  let h1;
+  if (maiorEvo) {
+    h1 = `<div class="hl-card"><div class="hl-top"><div class="hl-icon ev">${ICON_CHART}</div><div><div class="hl-title">Maior evolução</div></div></div><div class="hl-name">${maiorEvo.vendedor}</div><div class="hl-detail">↑ ${maiorEvo.evolucao_pp.toFixed(1).replace('.', ',')} p.p. de cobertura vs ${refLabel}</div></div>`;
+  } else if (mesRef) {
+    h1 = `<div class="hl-card"><div class="hl-top"><div class="hl-icon ev">${ICON_CHART}</div><div><div class="hl-title">Maior evolução</div></div></div><div class="hl-detail">Ninguém subiu a cobertura individual vs ${refLabel}.</div></div>`;
+  } else {
+    h1 = `<div class="hl-card"><div class="hl-top"><div class="hl-icon ev">${ICON_CHART}</div><div><div class="hl-title">Maior evolução</div></div></div><div class="hl-detail">Sem mês anterior na planilha <strong>QtdeMetas</strong> para comparar (inclua outro mês ou dez./ano anterior para jan.).</div></div>`;
+  }
+
+  const h2 = melhorConv
+    ? `<div class="hl-card"><div class="hl-top"><div class="hl-icon cv">${ICON_PCT}</div><div><div class="hl-title">Melhor conversão</div></div></div><div class="hl-name">${melhorConv.vendedor}</div><div class="hl-detail">${fmtConv(melhorConv.conversao_pct)} conversão</div></div>`
+    : '';
+
+  const h3 = maisContr
+    ? `<div class="hl-card"><div class="hl-top"><div class="hl-icon ct">${ICON_DOCPLUS}</div><div><div class="hl-title">Mais contratos</div></div></div><div class="hl-name">${maisContr.vendedor}</div><div class="hl-detail">${maisContr.contratos} contrato${maisContr.contratos !== 1 ? 's' : ''}</div></div>`
+    : '';
+
+  const h4 = lider
+    ? `<div class="hl-card"><div class="hl-top"><div class="hl-icon st">${ICON_STAR}</div><div><div class="hl-title">Destaque do mês</div></div></div><div class="hl-name">${lider.vendedor}</div><div class="hl-detail">Líder em cobertura</div></div>`
+    : '';
+
+  return `<div class="highlights">${h1}${h2}${h3}${h4}</div>`;
+}
+
+function renderRanking(data) {
+  const full = data.ranking || [];
+  const mesNome = MESES_NOME[data.mes] || '';
+  const ano = data.ano || 2026;
+  const mesRef = data.evolucao_mes_referencia;
+  const anoRef = data.evolucao_ano_referencia != null ? data.evolucao_ano_referencia : ano;
+
+  document.getElementById('hdrTitle').textContent = 'Ranking de Vendedores';
+
+  if (!full.length) {
+    document.getElementById('raceArea').innerHTML =
+      '<div class="estado">Sem dados para este mês na planilha <strong>QtdeMetas</strong>.</div>';
+    document.getElementById('footerTs').textContent = '';
+    return;
+  }
+
+  const top3 = full.slice(0, 3);
+  const podium = buildPodium(top3);
+  const table = buildTable(full);
+  const highlights = pickHighlights(full, mesRef, anoRef);
+
+  const rankNote = `<div class="rank-note"><strong>Cálculo:</strong> cobertura no mês = (OBI × Meta Individual) ÷ Meta Individual × 100 na aba <strong>QtdeMetas</strong>. <strong>Evolução</strong> = essa cobertura menos a do mês civil anterior (ex.: abril vs março).</div>`;
+  document.getElementById('raceArea').innerHTML = podium + rankNote + table + highlights;
+
+  const btn = document.getElementById('btnFullRank');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      document.getElementById('classificacao').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  document.getElementById('footerTs').textContent =
+    `${mesNome} de ${ano} · ${new Date().toLocaleString('pt-BR')}`;
+}
+
+function fillMesSelect(mesesDisp, mesAtual, ano) {
+  const sel = document.getElementById('mesSel');
+  const y = ano || 2026;
+  sel.innerHTML = '';
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement('option');
+    opt.value = m;
+    opt.textContent = MESES_NOME[m] + ' ' + y;
+    if (mesesDisp && mesesDisp.length && !mesesDisp.includes(m)) opt.disabled = true;
+    if (m === mesAtual) opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+function load(mes) {
+  const q = mes ? `?mes=${mes}&ano=2026` : '?ano=2026';
+  fetch('/api/ranking-vendedores' + q)
+    .then(r => r.json())
+    .then(d => {
+      if (d.erro) {
+        document.getElementById('raceArea').innerHTML = '<div class="estado">' + d.erro + '</div>';
+        return;
+      }
+      fillMesSelect(d.meses_disponiveis || [], d.mes, d.ano);
+      renderRanking(d);
+    })
+    .catch(() => {
+      document.getElementById('raceArea').innerHTML =
+        '<div class="estado">Não foi possível carregar o ranking.</div>';
+    });
+}
+
+document.getElementById('mesSel').addEventListener('change', e => {
+  load(parseInt(e.target.value, 10));
+});
+
+load();
+</script>
+</body>
+</html>
