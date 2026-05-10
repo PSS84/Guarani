@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard CRM — Instagram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.3.0/dist/tabler-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    background: #f5f4f0;
+    color: #1a1a18;
+    padding: 32px;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  /* header */
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .header-dot {
+    font-size: 18px;
+    color: #888780;
+  }
+  .header-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #73726c;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+  }
+
+  /* kpi grid */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .kpi-card { min-width: 0; }
+  .kpi-card {
+    background: #ffffff;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .kpi-label {
+    font-size: 12px;
+    color: #73726c;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 500;
+    color: #1a1a18;
+    line-height: 1;
+  }
+  .kpi-value.blue  { color: #185FA5; }
+  .kpi-value.red   { color: #A32D2D; }
+  .kpi-value.amber { color: #854F0B; }
+  .kpi-value.muted { color: #888780; }
+  .kpi-sub {
+    font-size: 11px;
+    color: #b4b2a9;
+    margin-top: 5px;
+  }
+
+  /* charts row */
+  .charts-row {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .card {
+    background: #ffffff;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a1a18;
+    margin-bottom: 3px;
+  }
+  .card-sub {
+    font-size: 11px;
+    color: #b4b2a9;
+    margin-bottom: 16px;
+  }
+
+  /* funnel */
+  .funnel-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 7px;
+  }
+  .funnel-label {
+    font-size: 12px;
+    color: #73726c;
+    min-width: 145px;
+    flex-shrink: 0;
+  }
+  .funnel-track {
+    flex: 1;
+    height: 24px;
+    background: #f1efe8;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .funnel-fill {
+    height: 100%;
+    border-radius: 4px;
+  }
+  .funnel-val {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1a1a18;
+    min-width: 28px;
+    text-align: right;
+  }
+  .funnel-pct {
+    font-size: 11px;
+    color: #b4b2a9;
+    min-width: 36px;
+  }
+
+  /* analysis */
+  .analysis-section {
+    background: #ffffff;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 16px;
+  }
+  .analysis-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 14px;
+    border-bottom: 0.5px solid rgba(0,0,0,0.10);
+    margin-bottom: 18px;
+  }
+  .analysis-header i {
+    font-size: 18px;
+    color: #73726c;
+  }
+  .analysis-header-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #444441;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
+  .analysis-items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .analysis-item {
+    display: flex;
+    gap: 12px;
+  }
+  .analysis-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 16px;
+  }
+  .analysis-icon.danger  { color: #A32D2D; }
+  .analysis-icon.warning { color: #854F0B; }
+  .analysis-icon.muted   { color: #888780; }
+  .analysis-icon.success { color: #3B6D11; }
+
+  .analysis-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a1a18;
+    margin-bottom: 4px;
+  }
+  .analysis-title.success { color: #3B6D11; }
+  .analysis-body {
+    font-size: 13px;
+    color: #5f5e5a;
+    line-height: 1.65;
+  }
+  .analysis-divider {
+    border: none;
+    border-top: 0.5px solid rgba(0,0,0,0.10);
+    margin: 4px 0;
+  }
+
+  /* ranking table */
+  .ranking-table { display: flex; flex-direction: column; gap: 6px; }
+  .rank-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #fafaf8;
+    border: 0.5px solid #eeede7;
+    transition: background .15s;
+  }
+  .rank-row:hover { background: #f2f1eb; }
+  .rank-num {
+    font-size: 11px;
+    font-weight: 600;
+    color: #b4b2a9;
+    min-width: 18px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .rank-num.top { color: #888780; }
+  .rank-label {
+    font-size: 12.5px;
+    color: #1a1a18;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .rank-bar-wrap {
+    width: 100px;
+    height: 6px;
+    background: #e8e7e0;
+    border-radius: 99px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .rank-bar { height: 100%; border-radius: 99px; }
+  .rank-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a1a18;
+    min-width: 24px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .rank-pct {
+    font-size: 11px;
+    color: #888780;
+    min-width: 36px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* perfis */
+  .perfil-filtros { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .perfil-btn { font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500; padding: 5px 14px; border-radius: 20px; border: 0.5px solid rgba(0,0,0,0.15); background: #fafaf8; color: #73726c; cursor: pointer; transition: all .15s; }
+  .perfil-btn:hover { background: #f1efe8; }
+  .perfil-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+  .perfil-grid { display: flex; flex-direction: column; gap: 10px; }
+  .perfil-row { display: grid; grid-template-columns: 160px 1fr auto auto auto; align-items: center; gap: 12px; padding: 10px 14px; background: #fafaf8; border: 0.5px solid #eeede7; border-radius: 10px; }
+  .perfil-row:hover { background: #f2f1eb; }
+  .perfil-tag { font-size: 12px; font-weight: 600; color: #1a1a18; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .perfil-bar-wrap { height: 8px; background: #e8e7e0; border-radius: 99px; overflow: hidden; }
+  .perfil-bar { height: 100%; border-radius: 99px; }
+  .perfil-stat-n { font-size: 15px; font-weight: 600; }
+  .perfil-stat-pct { font-size: 10px; color: #b4b2a9; }
+  .leads-grid { margin-top: 14px; border-top: 0.5px solid rgba(0,0,0,0.07); padding-top: 14px; display: none; }
+  .leads-grid.visible { display: block; }
+  .leads-grid-title { font-size: 11px; font-weight: 600; color: #73726c; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
+  .leads-table { width: 100%; border-collapse: collapse; }
+  .leads-table th { font-size: 10px; font-weight: 500; color: #b4b2a9; text-align: left; padding: 0 10px 8px; letter-spacing: .04em; text-transform: uppercase; }
+  .leads-table th:last-child { text-align: right; }
+  .leads-table td { font-size: 12px; color: #1a1a18; padding: 7px 10px; border-top: 0.5px solid rgba(0,0,0,0.05); }
+  .leads-table td:last-child { text-align: right; font-weight: 600; color: #73726c; white-space: nowrap; }
+  .leads-table tr:hover td { background: #fafaf8; }
+
+  /* propostas ativas */
+  .prop-table { width: 100%; border-collapse: collapse; }
+  .prop-table th { font-size: 10px; font-weight: 500; color: #b4b2a9; text-align: left; padding: 0 10px 10px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+  .prop-table td { font-size: 12.5px; color: #1a1a18; padding: 8px 10px; border-top: 0.5px solid rgba(0,0,0,0.06); vertical-align: middle; }
+  .prop-table tr:hover td { background: #fafaf8; }
+  .dias-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .dias-badge.ok      { background: rgba(29,158,117,0.1);  color: #155c41; }
+  .dias-badge.alerta  { background: rgba(239,159,39,0.1);  color: #854F0B; }
+  .dias-badge.critico { background: rgba(163,45,45,0.1);   color: #A32D2D; }
+  .feedback-input { font-family: 'Inter', sans-serif; font-size: 12px; color: #1a1a18; border: 0.5px solid rgba(0,0,0,0.12); border-radius: 6px; padding: 5px 9px; background: #fafaf8; outline: none; width: 100%; min-width: 160px; resize: none; }
+  .feedback-input:focus { border-color: #185FA5; background: #fff; }
+  .feedback-saved { border-color: #1D9E75 !important; }
+
+  /* loading / erro */
+  .estado {
+    text-align: center;
+    padding: 60px 20px;
+    color: #888780;
+    font-size: 13px;
+  }
+
+  /* evolução semanal */
+  .semanas-section {
+    background: #ffffff;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 16px;
+  }
+  .semanas-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 14px;
+    border-bottom: 0.5px solid rgba(0,0,0,0.10);
+    margin-bottom: 16px;
+  }
+  .semanas-header i { font-size: 18px; color: #73726c; }
+  .semanas-header-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #444441;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .semanas-nota {
+    font-size: 11px;
+    color: #b4b2a9;
+    margin-left: auto;
+  }
+  .semanas-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .semanas-table th {
+    font-size: 11px;
+    font-weight: 500;
+    color: #73726c;
+    text-align: right;
+    padding: 0 10px 10px;
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+  .semanas-table th:first-child { text-align: left; padding-left: 0; }
+  .semanas-table td {
+    font-size: 13px;
+    color: #1a1a18;
+    text-align: right;
+    padding: 7px 10px;
+    border-top: 0.5px solid rgba(0,0,0,0.06);
+    white-space: nowrap;
+  }
+  .semanas-table td:first-child {
+    text-align: left;
+    padding-left: 0;
+    font-size: 11.5px;
+    color: #73726c;
+    font-weight: 500;
+  }
+  .semanas-table tr:hover td { background: #fafaf8; }
+  .trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 4px;
+    vertical-align: middle;
+  }
+  .trend.up   { color: #3B6D11; }
+  .trend.down { color: #A32D2D; }
+  .trend.flat { color: #b4b2a9; }
+  .fit-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 20px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .fit-badge.bom  { background: #e6f0db; color: #3B6D11; }
+  .fit-badge.med  { background: #fef3e2; color: #854F0B; }
+  .fit-badge.ruim { background: #fde8e8; color: #A32D2D; }
+
+  /* ── evolução semanal redesign ─────────────────────────────── */
+  .ev-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a18;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 16px;
+  }
+  .ev-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .ev-kpi-card {
+    background: #fafaf8;
+    border: 0.5px solid #eeede7;
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .ev-kpi-icon-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #73726c;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 8px;
+  }
+  .ev-kpi-value { font-size: 24px; font-weight: 500; line-height: 1; margin-bottom: 6px; }
+  .ev-kpi-vs   { font-size: 10.5px; color: #888780; }
+  .ev-kpi-vs .ev-up   { color: #3B6D11; font-weight: 600; }
+  .ev-kpi-vs .ev-down { color: #A32D2D; font-weight: 600; }
+
+  .ev-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    padding: 8px 12px;
+    background: #fafaf8;
+    border: 0.5px solid #eeede7;
+    border-radius: 8px;
+  }
+  .ev-filter-label { font-size: 11px; color: #73726c; font-weight: 500; }
+  .ev-filter input[type="date"] {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    color: #1a1a18;
+    border: 0.5px solid rgba(0,0,0,0.15);
+    border-radius: 6px;
+    padding: 5px 8px;
+    background: #fff;
+    outline: none;
+    cursor: pointer;
+  }
+  .ev-filter input[type="date"]:focus { border-color: #185FA5; }
+  .ev-filter-reset {
+    font-size: 11px;
+    color: #73726c;
+    background: none;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    margin-left: auto;
+  }
+  .ev-filter-reset:hover { background: #f1efe8; }
+  .ev-filter-quick {
+    font-size: 11px;
+    font-weight: 500;
+    color: #73726c;
+    background: none;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+  .ev-filter-quick:hover { background: #f1efe8; }
+  .ev-filter-quick.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+
+  .ev-charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .ev-chart-card {
+    background: #fafaf8;
+    border: 0.5px solid #eeede7;
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .ev-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #444441;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: 12px;
+  }
+  .ev-source { font-size: 10px; color: #b4b2a9; margin-top: 6px; }
+
+  .semanas-table td.cell-novos    { background: rgba(55,138,221,0.09); color: #185FA5; font-weight: 600; }
+  .semanas-table td.cell-apres    { background: rgba(29,158,117,0.09); color: #155c41; font-weight: 600; }
+  .semanas-table td.cell-prop     { background: rgba(239,159,39,0.09); color: #854F0B; font-weight: 600; }
+  .semanas-table td.cell-contrato { background: rgba(59,109,17,0.09);  color: #3B6D11; font-weight: 600; }
+  .semanas-table td.cell-zero     { color: #c8c6be; }
+
+  .insights-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .insight-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px 14px;
+    background: #fafaf8;
+    border: 0.5px solid #eeede7;
+    border-radius: 10px;
+  }
+  .insight-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+  }
+  .insight-icon.blue   { background: rgba(55,138,221,0.12);  color: #185FA5; }
+  .insight-icon.green  { background: rgba(29,158,117,0.12);  color: #155c41; }
+  .insight-icon.amber  { background: rgba(239,159,39,0.12);  color: #854F0B; }
+  .insight-icon.dgreen { background: rgba(59,109,17,0.12);   color: #3B6D11; }
+  .insight-icon.red    { background: rgba(163,45,45,0.12);   color: #A32D2D; }
+  .insight-title { font-size: 12.5px; font-weight: 600; color: #1a1a18; margin-bottom: 3px; }
+  .insight-body  { font-size: 11.5px; color: #5f5e5a; line-height: 1.5; }
+
+  /* chart toggles */
+  .chart-toggles { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .chart-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    color: #fff;
+    padding: 3px 10px 3px 8px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+  }
+  .chart-toggle-btn:hover { transform: translateY(-1px); }
+  .chart-toggle-btn.off { opacity: 0.3; text-decoration: line-through; }
+  .chart-toggle-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.6); }
+
+  @media print {
+    body { background: #fff; padding: 16px; }
+    .card, .analysis-section { break-inside: avoid; }
+    .rank-row { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <span class="header-dot" aria-hidden="true">◈</span>
+    <span class="header-label" id="headerLabel">CRM · Filtro: tag Instagram · carregando…</span>
+    <span style="margin-left:auto; background:#1a1a18; color:#fff; font-size:10px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.05em;">VERSÃO FULL</span>
+  </div>
+
+  <div id="conteudo">
+    <div class="estado">Carregando dados do CSV…</div>
+  </div>
+
+</div>
+
+<script>
+const FUNIL_CORES = ['#378ADD','#1D9E75','#EF9F27','#D85A30','#888780'];
+
+// ── Perfis ───────────────────────────────────────────────────────────────────
+const PERFIL_CORES = { 'Dentro Perfil': '#1D9E75', 'Fora Perfil': '#A32D2D', 'Perfil Indefinido': '#EF9F27' };
+let _perfisData = [], _perfilFiltro = 'todos';
+
+function renderLeadsGrid(filtro) {
+  const el = document.getElementById('perfilLeadsGrid');
+  if (!el) return;
+  if (filtro === 'todos') { el.classList.remove('visible'); return; }
+  const statusLabel = { ativo: 'Ativos', perdido: 'Perdidos', ganho: 'Ganhos' };
+  const leads = _perfisData.flatMap(p =>
+    (p.leads || []).filter(l => l.status.toLowerCase() === filtro)
+      .map(l => ({ ...l, perfil: p.tag, cor: PERFIL_CORES[p.tag] || '#73726c' }))
+  );
+  if (!leads.length) {
+    el.innerHTML = '<div style="color:#b4b2a9;font-size:12px;padding:10px 0;">Nenhum lead neste filtro.</div>';
+    el.classList.add('visible'); return;
+  }
+  const rows = leads.map(l => `<tr>
+    <td style="font-weight:500;">${l.titulo}</td>
+    <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${l.cor};margin-right:5px;"></span>${l.perfil}</td>
+    <td>${l.tempo !== null ? l.tempo + 'd' : '—'}</td>
+  </tr>`).join('');
+  el.innerHTML = `
+    <p class="leads-grid-title">${leads.length} lead${leads.length !== 1 ? 's' : ''} — ${statusLabel[filtro]}</p>
+    <div style="max-height:320px;overflow-y:auto;">
+      <table class="leads-table">
+        <thead><tr><th>Título do lead</th><th>Perfil</th><th style="text-align:right;">Tempo oport.</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  el.classList.add('visible');
+}
+
+function renderPerfis() {
+  const el = document.getElementById('perfilGrid');
+  if (!el) return;
+  const filtro = _perfilFiltro;
+  const total = _perfisData.reduce((a, p) => a + (filtro === 'todos' ? p.total : p[filtro] || 0), 0) || 1;
+  el.innerHTML = _perfisData.map(p => {
+    const n   = filtro === 'todos' ? p.total : (p[filtro] || 0);
+    const pct = Math.round(n / total * 100);
+    const cor = PERFIL_CORES[p.tag] || '#73726c';
+    return `<div class="perfil-row">
+      <span class="perfil-tag">${p.tag}</span>
+      <div class="perfil-bar-wrap"><div class="perfil-bar" style="width:${pct}%;background:${cor};"></div></div>
+      <span class="perfil-stat-n" style="color:${cor};">${n}</span>
+      <span class="perfil-stat-pct">${pct}%</span>
+      <div style="display:flex;gap:6px;font-size:10px;color:#b4b2a9;white-space:nowrap;">
+        <span style="color:#185FA5;">A:${p.ativo}</span>
+        <span style="color:#A32D2D;">P:${p.perdido}</span>
+        <span style="color:#3B6D11;">G:${p.ganho}</span>
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:#b4b2a9;font-size:12px;padding:10px 0;">Sem dados de perfil.</div>';
+  renderLeadsGrid(filtro);
+}
+
+function setupPerfis(perfis) {
+  _perfisData = perfis; _perfilFiltro = 'todos';
+  renderPerfis();
+  document.querySelectorAll('.perfil-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.perfil-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _perfilFiltro = btn.dataset.filtro;
+      renderPerfis();
+    });
+  });
+}
+
+const FEEDBACK_KEY = id => `feedback_prop_${id}`;
+
+function diasBadge(dias) {
+  if (dias === null || dias === undefined) return '—';
+  const cls = dias <= 7 ? 'ok' : dias <= 15 ? 'alerta' : 'critico';
+  return `<span class="dias-badge ${cls}">${dias}d</span>`;
+}
+
+function renderPropostasAtivas(lista) {
+  const el = document.getElementById('propostasAtivasBody');
+  if (!el) return;
+  if (!lista || !lista.length) {
+    el.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#b4b2a9;padding:20px;">Nenhuma proposta ativa no momento.</td></tr>';
+    return;
+  }
+  el.innerHTML = lista.map(p => {
+    const feedback = localStorage.getItem(FEEDBACK_KEY(p.id)) || '';
+    const ultCls   = !p.ult_contato ? 'color:#b4b2a9;' : '';
+    return `<tr>
+      <td style="font-weight:500;">${p.titulo}</td>
+      <td style="color:#73726c;white-space:nowrap;">${p.vendedor || '—'}</td>
+      <td style="white-space:nowrap;color:#73726c;">${p.data_proposta}</td>
+      <td>${diasBadge(p.dias_proposta)}</td>
+      <td style="white-space:nowrap;${ultCls}">${p.ult_contato || '—'}</td>
+      <td><textarea class="feedback-input${feedback ? ' feedback-saved' : ''}" rows="1"
+        data-id="${p.id}" placeholder="Anotação…">${feedback}</textarea></td>
+    </tr>`;
+  }).join('');
+  el.querySelectorAll('.feedback-input').forEach(ta => {
+    ta.addEventListener('input', () => {
+      localStorage.setItem(FEEDBACK_KEY(ta.dataset.id), ta.value);
+      ta.classList.toggle('feedback-saved', ta.value.length > 0);
+    });
+  });
+}
+
+function buildRanking(containerId, data, total, barColor) {
+  const maxVal = data[0]?.n || 1;
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  data.forEach((d, i) => {
+    const pct = Math.round(d.n / total * 100);
+    const barW = Math.round(d.n / maxVal * 100);
+    const row = document.createElement('div');
+    row.className = 'rank-row';
+    row.title = d.label;
+    row.innerHTML = `
+      <span class="rank-num ${i < 3 ? 'top' : ''}">${i + 1}</span>
+      <span class="rank-label">${d.label}</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:${barW}%;background:${barColor};"></div></div>
+      <span class="rank-count">${d.n}</span>
+      <span class="rank-pct">${pct}%</span>
+    `;
+    el.appendChild(row);
+  });
+}
+
+function buildFunil(containerId, funil) {
+  const base = funil[0]?.value || 1;
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  funil.forEach((d, i) => {
+    const pct = base > 0 ? Math.round(d.value / base * 100) : 0;
+    el.innerHTML += `
+      <div class="funnel-row">
+        <span class="funnel-label">${d.label}</span>
+        <div class="funnel-track">
+          <div class="funnel-fill" style="width:${pct}%; background:${FUNIL_CORES[i]}; min-width:${d.value > 0 ? '4px' : '0'};"></div>
+        </div>
+        <span class="funnel-val">${d.value}</span>
+        <span class="funnel-pct">${pct}%</span>
+      </div>`;
+  });
+}
+
+function renderAnalise(d) {
+  const k = d.kpis;
+  const top1 = d.ranking_todos[0];
+  const top1Pct = top1 ? Math.round(top1.n / d.total_perdidos * 100) : 0;
+  const top2 = d.ranking_todos[1];
+  const propPerdidos = d.total_perdidos_proposta;
+  const topProp1 = d.ranking_proposta[0];
+  const topProp2 = d.ranking_proposta[1];
+  const topProp3 = d.ranking_proposta[2];
+
+  const convZero = k.ganhos === 0;
+
+  return `
+    <div class="analysis-section">
+      <div class="analysis-header">
+        <i class="ti ti-report-analytics" aria-hidden="true"></i>
+        <span class="analysis-header-label">Análise e observações</span>
+      </div>
+      <div class="analysis-items">
+
+        <div class="analysis-item">
+          <i class="ti ti-trending-down analysis-icon danger" aria-hidden="true"></i>
+          <div>
+            <p class="analysis-title">Taxa de conversão ${convZero ? 'zero' : 'baixa'}</p>
+            <p class="analysis-body">Funil de conversão (${k.total} leads → ${k.ganhos} ganhos) revela uma taxa de conversão ${convZero ? 'zero' : 'muito baixa'} para contrato — indica problema sistêmico no canal Instagram, provavelmente na qualificação inicial.</p>
+          </div>
+        </div>
+
+        ${top1 ? `
+        <div class="analysis-item">
+          <i class="ti ti-alert-triangle analysis-icon warning" aria-hidden="true"></i>
+          <div>
+            <p class="analysis-title">Destaque crítico: ${top1.label}</p>
+            <p class="analysis-body">"${top1.label}" representa ${top1.n} de ${d.total_perdidos} perdas (${top1Pct}%).${top2 ? ` O 2º motivo é "${top2.label}" (${top2.n} perdas) — o filtro de entrada precisa ser mais rigoroso antes de chegar ao time comercial.` : ''}</p>
+          </div>
+        </div>` : ''}
+
+        ${topProp1 ? `
+        <div class="analysis-item">
+          <i class="ti ti-receipt analysis-icon muted" aria-hidden="true"></i>
+          <div>
+            <p class="analysis-title">Barreira financeira nas propostas</p>
+            <p class="analysis-body">Nas ${propPerdidos} propostas perdidas: "${topProp1.label}" lidera (${topProp1.n})${topProp2 ? `, seguida de "${topProp2.label}" (${topProp2.n})` : ''}${topProp3 ? ` e "${topProp3.label}" (${topProp3.n})` : ''}. A barreira financeira continua sendo o principal obstáculo após a proposta.</p>
+          </div>
+        </div>` : ''}
+
+        <div class="analysis-item">
+          <i class="ti ti-hourglass-empty analysis-icon muted" aria-hidden="true"></i>
+          <div>
+            <p class="analysis-title">Pipeline vivo praticamente inexistente</p>
+            <p class="analysis-body">Propostas em negociação ativa: apenas ${k.negociacao_ativa} — de ${k.propostas} que receberam proposta, ${k.propostas - k.negociacao_ativa} já se perderam. Praticamente não há pipeline vivo vindo desse canal.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>`;
+}
+
+// ── Evolução Semanal ────────────────────────────────────────────────────
+let _allSemanas = [];
+let _chartLine  = null;
+let _chartBar   = null;
+
+function fitBadge(novos, apres, prop) {
+  if (novos === 0) return '<span class="fit-badge ruim">fit baixo</span>';
+  const score = (apres + prop * 2) / (novos * 3);
+  if (score >= 0.25) return '<span class="fit-badge bom">bom fit</span>';
+  if (score >= 0.08) return '<span class="fit-badge med">fit médio</span>';
+  return '<span class="fit-badge ruim">fit baixo</span>';
+}
+
+function evDelta(atual, prev) {
+  if (prev === null) return '';
+  const d = atual - prev;
+  if (d === 0) return '<span style="color:#b4b2a9;"> — 0 (0%)</span>';
+  const pct = prev > 0 ? Math.round(d / prev * 100) : 100;
+  const cls = d > 0 ? 'ev-up' : 'ev-down';
+  const arr = d > 0 ? '↑' : '↓';
+  return ` <span class="${cls}">${arr}${Math.abs(d)} (${pct > 0 ? '+' : ''}${pct}%)</span>`;
+}
+
+function renderEvKpis(semanas) {
+  const el = document.getElementById('evKpis');
+  if (!el) return;
+  const last = semanas[semanas.length - 1] || null;
+  const prev = semanas.length > 1 ? semanas[semanas.length - 2] : null;
+
+  const nSem = semanas.length;
+  const periodo = nSem > 0
+    ? `${semanas[0].label.split('–')[0]} – ${semanas[nSem-1].label.split('–')[1] || ''}`
+    : '—';
+
+  function card(icon, color, label, key) {
+    const val = last ? last[key] : 0;
+    const pv  = prev ? prev[key] : null;
+    return `
+      <div class="ev-kpi-card">
+        <p class="ev-kpi-icon-label"><i class="ti ${icon}" style="color:${color}"></i> ${label}</p>
+        <p class="ev-kpi-value" style="color:${color}">${val}</p>
+        <p class="ev-kpi-vs">vs semana anterior${evDelta(val, pv)}</p>
+      </div>`;
+  }
+
+  el.innerHTML =
+    card('ti-user-plus',   '#378ADD', 'Leads Novos',    'novos') +
+    card('ti-presentation','#1D9E75', 'Apresentações',  'apresentacoes') +
+    card('ti-file-text',   '#EF9F27', 'Propostas',      'propostas') +
+    card('ti-check',       '#3B6D11', 'Contratos',      'ganhos') +
+    `<div class="ev-kpi-card">
+       <p class="ev-kpi-icon-label"><i class="ti ti-calendar" style="color:#73726c"></i> Período Analisado</p>
+       <p class="ev-kpi-value" style="font-size:13px;color:#1a1a18;margin-top:4px;">${periodo}</p>
+       <p class="ev-kpi-vs">${nSem} semana${nSem !== 1 ? 's' : ''}</p>
+     </div>`;
+}
+
+function renderEvTable(semanas) {
+  const tbody = document.getElementById('evTableBody');
+  if (!tbody) return;
+  const invertida = [...semanas].reverse();
+  tbody.innerHTML = invertida.map((s, i) => {
+    const prev  = i < invertida.length - 1 ? invertida[i + 1] : null;
+    const badge = fitBadge(s.novos, s.apresentacoes, s.propostas);
+    function cell(val, cls) {
+      return `<td class="${val === 0 ? 'cell-zero' : cls}">${val}</td>`;
+    }
+    return `<tr>
+      <td>${s.label}</td>
+      ${cell(s.novos,         'cell-novos')}
+      ${cell(s.apresentacoes, 'cell-apres')}
+      ${cell(s.propostas,     'cell-prop')}
+      ${cell(s.ganhos,        'cell-contrato')}
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderEvInsights(semanas) {
+  const el = document.getElementById('evInsights');
+  if (!el || !semanas.length) return;
+
+  const totNovos = semanas.reduce((a, s) => a + s.novos, 0);
+  const totApres = semanas.reduce((a, s) => a + s.apresentacoes, 0);
+  const totProp  = semanas.reduce((a, s) => a + s.propostas, 0);
+  const totGanho = semanas.reduce((a, s) => a + s.ganhos, 0);
+  const nSem     = semanas.length;
+
+  const pico = semanas.reduce((mx, s) => s.novos > mx.novos ? s : mx, semanas[0]);
+  const convPct = totNovos > 0 ? (totApres / totNovos * 100).toFixed(1) : '0';
+  const avgProp = (totProp / nSem).toFixed(1);
+
+  function insight(iconCls, icon, titleCls, title, body) {
+    return `
+      <div class="insight-item">
+        <div class="insight-icon ${iconCls}"><i class="ti ${icon}"></i></div>
+        <div>
+          <p class="insight-title" style="color:${titleCls}">${title}</p>
+          <p class="insight-body">${body}</p>
+        </div>
+      </div>`;
+  }
+
+  el.innerHTML =
+    insight('blue',   'ti-chart-bar',      '#185FA5',
+      'Pico de leads novos',
+      `Maior volume na semana ${pico.label} (${pico.novos} leads).`) +
+    insight('green',  'ti-trending-up',    '#155c41',
+      'Conversão média',
+      `Taxa média de conversão de leads para apresentações: ${convPct}%.`) +
+    insight('amber',  'ti-file-invoice',   '#854F0B',
+      'Propostas',
+      `Média de ${avgProp} proposta${avgProp !== '1.0' ? 's' : ''} por semana · ${totProp} no total.`) +
+    insight(totGanho > 0 ? 'dgreen' : 'red',
+      totGanho > 0 ? 'ti-check-circle' : 'ti-circle-x',
+      totGanho > 0 ? '#3B6D11' : '#A32D2D',
+      totGanho > 0 ? `${totGanho} contrato${totGanho > 1 ? 's' : ''} fechado${totGanho > 1 ? 's' : ''}` : 'Contratos ainda baixos',
+      totGanho > 0
+        ? `Canal Instagram converteu ${totGanho} contrato${totGanho > 1 ? 's' : ''} no período.`
+        : 'Nenhum contrato fechado no período. Acompanhe as negociações ativas.');
+}
+
+function buildEvCharts(semanas) {
+  if (_chartLine) { _chartLine.destroy(); _chartLine = null; }
+  if (_chartBar)  { _chartBar.destroy();  _chartBar  = null; }
+  if (!semanas.length) return;
+
+  const FONT = { family: 'Inter', size: 10 };
+  const tooltipOpts = {
+    backgroundColor: '#1a1a18',
+    titleFont: { family: 'Inter', size: 11 },
+    bodyFont:  { family: 'Inter', size: 12 },
+    padding: 10, cornerRadius: 8,
+  };
+
+  // Line chart
+  const ctxLine = document.getElementById('chartSemanasLine');
+  if (ctxLine) {
+    _chartLine = new Chart(ctxLine, {
+      type: 'line',
+      data: {
+        labels: semanas.map(s => s.label),
+        datasets: [
+          { label: 'Leads novos',    data: semanas.map(s => s.novos),         borderColor: '#378ADD', borderWidth: 2, pointRadius: 3, tension: 0.3, fill: false },
+          { label: 'Apresentações',  data: semanas.map(s => s.apresentacoes), borderColor: '#1D9E75', borderWidth: 2, pointRadius: 3, tension: 0.3, fill: false },
+          { label: 'Propostas',      data: semanas.map(s => s.propostas),     borderColor: '#EF9F27', borderWidth: 2, pointRadius: 3, tension: 0.3, fill: false },
+          { label: 'Contratos',      data: semanas.map(s => s.ganhos),        borderColor: '#3B6D11', borderWidth: 2, pointRadius: 3, tension: 0.3, fill: false },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'bottom', labels: { font: FONT, color: '#73726c', boxWidth: 12, boxHeight: 2, padding: 14 } },
+          tooltip: tooltipOpts,
+        },
+        scales: {
+          x: { grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: FONT, color: '#b4b2a9', maxRotation: 45 } },
+          y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: FONT, color: '#b4b2a9', stepSize: 1 } },
+        },
+      },
+    });
+  }
+
+  // Toggle buttons para o line chart
+  const togglesEl = document.getElementById('chartLineToggles');
+  if (togglesEl && _chartLine) {
+    const series = [
+      { label: 'Leads novos',   color: '#378ADD' },
+      { label: 'Apresentações', color: '#1D9E75' },
+      { label: 'Propostas',     color: '#EF9F27' },
+      { label: 'Contratos',     color: '#3B6D11' },
+    ];
+    togglesEl.innerHTML = series.map((s, i) =>
+      `<button class="chart-toggle-btn" data-idx="${i}" style="background:${s.color}">
+        <span class="chart-toggle-dot"></span>${s.label}
+       </button>`
+    ).join('');
+    togglesEl.querySelectorAll('.chart-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx  = +btn.dataset.idx;
+        const meta = _chartLine.getDatasetMeta(idx);
+        meta.hidden = !meta.hidden;
+        btn.classList.toggle('off');
+        _chartLine.update();
+      });
+    });
+  }
+
+  // Horizontal bar — médias
+  const ctxBar = document.getElementById('chartSemanasBar');
+  if (ctxBar) {
+    const n = semanas.length;
+    const avg = key => +(semanas.reduce((a, s) => a + s[key], 0) / n).toFixed(1);
+    document.getElementById('evAvgLabel').textContent = `Média por Semana (${n} semanas)`;
+    _chartBar = new Chart(ctxBar, {
+      type: 'bar',
+      data: {
+        labels: ['Leads novos', 'Apresentações', 'Propostas', 'Contratos'],
+        datasets: [{
+          data: [avg('novos'), avg('apresentacoes'), avg('propostas'), avg('ganhos')],
+          backgroundColor: ['rgba(55,138,221,0.75)','rgba(29,158,117,0.75)','rgba(239,159,39,0.75)','rgba(59,109,17,0.75)'],
+          borderRadius: 4,
+          borderSkipped: false,
+        }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            ...tooltipOpts,
+            callbacks: { label: ctx => ` ${ctx.raw} por semana` },
+          },
+          datalabels: { display: false },
+        },
+        scales: {
+          x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' }, ticks: { font: FONT, color: '#b4b2a9' } },
+          y: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 }, color: '#73726c' } },
+        },
+      },
+    });
+  }
+}
+
+function renderSemanas(semanas) {
+  if (!semanas || semanas.length === 0) return '';
+  _allSemanas = semanas;
+  const min = semanas[0].inicio;
+  const max = semanas[semanas.length - 1].inicio;
+  return `
+    <div class="semanas-section">
+      <p class="ev-title">Evolução Semanal – Funil de Vendas</p>
+
+      <div class="ev-kpi-grid" id="evKpis"></div>
+
+      <div class="ev-filter">
+        <span class="ev-filter-label">Período:</span>
+        <input type="date" id="filtroInicio" min="${min}" max="${max}" value="${min}">
+        <span class="ev-filter-label">até</span>
+        <input type="date" id="filtroFim"    min="${min}" max="${max}" value="${max}">
+        <button class="ev-filter-quick" id="filtro7d"  title="Última semana">7 dias</button>
+        <button class="ev-filter-quick" id="filtro30d" title="Último mês">30 dias</button>
+        <button class="ev-filter-reset" id="filtroReset">Limpar filtro</button>
+      </div>
+
+      <div class="ev-charts-grid">
+        <div class="ev-chart-card">
+          <p class="ev-section-label">Evolução Semanal</p>
+          <div class="chart-toggles" id="chartLineToggles"></div>
+          <div style="position:relative;height:186px;"><canvas id="chartSemanasLine"></canvas></div>
+          <p class="ev-source">Fonte: Dados internos do CRM</p>
+        </div>
+        <div class="ev-chart-card">
+          <p class="ev-section-label" id="evAvgLabel">Média por Semana</p>
+          <div style="position:relative;height:200px;"><canvas id="chartSemanasBar"></canvas></div>
+          <p class="ev-source">Fonte: Dados internos do CRM</p>
+        </div>
+      </div>
+
+      <p class="ev-section-label">Desempenho Semanal Detalhado</p>
+      <div style="max-height:320px;overflow-y:auto;">
+        <table class="semanas-table">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding-left:0;">Semana</th>
+              <th>Leads novos</th><th>Apresentações</th><th>Propostas</th><th>Contratos</th><th>Performance</th>
+            </tr>
+          </thead>
+          <tbody id="evTableBody"></tbody>
+        </table>
+      </div>
+      <p class="ev-source" style="margin-top:6px;">Fonte: Dados internos do CRM</p>
+
+      <p class="ev-section-label" style="margin-top:20px;">Insights do Período</p>
+      <div class="insights-grid" id="evInsights"></div>
+    </div>`;
+}
+
+function setupSemanas(semanas) {
+  function filtrados() {
+    const ini = document.getElementById('filtroInicio')?.value || '';
+    const fim = document.getElementById('filtroFim')?.value    || '';
+    return _allSemanas.filter(s => (!ini || s.inicio >= ini) && (!fim || s.inicio <= fim));
+  }
+  function atualizar() {
+    const f = filtrados();
+    renderEvKpis(f);
+    renderEvTable(f);
+    renderEvInsights(f);
+    buildEvCharts(f);
+  }
+  function setQuickActive(id) {
+    ['filtro7d','filtro30d'].forEach(b => document.getElementById(b)?.classList.remove('active'));
+    if (id) document.getElementById(id)?.classList.add('active');
+  }
+
+  function aplicarJanela(dias) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const dtInicio = new Date(hoje);
+    dtInicio.setDate(hoje.getDate() - dias + 1);
+    const toISO = d => d.toISOString().slice(0, 10);
+    document.getElementById('filtroInicio').value = toISO(dtInicio);
+    document.getElementById('filtroFim').value    = toISO(hoje);
+    atualizar();
+  }
+
+  document.getElementById('filtroInicio')?.addEventListener('change', () => { setQuickActive(null); atualizar(); });
+  document.getElementById('filtroFim')?.addEventListener('change',    () => { setQuickActive(null); atualizar(); });
+
+  document.getElementById('filtro7d')?.addEventListener('click', () => {
+    setQuickActive('filtro7d');
+    aplicarJanela(7);
+  });
+  document.getElementById('filtro30d')?.addEventListener('click', () => {
+    setQuickActive('filtro30d');
+    aplicarJanela(30);
+  });
+
+  document.getElementById('filtroReset')?.addEventListener('click', () => {
+    setQuickActive(null);
+    document.getElementById('filtroInicio').value = _allSemanas[0]?.inicio || '';
+    document.getElementById('filtroFim').value    = _allSemanas[_allSemanas.length - 1]?.inicio || '';
+    atualizar();
+  });
+  atualizar();
+}
+
+function renderDashboard(d) {
+  const k = d.kpis;
+
+  document.getElementById('headerLabel').textContent =
+    `CRM · Filtro: tag Instagram · ${d.csv}`;
+
+  document.getElementById('conteudo').innerHTML = `
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <p class="kpi-label">Total de leads</p>
+        <p class="kpi-value">${k.total}</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Leads ativos</p>
+        <p class="kpi-value blue">${k.ativos}</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Leads perdidos</p>
+        <p class="kpi-value red">${k.perdidos}</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Apresentações feitas</p>
+        <p class="kpi-value">${k.apresentacoes}</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Propostas negociadas</p>
+        <p class="kpi-value">${k.propostas}</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Em negociação ativa</p>
+        <p class="kpi-value amber">${k.negociacao_ativa}</p>
+        <p class="kpi-sub">proposta + status ativo</p>
+      </div>
+      <div class="kpi-card">
+        <p class="kpi-label">Contratos assinados</p>
+        <p class="kpi-value muted">${k.ganhos}</p>
+      </div>
+    </div>
+
+    <div class="charts-row">
+      <div class="card">
+        <p class="card-title">Motivos de perda — todos os leads</p>
+        <p class="card-sub">${d.total_perdidos} perdidos no total · fonte: ${d.csv}</p>
+        <div class="ranking-table" id="rankingTodos"></div>
+      </div>
+      <div class="card">
+        <p class="card-title">Motivos de perda — com proposta</p>
+        <p class="card-sub">${d.total_perdidos_proposta} perdidos que tiveram proposta</p>
+        <div class="ranking-table" id="rankingProposta"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:0;">
+      <p class="card-title" style="margin-bottom:16px;">Funil de conversão — Instagram</p>
+      <div id="funnel"></div>
+    </div>
+
+    ${renderAnalise(d)}
+    ${renderSemanas(d.semanas)}
+
+    <!-- Perfil dos Leads -->
+    <div class="card" style="margin-top:16px;">
+      <p class="card-title">Perfil dos Leads — Instagram</p>
+      <p class="card-sub">Leads com tag de perfil dentro/fora · fonte: ${d.csv}</p>
+      <div class="perfil-filtros">
+        <button class="perfil-btn active" data-filtro="todos">Todos</button>
+        <button class="perfil-btn" data-filtro="ativo">Ativo</button>
+        <button class="perfil-btn" data-filtro="perdido">Perdido</button>
+        <button class="perfil-btn" data-filtro="ganho">Ganho</button>
+      </div>
+      <div class="perfil-grid" id="perfilGrid"></div>
+      <div class="leads-grid" id="perfilLeadsGrid"></div>
+    </div>
+
+    <!-- Propostas ativas -->
+    <div class="card" style="margin-top:16px;">
+      <p class="card-title">Propostas em Aberto</p>
+      <p class="card-sub">${k.negociacao_ativa} oportunidade${k.negociacao_ativa !== 1 ? 's' : ''} com proposta ativa · ordenado por dias aguardando</p>
+      <div style="overflow-x:auto;">
+        <table class="prop-table">
+          <thead><tr>
+            <th>Título do negócio</th>
+            <th>Vendedor</th>
+            <th>Data proposta</th>
+            <th>Dias aguardando</th>
+            <th>Último contato</th>
+            <th>Feedback do vendedor</th>
+          </tr></thead>
+          <tbody id="propostasAtivasBody"></tbody>
+        </table>
+      </div>
+    </div>
+  `;
+
+  if (d.ranking_todos.length)    buildRanking('rankingTodos',    d.ranking_todos,    d.total_perdidos,          '#F09595');
+  if (d.ranking_proposta.length) buildRanking('rankingProposta', d.ranking_proposta, d.total_perdidos_proposta,  '#AFA9EC');
+  buildFunil('funnel', d.funil);
+  if (d.semanas?.length) setupSemanas(d.semanas);
+  renderPropostasAtivas(d.propostas_ativas || []);
+  if (d.perfis?.length) setupPerfis(d.perfis);
+}
+
+fetch('/api/instagram-data')
+  .then(r => r.json())
+  .then(d => {
+    if (d.erro) {
+      document.getElementById('conteudo').innerHTML =
+        `<div class="estado">Erro: ${d.erro}</div>`;
+      return;
+    }
+    renderDashboard(d);
+  })
+  .catch(err => {
+    document.getElementById('conteudo').innerHTML =
+      `<div class="estado">Falha ao buscar dados: ${err.message}</div>`;
+  });
+</script>
+</body>
+</html>
