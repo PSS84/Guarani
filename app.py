@@ -8,10 +8,17 @@ from collections import Counter
 import pandas as pd
 from flask import Flask, render_template, send_from_directory, jsonify, request
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+except ImportError:
+    pass
+
 BASE_DIR = Path(__file__).resolve().parent
 TEMPLATE_DIR = BASE_DIR / "guarani" / "templates"
 SCRIPT_DIR = BASE_DIR / "guarani" / "Script"
-DADOS_DIR = BASE_DIR / "dados"
+_dados_env = os.environ.get("GUARANI_DADOS_DIR")
+DADOS_DIR = Path(_dados_env) if _dados_env else BASE_DIR / "dados"
 
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.append(str(SCRIPT_DIR))
