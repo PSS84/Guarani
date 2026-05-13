@@ -147,6 +147,7 @@ body {
 
 .topbar-ts { font-size:11px; color:var(--sub); display:flex; align-items:center; gap:6px; }
 .topbar-ts::before { content:'◷'; font-size:13px; }
+.topbar-title { font-size:13px; font-weight:600; color:var(--muted); letter-spacing:.3px; }
 
 /* Main scrollable */
 .main {
@@ -310,6 +311,7 @@ body {
         <option value="">— selecione o vendedor —</option>
       </select>
     </div>
+    <span class="topbar-title" id="topbarMes"></span>
     <div class="topbar-right">
       <span class="topbar-ts" id="topbarTs">—</span>
     </div>
@@ -445,6 +447,12 @@ function renderSidebar(d, indVal, apresVal, propVal, eqVal) {
   `;
   document.getElementById('sidebarFooter').textContent = 'Atualizado ' + now();
   document.getElementById('topbarTs').textContent = 'Atualizado ' + now();
+
+  const MESES_FULL = {Jan:'Janeiro',Fev:'Fevereiro',Mar:'Março',Abr:'Abril',Mai:'Maio',
+    Jun:'Junho',Jul:'Julho',Ago:'Agosto',Set:'Setembro',Out:'Outubro',Nov:'Novembro',Dez:'Dezembro'};
+  const mesAbrev = Array.isArray(d.meses) && d.meses.length ? d.meses[d.meses.length - 1] : '';
+  const ano = new Date().getFullYear();
+  document.getElementById('topbarMes').textContent = mesAbrev ? `${MESES_FULL[mesAbrev] || mesAbrev} ${ano}` : '';
 }
 
 // ── Alerts — por criticidade ──────────────────────────────────────────────────
@@ -830,6 +838,13 @@ function origemBadge(origem) {
 function renderPendencias(lista) {
   if (!lista || !lista.length)
     return `<div class="pend-empty">Nenhuma pendência encontrada</div>`;
+  const seen = new Set();
+  lista = lista.filter(p => {
+    const key = `${p.origem}|${(p.titulo||'').trim().toLowerCase()}|${p.data||''}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
   const rows = lista.slice(0,8).map(p=>`
     <tr>
       <td>${origemBadge(p.origem)}</td>
