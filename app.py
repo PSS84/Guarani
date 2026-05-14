@@ -484,7 +484,7 @@ def _processar_metas(vendedor=None):
         raise ValueError("Planilha QtdeMetas: coluna OBI não encontrada.")
 
     return {
-        "dashboard_payload_ver": 4,
+        "dashboard_payload_ver": 5,  # mantido para compatibilidade; não utilizado pelo front
         "vendedor": vendedor,
         "vendedores": vendedores,
         "meses": [MESES_PT[m.month] for m in vdf["Mês"]],

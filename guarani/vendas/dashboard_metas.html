@@ -971,14 +971,9 @@ function renderDashboard(d) {
   _charts.prop  = buildBarQtyPct('cProp',  d.meses, propP,  d.proposta || [],      'prop');
 }
 
-// ── Bootstrap — troca de vendedor só atualiza JSON (sem recarregar página); cache por vendedor ──
-/** Incrementar quando mudar o cálculo da API (ex.: cobertura equipe) para forçar novo fetch e não reusar JSON velho na mesma aba. */
-const METAS_CACHE_VER = 8;
-/** Deve coincidir com dashboard_payload_ver em app.py — invalida cache salvo antes dessa versão do payload. */
-const DASH_PAYLOAD_VER = 4;
+// ── Bootstrap — troca de vendedor sempre busca dados frescos da API ──
 /** Persiste o vendedor escolhido para sobreviver a F5 / atualização do navegador (mesma aba). */
 const METAS_VENDEDOR_STORAGE_KEY = 'guarani_dashboard_metas_vendedor';
-const metasPorVendedor = Object.create(null);
 let ultimoVendedorCarregado = null;
 
 function persistVendedorNoStorage(v) {
@@ -990,12 +985,7 @@ function persistVendedorNoStorage(v) {
 
 function aplicarMetas(json) {
   if (json.erro) { console.error(json.erro); return; }
-  const nome = json.vendedor;
-  if (nome) {
-    json._metasCache = METAS_CACHE_VER;
-    metasPorVendedor[nome] = json;
-  }
-  ultimoVendedorCarregado = nome || null;
+  ultimoVendedorCarregado = json.vendedor || null;
   renderDashboard(json);
 }
 
@@ -1017,19 +1007,13 @@ function estadoSemVendedor() {
 
 function carregarMetas(v) {
   if (!v) return;
-  const cached = metasPorVendedor[v];
-  if (cached && cached._metasCache === METAS_CACHE_VER && cached.dashboard_payload_ver === DASH_PAYLOAD_VER) {
-    ultimoVendedorCarregado = v;
-    aplicarMetas(cached);
-    return;
-  }
-  fetch(`/api/metas-vendedor?vendedor=${encodeURIComponent(v)}&cb=${METAS_CACHE_VER}`)
+  fetch(`/api/metas-vendedor?vendedor=${encodeURIComponent(v)}`)
     .then(r=>r.json())
     .then(aplicarMetas)
     .catch(console.error);
 }
 
-fetch('/api/metas-vendedor?cb=' + METAS_CACHE_VER)
+fetch('/api/metas-vendedor')
   .then(r=>r.json())
   .then(d=>{
     const sel = document.getElementById('vendedorSelect');

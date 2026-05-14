@@ -1,128 +1,90 @@
-# Pendências para Subir o Ambiente — GitHub & Render
+# Pendencias — GitHub & Render
 
-> Antes de publicar o projeto, leia este arquivo e confirme cada item com o usuário.
-> Para cada pendência: confirmar o que será feito, executar e marcar como resolvido.
-
----
-
-## 1. PDFs, Imagens e Arquivos do Material de Apoio
-
-**Situação:** Os arquivos do diretório `guarani/rh/integracao/material_de_apoio/` estão linkados no `manual-vendedor.html` com caminhos relativos locais. Eles **não sobem para o GitHub** e **não funcionam no Render** dessa forma.
-
-**O que precisa ser feito:**
-- Decidir onde hospedar os arquivos:
-  - **Opção A — Google Drive:** Criar pasta `material_de_apoio`, subir os arquivos, compartilhar como público e substituir todos os links no HTML pelas URLs diretas do Drive.
-  - **Opção B — Render (servidor):** Adicionar rota no `app.py` para servir via `send_from_directory` e subir os arquivos junto ao repositório.
-- Atualizar todos os links no `manual-vendedor.html` com as URLs correspondentes à opção escolhida.
-
-**Arquivos envolvidos:**
-- `guarani/rh/integracao/manual-vendedor.html` — seções com links para `material_de_apoio/`
-- `guarani/rh/integracao/material_de_apoio/` — arquivos locais
-
-**Lista completa de arquivos que precisam ser hospedados:**
-
-*Seção 09 · Material de Apoio — PDFs (10 arquivos):*
-1. `[Guarani] Matrizes Comerciais ... v1 - 1. Encaixe Problema-Solução (PSF).pdf`
-2. `[Guarani] Matrizes Comerciais ... v1 - 2. SPIN Selling.pdf`
-3. `[Guarani] Matrizes Comerciais ... v1 - 3. Qualificação Pré-Vendas.pdf`
-4. `[Guarani] Matrizes Comerciais ... v1 - 4. Objeção.pdf`
-5. `Spin Selling - Alcançando Excelência Em Vendas - Neil Rackham.pdf`
-6. `[Guarani Sistemas] 4 pilares principais de uma estrutura de ligação.pptx.pdf`
-7. `[Guarani Sistemas] Investigação (SPIN Selling).pptx.pdf`
-8. `[Guarani Sistemas] Demonstração de Capacidade.pptx.pdf`
-9. `[Guarani] Script de Cold Call .pdf`
-10. `[Guarani Sistemas] Processo de Follow Up - Atualizado.pdf`
-
-*Seção 12 · Tarefas — Produtos Fase Inicial (2 arquivos):*
-11. `GuaraniAFV.pdf`
-12. `GuaraniB2B.pdf`
-
-*Seção 22 · Estrutura de Vendas (2 arquivos):*
-13. `02-Estrutura de Vendas.pdf`
-14. `02-Estrutura de Vendas.png` *(imagem exibida na seção)*
-
-*Seção 26 · Apresentações e Propostas (3 arquivos):*
-15. `GuaraniBI.pdf`
-16. `PROPOSTACLOUDICUS.pdf`
-17. `PropostaERP2026.pdf`
-
-> **Total: 16 PDFs + 1 PNG = 17 arquivos**
-
----
-
-## 2. Rota Flask para servir arquivos (Opção B — Render)
-
-**Situação:** Se decidir manter os arquivos no próprio Render (em vez de hospedagem externa), o `app.py` precisará de uma rota para servir os arquivos do `material_de_apoio`.
-
-**O que precisa ser feito:**
-- Adicionar a seguinte rota no `app.py`:
-
-```python
-@app.route("/guarani/rh/integracao/material_de_apoio/<path:filename>")
-def material_de_apoio(filename):
-    return send_from_directory(
-        str(BASE_DIR / "guarani" / "rh" / "integracao" / "material_de_apoio"),
-        filename
-    )
-```
-
-**Arquivo envolvido:**
-- `app.py`
-
----
-
-## 3. Arquivo render.yaml
-
-**Situação:** O projeto não possui o arquivo `render.yaml`, que conecta formalmente o projeto ao Render (define serviço, build command, start command).
-
-**O que precisa ser feito:**
-- Criar o `render.yaml` na raiz do projeto com o seguinte conteúdo:
-
-```yaml
-services:
-  - type: web
-    name: guarani
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
-```
-
-**Arquivo a criar:**
-- `render.yaml` (raiz do projeto)
-
----
-
-## 4. Verificar .gitignore
-
-**Situação:** Confirmar se os PDFs e arquivos binários estão corretamente listados no `.gitignore`.
-
-**O que precisa ser feito:**
-- **Se escolher Opção A (Google Drive):** garantir que `material_de_apoio/` está no `.gitignore` — os arquivos ficam no Drive, não no repo.
-- **Se escolher Opção B (Render):** remover `material_de_apoio/` do `.gitignore` para que os arquivos subam junto ao repositório.
-
-**Arquivo envolvido:**
-- `.gitignore`
-
----
-
-## 5. Seções com conteúdo baseado em arquivos locais (referência interna)
-
-**Situação:** As seções abaixo foram criadas com base em arquivos do `material_de_apoio` que **não estão diretamente linkados no HTML**, mas cujo conteúdo foi incorporado manualmente. Não há links a corrigir, mas é importante saber a origem caso precise atualizar o conteúdo futuramente.
-
-| Seção HTML | Arquivo de origem |
-|---|---|
-| 19 · Qualificação de Lead | `Formulário de Qualificação AFV.xlsx` |
-| 20 · PIC — Perfil Ideal do Cliente | `07 - PIC - Perfil Ideal Cliente.pdf` |
-
-**O que precisa ser feito:**
-- Nenhuma ação imediata para o deploy.
-- Se esses arquivos forem atualizados no futuro, rever as seções 19 e 20 do `manual-vendedor.html`.
+> Para cada nova pendencia: registrar aqui, confirmar com o usuario, executar e marcar como resolvido.
+>
+> **Status atual:** sem pendencias abertas. Registre aqui novas pendencias assim que surgirem.
 
 ---
 
 ## Como usar este arquivo
 
-Quando for subir o ambiente, envie para o assistente:
+Quando for subir o ambiente ou surgir uma nova pendencia, envie para o assistente:
 > "Leia o README_PENDENCIAS e me diga o que precisa ser feito."
 
-O assistente irá listar cada pendência, confirmar o que será executado e resolver item por item.
+O assistente ira listar cada pendencia, confirmar o que sera executado e resolver item por item.
+
+---
+
+## Logicas e Referencias
+
+### Funil Deduplicado — Contagem unica entre entidades (Prospect → Lead → Oportunidade)
+
+**Problema:** um registro pode existir nas tres entidades (prospect, lead, oportunidade) ao mesmo tempo.
+Contar todas gera duplicidade. A logica abaixo garante contagem unica.
+
+**Regra:**
+- Quando um prospect e **ganho** → migrou para Lead. **Nao contar no prospect.**
+- Quando um lead e **ganho** → migrou para Oportunidade. **Nao contar no lead.**
+- Prospect **perdido ou em aberto** → nao migrou. **Contar no prospect.**
+- Lead **perdido ou em aberto** → nao migrou. **Contar no lead.**
+- Oportunidade em **qualquer status** (ativo, ganho, perdido) → **sempre contar.**
+
+**Formula:**
+```
+Total unico = Prospects (perdidos + em aberto)
+            + Leads (perdidos + em aberto)
+            + Todas as oportunidades (ativo + ganho + perdido)
+```
+
+**Campos usados:**
+- Prospect: coluna `Ativo` + `Data de Perda` (sem status direto na API)
+- Lead: coluna `Status` (valores: Ganho, Perdido, Em andamento)
+- Oportunidade: coluna `Status` (valores: Ativo, Ganho, Perdido)
+
+> Implementar quando for construir o dashboard de funil deduplicado.
+
+---
+
+## Historico de pendencias resolvidas
+
+### Integracao API Leads2b — 13/05/2026 ✅
+
+| Item | Descricao | Status |
+|---|---|---|
+| 1 | Ler e analisar documentacao da API Leads2b (PDF) | ✅ Resolvido |
+| 2 | Criar script `api/leads2b_extrator.py` para extrair oportunidades e leads | ✅ Resolvido |
+| 3 | Mapear custom_fields reais da plataforma | ✅ Resolvido — descobertos via `--descobrir` |
+| 4 | Extrair historico completo (nov/2024 a mai/2026) | ✅ Resolvido — 543 oportunidades, 521 leads |
+
+**Observacoes:**
+- Script local apenas — nao faz parte do deploy no Render.
+- O campo `Descricao` (notas do SDR) nao e retornado pela API v1.
+- Dependencias locais necessarias: `requests` e `python-dateutil` (nao estao em `requirements.txt`).
+
+### Dashboards comerciais e Instagram — 10/05/2026 ✅
+
+| Item | Descricao | Status |
+|---|---|---|
+| 1 | Publicar dashboards Instagram geral e maio no Render | ✅ Resolvido — rotas `/guarani/crm/instagram` e `/guarani/crm/instagram/maio` |
+| 2 | Publicar CSV de oportunidades usado pelas APIs Instagram | ✅ Resolvido — `dados/crmoportunidades-336.csv` versionado |
+| 3 | Publicar dashboard de acompanhamento por vendedor Instagram | ✅ Resolvido — rota `/guarani/crm/instagram/vendedor` |
+| 4 | Publicar dashboard de metas e ranking comercial | ✅ Resolvido — rotas `/guarani/vendas/metas`, `/guarani/vendas/ranking` e `/guarani/vendas/ranking_vendedor` |
+| 5 | Publicar dados e imagens necessarios aos dashboards comerciais | ✅ Resolvido — `dados/Vendas2026.xlsx` e fotos dos vendedores em `dados/img/` |
+
+**Observacoes:**
+- `dados/img/meta.png` nao foi versionado porque nao sera usado no ranking atual.
+- Enquanto `crmoportunidades-336.csv` e `Vendas2026.xlsx` forem fontes versionadas, atualizacoes de dados exigem novo commit/push para refletir no Render.
+
+### Deploy inicial — 27/04/2026 ✅
+
+| Item | Descricao | Status |
+|---|---|---|
+| 1 | PDFs linkados localmente no `manual-vendedor.html` | ✅ Resolvido — hospedados no Google Drive |
+| 2 | Rota Flask para servir `material_de_apoio/` | ✅ Nao necessario — optado pelo Google Drive |
+| 3 | Criar `render.yaml` | ✅ Criado na raiz do projeto |
+| 4 | Revisar `.gitignore` | ✅ `material_de_apoio/` adicionado ao `.gitignore` |
+| 5 | Secoes 19 e 20 com conteudo de arquivos locais | ✅ Sem acao necessaria para deploy |
+
+**Arquivos hospedados no Google Drive:**
+Pasta: `https://drive.google.com/drive/folders/1l4QEjtjEkS_LCvQDlqQRahQ8ld1VukD5`
+Total: 16 PDFs + 1 PNG = 17 arquivos
