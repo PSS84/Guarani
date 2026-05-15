@@ -337,6 +337,83 @@ def _processar_vendedor(csv_path, vendedor=None):
     }
 
 
+def _processar_funil_mes(vendedor=None, mes=None, ano=None):
+    """Funil sem duplicados (Prospects + Leads + Oportunidades) para o vendedor no mês."""
+    from datetime import date as _date
+    dir_api = BASE_DIR / "dados" / "api_leads2b"
+    hoje = _date.today()
+    mes = mes or hoje.month
+    ano = ano or hoje.year
+    META_LEADS = 150
+
+    def _ler(nome):
+        p = dir_api / nome
+        if not p.exists():
+            return pd.DataFrame()
+        return pd.read_csv(p, encoding="utf-8-sig", low_memory=False)
+
+    def _filtrar(df, col_data, col_resp):
+        if df.empty:
+            return df
+        df = df.copy()
+        df["_dt"] = pd.to_datetime(df[col_data], dayfirst=True, errors="coerce")
+        mask = (df["_dt"].dt.month == mes) & (df["_dt"].dt.year == ano)
+        if vendedor:
+            primeiro = vendedor.split()[0].lower()
+            mask &= df[col_resp].fillna("").str.lower().str.startswith(primeiro)
+        return df[mask]
+
+    KW_INBOUND = ["campanha", "site", "mkt", "inbound", "facebook", "marketing"]
+    def _is_inbound(row):
+        if str(row.get("Funil", "")).strip().lower() == "inbound":
+            return True
+        return any(kw in str(row.get("Origem", "")).lower() for kw in KW_INBOUND)
+
+    df_p = _filtrar(_ler("prospects_base.csv"), "Data de Criação", "Responsável")
+    if not df_p.empty and "Ativo" in df_p.columns:
+        ativo  = df_p["Ativo"].astype(str).str.strip()
+        perda  = df_p["Data de Perda"].fillna("").astype(str).str.strip() if "Data de Perda" in df_p.columns else pd.Series([""] * len(df_p))
+        ganhou = (ativo == "0") & (perda == "")
+        df_p   = df_p[~ganhou]
+
+    df_l = _filtrar(_ler("leads_base.csv"), "Data de Criação", "Responsável")
+    if not df_l.empty and "Status" in df_l.columns:
+        df_l = df_l[df_l["Status"] != "Ganho"]
+
+    df_o = _filtrar(_ler("oportunidades_base.csv"), "Data de Criação", "Responsável")
+
+    def _cnt_inbound(df):
+        if df.empty:
+            return 0, 0
+        ib = df.apply(_is_inbound, axis=1)
+        return int(ib.sum()), int((~ib).sum())
+
+    p_ib, p_ob = _cnt_inbound(df_p)
+    l_ib, l_ob = _cnt_inbound(df_l)
+    o_ib, o_ob = _cnt_inbound(df_o)
+
+    total_p  = len(df_p)
+    total_l  = len(df_l)
+    total_o  = len(df_o)
+    total    = total_p + total_l + total_o
+    inbound  = p_ib + l_ib + o_ib
+    outbound = p_ob + l_ob + o_ob
+
+    return {
+        "total":         total,
+        "prospects":     total_p,
+        "leads":         total_l,
+        "oportunidades": total_o,
+        "inbound":       inbound,
+        "outbound":      outbound,
+        "meta":          META_LEADS,
+        "pct_meta":      round((total / META_LEADS) * 100, 1) if META_LEADS else 0,
+        "mes":           mes,
+        "ano":           ano,
+        "disponivel":    (dir_api / "leads_base.csv").exists(),
+    }
+
+
 def _processar_metas(vendedor=None):
     planilha = BASE_DIR / "dados" / "Vendas2026.xlsx"
     df = pd.read_excel(planilha, sheet_name="QtdeMetas")
@@ -504,6 +581,7 @@ def _processar_metas(vendedor=None):
         "pendencias":           pendencias,
         "total_contratos_pendentes": sum(1 for p in pendencias if p["origem"] == "contrato"),
         "total_perfil_indef":        sum(1 for p in pendencias if p["origem"] == "crm"),
+        "funil_mes":                 _processar_funil_mes(vendedor=vendedor),
     }
 
 

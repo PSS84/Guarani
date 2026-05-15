@@ -26,10 +26,25 @@
   --muted:         #64748B;
   --sub:           #94A3B8;
   /* indicadores */
+  --c-funil: #0891B2;
   --c-ind:   #059669;
   --c-eq:    #3B82F6;
   --c-apres: #7C3AED;
   --c-prop:  #D97706;
+}
+
+/* Cobertura individual na sidebar */
+.sidebar-cob-ind {
+  width: 100%; padding: 12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.sidebar-cob-ind-label {
+  font-size: 8px; color: rgba(255,255,255,0.40);
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.sidebar-cob-ind-delta {
+  font-size: 9px; text-align: center;
 }
 
 body {
@@ -298,6 +313,7 @@ body {
     <div class="profile-name" style="color:rgba(255,255,255,0.3);font-size:11px;">Nenhum vendedor</div>
   </div>
 
+  <div class="sidebar-cob-ind" id="sidebarCobInd"></div>
   <div class="sidebar-footer" id="sidebarFooter">Carregando...</div>
 </aside>
 
@@ -445,6 +461,36 @@ function renderSidebar(d, indVal, apresVal, propVal, eqVal) {
       </div>
     </div>
   `;
+
+  // Cobertura individual abaixo dos kpi-boxes — ring com label "Recorrente"
+  const pInd      = prev(d.cobertura_individual);
+  const dp        = ppDelta(indVal);
+  const trendInd  = pInd !== null
+    ? `${indVal >= pInd ? '▲' : '▼'} ${Math.abs(indVal - pInd).toFixed(1)} p.p. vs mês ant.`
+    : 'Primeiro mês';
+  const indColor      = colorOf(indVal);
+  const trendIndColor = pInd !== null && indVal >= pInd ? 'var(--c-ind)' : '#F87171';
+  const r = 46, cx = 54, cy = 54, circ = 2 * Math.PI * r;
+  const dash = (Math.min(indVal, 100) / 100 * circ).toFixed(2);
+  const cobIndEl = document.getElementById('sidebarCobInd');
+  if (cobIndEl) {
+    cobIndEl.innerHTML = `
+      <span class="sidebar-cob-ind-label">Cobertura individual</span>
+      <div class="score-ring" style="width:108px;height:108px;">
+        <svg width="108" height="108" viewBox="0 0 108 108">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="8"/>
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${indColor}" stroke-width="8"
+            stroke-dasharray="${dash} ${circ.toFixed(2)}" stroke-linecap="round"/>
+        </svg>
+        <div class="score-ring-label">
+          <span class="score-ring-val" style="font-size:20px;">${fmtPct(indVal)}</span>
+          <span class="score-ring-sub">Recorrente</span>
+        </div>
+      </div>
+      <span class="sidebar-cob-ind-delta" style="color:${dp.cls === 'pos' ? 'var(--c-ind)' : '#DC2626'};">${dp.txt} ${dp.cls === 'pos' ? 'superior à meta' : 'para atingir a meta'}</span>
+      <span class="sidebar-cob-ind-delta" style="color:${trendIndColor};">${trendInd}</span>
+    `;
+  }
   document.getElementById('sidebarFooter').textContent = 'Atualizado ' + now();
   document.getElementById('topbarTs').textContent = 'Atualizado ' + now();
 
@@ -458,11 +504,11 @@ function renderSidebar(d, indVal, apresVal, propVal, eqVal) {
 // ── Alerts — por criticidade ──────────────────────────────────────────────────
 // Cada alerta: { type, prioridade, msg }
 // prioridade: 0=crítico(red) 1=atenção(amber) 2=info(blue) 3=ok(green)
-function buildAlerts(d, indVal, apresVal, propVal, eqVal) {
+function buildAlerts(d, indVal, apresVal, propVal, eqVal, nContr, nIndef) {
   const candidatos = [];
   const prevInd  = prev(d.cobertura_individual);
-  const nContr   = d.total_contratos_pendentes || 0;
-  const nIndef   = d.total_perfil_indef        || 0;
+  if (nContr === undefined) nContr = d.total_contratos_pendentes || 0;
+  if (nIndef === undefined) nIndef = d.total_perfil_indef        || 0;
 
   // ── CRÍTICO (vermelho) ─────────────────────────────────
   if (nContr === 0)
@@ -864,6 +910,46 @@ function renderPendencias(lista) {
     ${mais}`;
 }
 
+// ── Card Prospect (funil sem duplicados) ──────────────────────────────────────
+function kpiCardFunil(f) {
+  if (!f || !f.disponivel) {
+    return `
+      <div class="kpi-card" style="border-left-color:#0891B2">
+        <div class="kpi-card-header">
+          <span class="kpi-card-label">Prospect / Leads</span>
+        </div>
+        <div class="kpi-val" style="color:#94A3B8;font-size:16px;margin-top:8px;">Sem dados</div>
+        <div class="kpi-sub">api_leads2b não encontrado</div>
+      </div>`;
+  }
+  const pct = f.pct_meta;
+  const dp  = ppDelta(pct);
+  return `
+    <div class="kpi-card" style="border-left-color:#0891B2;display:flex;flex-direction:row;gap:10px;align-items:stretch;">
+      <div style="flex:1;display:flex;flex-direction:column;gap:0;">
+        <div class="kpi-card-header">
+          <span class="kpi-card-label">Prospect</span>
+        </div>
+        <div class="kpi-val" style="color:#0891B2">${fmtPct(pct)}</div>
+        <div class="kpi-sub">vs meta (${f.meta}/mês)</div>
+        <div class="kpi-delta ${dp.cls}">${dp.txt}</div>
+        <div class="kpi-trend">${f.total} no funil · ${f.prospects}P · ${f.leads}L · ${f.oportunidades}O</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;justify-content:center;flex-shrink:0;">
+        <div style="background:rgba(55,138,221,0.08);border:0.5px solid rgba(55,138,221,0.25);border-radius:8px;padding:7px 10px;min-width:72px;">
+          <div style="font-size:9px;font-weight:700;color:#185FA5;margin-bottom:3px;">Inbound</div>
+          <div style="font-size:18px;font-weight:700;color:#185FA5;line-height:1;">${f.inbound ?? '—'}</div>
+          <div style="font-size:9px;color:#94A3B8;margin-top:2px;">origens digitais</div>
+        </div>
+        <div style="background:rgba(239,159,39,0.08);border:0.5px solid rgba(239,159,39,0.3);border-radius:8px;padding:7px 10px;min-width:72px;">
+          <div style="font-size:9px;font-weight:700;color:#854F0B;margin-bottom:3px;">Outbound</div>
+          <div style="font-size:18px;font-weight:700;color:#854F0B;line-height:1;">${f.outbound ?? '—'}</div>
+          <div style="font-size:9px;color:#94A3B8;margin-top:2px;">prospecção ativa</div>
+        </div>
+      </div>
+    </div>`;
+}
+
 // ── Render principal ──────────────────────────────────────────────────────────
 function renderDashboard(d) {
   const apresP = pctArr(d.apresentacao, d.apresentacao_ob);
@@ -876,7 +962,18 @@ function renderDashboard(d) {
 
   renderSidebar(d, indVal, apresVal, propVal, eqVal);
 
-  const alerts   = buildAlerts(d, indVal, apresVal, propVal, eqVal);
+  // deduplica pendências igual ao renderPendencias() para contar contratos corretos
+  const _seen = new Set();
+  const pendDedup = (d.pendencias || []).filter(p => {
+    const key = `${p.origem}|${(p.titulo||'').trim().toLowerCase()}|${p.data||''}`;
+    if (_seen.has(key)) return false;
+    _seen.add(key);
+    return true;
+  });
+  const nContrDedup = pendDedup.filter(p => p.origem === 'contrato').length;
+  const nIndefDedup = pendDedup.filter(p => p.origem === 'crm').length;
+
+  const alerts   = buildAlerts(d, indVal, apresVal, propVal, eqVal, nContrDedup, nIndefDedup);
   const insights = buildInsights(d, indVal, apresVal, propVal, eqVal);
 
   function kpiCard(label, val, history, color, borderColor) {
@@ -924,21 +1021,13 @@ function renderDashboard(d) {
     ${alertsHtml()}
 
     <div class="kpi-row">
-      ${kpiCard('Cobertura individual', indVal,  d.cobertura_individual, 'var(--c-ind)',  '#059669')}
-      ${kpiCard('Cobertura equipe',     eqVal,   eqSerie,                'var(--c-eq)',   '#3B82F6')}
+      ${kpiCardFunil(d.funil_mes)}
       ${kpiCard('Apresentações',        apresVal, apresP,                'var(--c-apres)','#7C3AED')}
       ${kpiCard('Propostas',            propVal,  propP,                 'var(--c-prop)', '#D97706')}
+      ${kpiCard('Cobertura equipe',     eqVal,   eqSerie,                'var(--c-eq)',   '#3B82F6')}
     </div>
 
     <div class="charts-row">
-      <div class="chart-card" data-color="ind">
-        <div class="chart-card-title">Cobertura individual (% da meta)</div>
-        <div class="chart-wrap"><canvas id="cInd"></canvas></div>
-      </div>
-      <div class="chart-card" data-color="eq">
-        <div class="chart-card-title">Cobertura equipe (% da meta)</div>
-        <div class="chart-wrap"><canvas id="cEq"></canvas></div>
-      </div>
       <div class="chart-card" data-color="apres">
         <div class="chart-card-title">Apresentações (% da meta)</div>
         <div class="chart-wrap"><canvas id="cApres"></canvas></div>
@@ -946,6 +1035,14 @@ function renderDashboard(d) {
       <div class="chart-card" data-color="prop">
         <div class="chart-card-title">Propostas (% da meta)</div>
         <div class="chart-wrap"><canvas id="cProp"></canvas></div>
+      </div>
+      <div class="chart-card" data-color="ind">
+        <div class="chart-card-title">Cobertura individual (% da meta)</div>
+        <div class="chart-wrap"><canvas id="cInd"></canvas></div>
+      </div>
+      <div class="chart-card" data-color="eq">
+        <div class="chart-card-title">Cobertura equipe (% da meta)</div>
+        <div class="chart-wrap"><canvas id="cEq"></canvas></div>
       </div>
     </div>
 
