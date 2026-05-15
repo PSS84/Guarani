@@ -888,6 +888,227 @@ def manual_vendedor():
     )
 
 
+@app.route("/guarani/crm/diagnostico")
+def diagnostico_prospectos():
+    return send_from_directory(str(BASE_DIR / "guarani" / "crm"), "diagnostico_prospecteleads.html")
+
+
+@app.route("/api/diagnostico-prospectos")
+def api_diagnostico_prospectos():
+    try:
+        api_dir = BASE_DIR / "dados" / "api_leads2b"
+        enc = "utf-8-sig"
+
+        prospects = pd.read_csv(api_dir / "prospects_base.csv", encoding=enc)
+        leads     = pd.read_csv(api_dir / "leads_base.csv",     encoding=enc)
+        opor      = pd.read_csv(api_dir / "oportunidades_base.csv", encoding=enc)
+
+        # Excluir responsáveis desligados / fora da análise comercial
+        EXCLUIR_RESP = {"Daniel Rubio Klein", "Fernanda Santiago", "Débora Duarte", "Damián Muñoz"}
+        for _df in [prospects, leads, opor]:
+            _df.drop(_df[_df["Responsável"].isin(EXCLUIR_RESP)].index, inplace=True)
+
+        # parse datas — _data (datetime) e _mes (period)
+        for df in [prospects, leads, opor]:
+            df["_data"] = pd.to_datetime(df["Data de Criação"], dayfirst=True, errors="coerce")
+            df["_mes"]  = df["_data"].dt.to_period("M")
+
+        # Lista de vendedores ANTES de qualquer filtro
+        todos_resp = sorted(set(
+            list(prospects["Responsável"].dropna().unique()) +
+            list(leads["Responsável"].dropna().unique()) +
+            list(opor["Responsável"].dropna().unique())
+        ))
+
+        # Filtro de período
+        data_inicio = request.args.get("data_inicio", "").strip()
+        data_fim    = request.args.get("data_fim",    "").strip()
+        dt_ini = pd.to_datetime(data_inicio, errors="coerce") if data_inicio else None
+        dt_fim = pd.to_datetime(data_fim,    errors="coerce") if data_fim    else None
+        if dt_ini is not None and pd.notna(dt_ini):
+            prospects = prospects[prospects["_data"] >= dt_ini].copy()
+            leads     = leads[leads["_data"]         >= dt_ini].copy()
+            opor      = opor[opor["_data"]           >= dt_ini].copy()
+        if dt_fim is not None and pd.notna(dt_fim):
+            prospects = prospects[prospects["_data"] <= dt_fim].copy()
+            leads     = leads[leads["_data"]         <= dt_fim].copy()
+            opor      = opor[opor["_data"]           <= dt_fim].copy()
+
+        # Filtro de vendedor
+        vendedor = request.args.get("vendedor", "").strip()
+        if vendedor:
+            prospects = prospects[prospects["Responsável"] == vendedor].copy()
+            leads     = leads[leads["Responsável"]         == vendedor].copy()
+            opor      = opor[opor["Responsável"]           == vendedor].copy()
+
+        # Funil sem Duplicados
+        prosp_ok = prospects[prospects["Data de Perda"].isna() | (prospects["Data de Perda"].astype(str).str.strip() == "")]
+
+        # Inbound — calcula antes de leads_ok para que leads_ok já herde a coluna
+        KW_INBOUND = ["campanha", "site", "mkt", "inbound", "facebook", "marketing"]
+        def _is_inbound(row):
+            if str(row.get("Funil", "")).strip().lower() == "inbound":
+                return True
+            return any(kw in str(row.get("Origem", "")).lower() for kw in KW_INBOUND)
+        leads["_inbound"]    = leads.apply(_is_inbound, axis=1)
+        prosp_ok["_inbound"] = prosp_ok.apply(_is_inbound, axis=1)
+        opor["_inbound"]     = opor.apply(_is_inbound, axis=1)
+
+        # leads_ok: exclui Ganho (migrou para Oportunidade) — base consistente com KPIs
+        leads_ok = leads[leads["Status"].str.strip() != "Ganho"].copy()
+
+        # Inbound/Outbound sobre o funil total (prospects + leads_ok + oportunidades)
+        lead_inbound  = int(prosp_ok["_inbound"].sum()) + int(leads_ok["_inbound"].sum()) + int(opor["_inbound"].sum())
+        lead_outbound = int((~prosp_ok["_inbound"]).sum()) + int((~leads_ok["_inbound"]).sum()) + int((~opor["_inbound"]).sum())
+
+        # KPIs gerais
+        total_a = int(len(prosp_ok))
+        total_b = int(len(leads_ok))
+        total_c = int(len(opor))
+        total   = total_a + total_b + total_c
+
+        # Por mês
+        def _mes_str(p): return str(p) if pd.notna(p) else "?"
+        a_mes = prosp_ok.groupby(prosp_ok["_mes"].map(_mes_str)).size().to_dict()
+        b_mes = leads_ok.groupby(leads_ok["_mes"].map(_mes_str)).size().to_dict()
+        c_mes = opor.groupby(opor["_mes"].map(_mes_str)).size().to_dict()
+        meses = sorted(set(list(a_mes) + list(b_mes) + list(c_mes)))
+        por_mes = [{"mes": m, "prospect": a_mes.get(m,0), "lead": b_mes.get(m,0), "opor": c_mes.get(m,0),
+                    "total": a_mes.get(m,0)+b_mes.get(m,0)+c_mes.get(m,0)} for m in meses]
+
+        # Por responsável
+        def _resp_agg(df, col="Responsável"):
+            return df.groupby(df[col].fillna("Sem responsável")).size().to_dict()
+        a_resp = _resp_agg(prosp_ok)
+        b_resp = _resp_agg(leads_ok)
+        c_resp = _resp_agg(opor)
+        resps  = sorted(set(list(a_resp)+list(b_resp)+list(c_resp)))
+        por_resp = [{"nome": r, "prospect": a_resp.get(r,0), "lead": b_resp.get(r,0),
+                     "opor": c_resp.get(r,0), "total": a_resp.get(r,0)+b_resp.get(r,0)+c_resp.get(r,0)}
+                    for r in resps]
+        por_resp.sort(key=lambda x: -x["total"])
+
+        # Inbound/outbound por mês — usa leads_ok (base do KPI Leads)
+        ib_mes = leads_ok[leads_ok["_inbound"]].groupby(leads_ok["_mes"].map(_mes_str)).size().to_dict()
+        ob_mes = leads_ok[~leads_ok["_inbound"]].groupby(leads_ok["_mes"].map(_mes_str)).size().to_dict()
+
+        # Sub-categorias Inbound — funil total (leads_ok + opor)
+        def _calc_inbound_subs(df_list):
+            import pandas as _pd2
+            ORIGENS_IB = {"Campanha", "Site", "Facebook", "Email Marketing", "Inbound", "Inbound Opens"}
+            partes = []
+            for df in df_list:
+                if "Origem" in df.columns:
+                    partes.append(df[df["Origem"].fillna("").str.strip().isin(ORIGENS_IB)].copy())
+            if not partes:
+                return []
+            df_ib = _pd2.concat(partes, ignore_index=True)
+            if df_ib.empty:
+                return []
+
+            tags = df_ib["TAGS"].fillna("").str.lower() if "TAGS" in df_ib.columns else _pd2.Series([""] * len(df_ib))
+            _ori = df_ib["Origem"].fillna("").str.strip()
+
+            _ig     = tags.str.contains("instagram")
+            _site   = (~_ig) & (_ori == "Site")
+            _fb     = (~_ig) & (_ori == "Facebook")
+            _em     = (~_ig) & (_ori == "Email Marketing")
+            _base   = ~(_ig | _site | _fb | _em)
+            _lp_comex = _base & tags.str.contains("comex")
+            _webinar  = _base & (~tags.str.contains("comex")) & tags.str.contains("webinar")
+            _lp       = _base & (~tags.str.contains("comex")) & (~tags.str.contains("webinar")) & tags.str.contains(r"\blp\b", regex=True)
+            _rep      = _base & (~tags.str.contains("comex")) & (~tags.str.contains("webinar")) & (~tags.str.contains(r"\blp\b", regex=True)) & tags.str.contains("rep")
+
+            n_lp = int(_lp.sum())
+            class_sem_lp = int(_ig.sum() + _site.sum() + _fb.sum() + _em.sum() +
+                                _lp_comex.sum() + _webinar.sum() + _rep.sum())
+            n_lp_total = n_lp + (int(len(df_ib)) - class_sem_lp - n_lp)
+
+            subs = [
+                {"nome": "Instagram",      "n": int(_ig.sum())},
+                {"nome": "Site",           "n": int(_site.sum())},
+                {"nome": "Facebook",       "n": int(_fb.sum())},
+                {"nome": "Email Marketing","n": int(_em.sum())},
+                {"nome": "LP Comex",       "n": int(_lp_comex.sum())},
+                {"nome": "Webinar",        "n": int(_webinar.sum())},
+                {"nome": "Landing Pages",  "n": n_lp_total},
+                {"nome": "Rep+",           "n": int(_rep.sum())},
+            ]
+            return [s for s in subs if s["n"] > 0]
+
+        # Sub-categorias Outbound
+        def _calc_outbound_subs(df_list):
+            import pandas as _pd3
+            OUTBOUND_ORIG = {"", "Outbound", "Base de empresas Leads2b", "Feiras"}
+            KW_FEIRA = ["abcasa", "abup", "feira", "feiras"]
+            partes = []
+            for df in df_list:
+                if "Origem" in df.columns:
+                    partes.append(df[df["Origem"].fillna("").str.strip().isin(OUTBOUND_ORIG)].copy())
+            if not partes:
+                return []
+            df_ob = _pd3.concat(partes, ignore_index=True)
+            if df_ob.empty:
+                return []
+            orig = df_ob["Origem"].fillna("").str.strip()
+            tag  = df_ob["TAGS"].fillna("").str.lower() if "TAGS" in df_ob.columns else _pd3.Series([""] * len(df_ob))
+            _feira = tag.apply(lambda t: any(kw in t for kw in KW_FEIRA))
+            _prosp = (~_feira) & (orig.isin({"", "Outbound"}))
+            _lista = ~(_feira | _prosp)
+            return [
+                {"nome": "Prospecção Ativa", "n": int(_prosp.sum())},
+                {"nome": "Listas Prontas",   "n": int(_lista.sum())},
+                {"nome": "Feiras",           "n": int(_feira.sum())},
+            ]
+
+        # Por origem — funil total (prosp_ok + leads_ok + opor)
+        def _normalizar_orig(serie):
+            s = serie.fillna("").str.strip()
+            s = s.replace("", "Outbound")
+            s = s.replace("Base de empresas Leads2b", "Outbound")
+            s = s.replace("Feiras", "Outbound")
+            s = s.replace("Inbound Opens", "Inbound")
+            s = s.replace("Campanha", "Inbound")
+            s = s.replace("Site", "Inbound")
+            s = s.replace("Facebook", "Inbound")
+            s = s.replace("Email Marketing", "Inbound")
+            return s
+
+        import pandas as _pd
+        orig_funil = _pd.concat([
+            _normalizar_orig(prosp_ok["Origem"]) if "Origem" in prosp_ok.columns else _pd.Series(["Outbound"] * len(prosp_ok)),
+            _normalizar_orig(leads_ok["Origem"]),
+            _normalizar_orig(opor["Origem"])     if "Origem" in opor.columns     else _pd.Series(["Outbound"] * len(opor)),
+        ], ignore_index=True)
+
+        por_origem = orig_funil.value_counts().head(15).reset_index()
+        por_origem.columns = ["origem","n"]
+        por_origem = por_origem.to_dict("records")
+
+        inbound_subs  = _calc_inbound_subs([leads_ok, opor])
+        outbound_subs = _calc_outbound_subs([prosp_ok, leads_ok, opor])
+
+        resp = jsonify({
+            "total": total,
+            "total_a": total_a,
+            "total_b": total_b,
+            "total_c": total_c,
+            "lead_inbound": lead_inbound,
+            "lead_outbound": lead_outbound,
+            "por_mes": por_mes,
+            "por_resp": por_resp,
+            "ib_mes": [{"mes": m, "inbound": ib_mes.get(m,0), "outbound": ob_mes.get(m,0)} for m in meses],
+            "por_origem": por_origem,
+            "inbound_subs": inbound_subs,
+            "outbound_subs": outbound_subs,
+            "vendedores": todos_resp,
+        })
+        resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        return resp
+    except Exception as exc:
+        return jsonify({"erro": str(exc)}), 500
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
