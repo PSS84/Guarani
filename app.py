@@ -763,6 +763,13 @@ def dashboard_metas():
     return resp
 
 
+@app.route("/guarani/vendas/metas-teste")
+def dashboard_metas_teste():
+    resp = send_from_directory(str(BASE_DIR / "guarani" / "vendas"), "dashboard_metas_teste.html")
+    resp.headers["Cache-Control"] = "no-cache, max-age=0, must-revalidate"
+    return resp
+
+
 @app.route("/api/metas-vendedor")
 def api_metas_vendedor():
     try:
