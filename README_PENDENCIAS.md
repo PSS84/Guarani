@@ -41,11 +41,30 @@ Total unico = Prospects (perdidos + em aberto)
 - Lead: coluna `Status` (valores: Ganho, Perdido, Em andamento)
 - Oportunidade: coluna `Status` (valores: Ativo, Ganho, Perdido)
 
-> Implementar quando for construir o dashboard de funil deduplicado.
+> Implementado em 15/05/2026 no `diagnostico_prospecteleads.html` e no card Prospect do `dashboard_metas.html`. Ver secao abaixo para detalhes.
 
 ---
 
 ## Historico de pendencias resolvidas
+
+### Dashboard Metas e Diagnostico Prospectos — 15/05/2026 ✅
+
+| Item | Descricao | Status |
+|---|---|---|
+| 1 | Card Prospect (funil sem duplicados) com Inbound/Outbound no dashboard metas | ✅ Resolvido |
+| 2 | Cobertura Individual movida para sidebar como anel "Recorrente" com delta vs meta | ✅ Resolvido |
+| 3 | Reordenacao KPIs: Prospect, Apresentacoes, Propostas, Equipe | ✅ Resolvido |
+| 4 | Reordenacao graficos: Apresentacoes, Propostas, Cob. Individual, Cob. Equipe | ✅ Resolvido |
+| 5 | Alertas alinhados com contagem deduplicada da tabela de Pendencias | ✅ Resolvido |
+| 6 | `dashboard_metas_teste.html` como sandbox local para testes antes de producao | ✅ Resolvido |
+| 7 | `_processar_funil_mes()` no `app.py` retorna funil_mes no payload `/api/metas-vendedor` | ✅ Resolvido |
+| 8 | Publicar `diagnostico_prospecteleads.html` e rotas `/guarani/crm/diagnostico` + `/api/diagnostico-prospectos` | ✅ Resolvido |
+| 9 | Versionar `dados/api_leads2b/*.csv` no GitHub para o Render acessar | ✅ Resolvido |
+
+**Observacoes:**
+- `dashboard_metas_teste.html` serve como sandbox local — nao e necessario publicar no Render.
+- Os CSVs da `api_leads2b/` precisam de commit manual a cada atualizacao via `leads2b_extrator.py`.
+- Extrator de oportunidades ja usa modo incremental (`updated_from`) — leads e prospects ainda fazem extracao completa.
 
 ### Integracao API Leads2b — 13/05/2026 ✅
 
