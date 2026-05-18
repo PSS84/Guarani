@@ -1,7 +1,9 @@
 import os
 import sys
 import glob
-from datetime import date
+import json
+import uuid
+from datetime import date, datetime
 from pathlib import Path
 from collections import Counter
 
@@ -1114,6 +1116,76 @@ def api_diagnostico_prospectos():
         return resp
     except Exception as exc:
         return jsonify({"erro": str(exc)}), 500
+
+
+@app.route("/operacao50")
+def operacao50():
+    return send_from_directory(str(BASE_DIR / "painel_pendencia"), "operacao50.html")
+
+
+# ── TAREFAS API ──
+TAREFAS_FILE = BASE_DIR / "painel_pendencia" / "tarefas.txt"
+
+def _ler_tarefas():
+    if not TAREFAS_FILE.exists():
+        return []
+    try:
+        return json.loads(TAREFAS_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return []
+
+def _salvar_tarefas(tarefas):
+    TAREFAS_FILE.write_text(
+        json.dumps(tarefas, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+@app.route("/api/tarefas", methods=["GET"])
+def api_tarefas_get():
+    return jsonify(_ler_tarefas())
+
+@app.route("/api/tarefas", methods=["POST"])
+def api_tarefas_post():
+    data    = request.get_json()
+    hoje    = datetime.today().strftime("%Y-%m-%d")
+    data_ex = data.get("data", hoje)
+    status  = "a_fazer" if data_ex == hoje else "pendente"
+    nova = {
+        "id":          str(uuid.uuid4()),
+        "titulo":      data.get("titulo") or data.get("desc", ""),
+        "desc":        data.get("desc", ""),
+        "entidade":    data.get("entidade", "trabalho"),
+        "prioridade":  data.get("prioridade", "B"),
+        "energia":     data.get("energia", "medio"),
+        "data":        data_ex,
+        "hora":        data.get("hora") or None,
+        "recorrencia": data.get("recorrencia", "nao"),
+        "status":      status,
+        "criado_em":   datetime.now().isoformat(),
+    }
+    tarefas = _ler_tarefas()
+    tarefas.append(nova)
+    _salvar_tarefas(tarefas)
+    return jsonify(nova), 201
+
+@app.route("/api/tarefas/<task_id>", methods=["DELETE"])
+def api_tarefas_delete(task_id):
+    tarefas = _ler_tarefas()
+    tarefas = [t for t in tarefas if t["id"] != task_id]
+    _salvar_tarefas(tarefas)
+    return jsonify({"ok": True})
+
+@app.route("/api/tarefas/<task_id>", methods=["PATCH"])
+def api_tarefas_patch(task_id):
+    data    = request.get_json()
+    tarefas = _ler_tarefas()
+    for t in tarefas:
+        if t["id"] == task_id:
+            for k, v in data.items():
+                if k != "id":
+                    t[k] = v
+            break
+    _salvar_tarefas(tarefas)
+    return jsonify({"ok": True})
 
 
 if __name__ == "__main__":
