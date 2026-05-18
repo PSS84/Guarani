@@ -368,8 +368,8 @@ function ppDelta(v)      {
   const d = (v-100).toFixed(1);
   return { txt: (d>=0?'+':'')+d+' p.p.', cls: d>=0?'pos':'neg' };
 }
-function scoreCalc(ind, apres, prop) {
-  return Math.min(ind,100)*0.50 + Math.min(apres,100)*0.25 + Math.min(prop,100)*0.25;
+function scoreCalc(ind, apres, prop, prosp) {
+  return Math.min(ind,100)*0.50 + Math.min(apres,100)*0.17 + Math.min(prop,100)*0.17 + Math.min(prosp||0,100)*0.16;
 }
 function now() {
   return new Date().toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'short'}).toUpperCase()
@@ -431,8 +431,8 @@ function cargoPorNome(nomeCompleto) {
   return 'Vendedor';
 }
 
-function renderSidebar(d, indVal, apresVal, propVal, eqVal) {
-  const score = scoreCalc(indVal, apresVal, propVal);
+function renderSidebar(d, indVal, apresVal, propVal, eqVal, prospVal) {
+  const score = scoreCalc(indVal, apresVal, propVal, prospVal);
   const sc    = score>=100?'#34D399':score>=50?'#FBBF24':'#F87171';
   const foto  = fotoVendedor(d.vendedor);
   const ini   = d.vendedor.charAt(0).toUpperCase();
@@ -448,7 +448,7 @@ function renderSidebar(d, indVal, apresVal, propVal, eqVal) {
     <div class="score-wrap">
       ${scoreRing(score, sc)}
       <span class="score-caption">Score geral</span>
-      <span class="score-como" title="Score = 50% Meta Individual + 25% Apresentações + 25% Propostas (teto 100% por indicador)">Como calculamos</span>
+      <span class="score-como" title="Score = 50% Meta Individual + 17% Apresentações + 17% Propostas + 16% Prospect (teto 100% por indicador)">Como calculamos</span>
     </div>
     <div class="kpi-boxes">
       <div class="kpi-box">
@@ -504,7 +504,7 @@ function renderSidebar(d, indVal, apresVal, propVal, eqVal) {
 // ── Alerts — por criticidade ──────────────────────────────────────────────────
 // Cada alerta: { type, prioridade, msg }
 // prioridade: 0=crítico(red) 1=atenção(amber) 2=info(blue) 3=ok(green)
-function buildAlerts(d, indVal, apresVal, propVal, eqVal, nContr, nIndef) {
+function buildAlerts(d, indVal, apresVal, propVal, eqVal, nContr, nIndef, prospVal) {
   const candidatos = [];
   const prevInd  = prev(d.cobertura_individual);
   if (nContr === undefined) nContr = d.total_contratos_pendentes || 0;
@@ -583,13 +583,13 @@ function buildAlerts(d, indVal, apresVal, propVal, eqVal, nContr, nIndef) {
   // Garantir sempre 3
   while (selecionados.length < 3)
     selecionados.push({type:'blue', p:2,
-      msg:`Score geral: ${fmtPct(scoreCalc(indVal,apresVal,propVal))} — acompanhe a evolução mensal`});
+      msg:`Score geral: ${fmtPct(scoreCalc(indVal,apresVal,propVal,prospVal))} — acompanhe a evolução mensal`});
 
   return selecionados;
 }
 
 // ── Insights ──────────────────────────────────────────────────────────────────
-function buildInsights(d, indVal, apresVal, propVal, eqVal) {
+function buildInsights(d, indVal, apresVal, propVal, eqVal, prospVal) {
   const prevInd  = prev(d.cobertura_individual);
   const indicadores = [
     {nome:'Meta individual', val:indVal},
@@ -959,8 +959,9 @@ function renderDashboard(d) {
   const eqVal   = last(eqSerie);
   const apresVal= last(apresP);
   const propVal = last(propP);
+  const prospVal= (d.funil_mes && d.funil_mes.disponivel) ? (d.funil_mes.pct_meta || 0) : 0;
 
-  renderSidebar(d, indVal, apresVal, propVal, eqVal);
+  renderSidebar(d, indVal, apresVal, propVal, eqVal, prospVal);
 
   // deduplica pendências igual ao renderPendencias() para contar contratos corretos
   const _seen = new Set();
@@ -973,8 +974,8 @@ function renderDashboard(d) {
   const nContrDedup = pendDedup.filter(p => p.origem === 'contrato').length;
   const nIndefDedup = pendDedup.filter(p => p.origem === 'crm').length;
 
-  const alerts   = buildAlerts(d, indVal, apresVal, propVal, eqVal, nContrDedup, nIndefDedup);
-  const insights = buildInsights(d, indVal, apresVal, propVal, eqVal);
+  const alerts   = buildAlerts(d, indVal, apresVal, propVal, eqVal, nContrDedup, nIndefDedup, prospVal);
+  const insights = buildInsights(d, indVal, apresVal, propVal, eqVal, prospVal);
 
   function kpiCard(label, val, history, color, borderColor) {
     const dp = ppDelta(val);
