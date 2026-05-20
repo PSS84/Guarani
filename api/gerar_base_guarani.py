@@ -1,7 +1,7 @@
 """
 Gera guarani/base/base_guarani.html
-Lê MapaOportunidadeClientesBaseGuarani.xlsm (sheet Clientes, 213 linhas, 85 colunas)
-e embute os dados como JSON no HTML.
+Lê MapaOportunidadeClientesBaseGuarani.xlsm (sheet Clientes, 214 linhas, 85 colunas)
+e embute os dados como JSON no HTML com TODOS os campos visíveis na tabela.
 """
 
 import json
@@ -99,6 +99,28 @@ COLUNAS = [
     "COUNT",                       # 84
 ]
 
+# Colunas booleanas (SIM/NÃO)
+BOOL_COLS = {
+    "IMPLANTADO","VIP","ATIVO",
+    "MÓDULO GUARANI ERP","MÓDULO GUARANI AFV","MÓDULO GUARANI BI",
+    "MÓDULO GUARANI B2B","MÓDULO GUARANI CLOUD",
+    "ADDON ERP PCP","ADDON ERP WMS","ADDON ERP MDFE","ADDON ERP TELEMARKETING",
+    "ADDON ERP CONTÁBIL","ADDON ERP CIAP","ADDON ERP MDE",
+    "ADDON ERP IMPORTAÇÃO XML","ADDON ERP LINK PAGAMENTO",
+    "ADDON ERP BOLETO WHATSAPP","ADDON ERP CTE",
+    "ALIANÇA ERP CONCIL","ALIANÇA ERP ROUTEASY","ALIANÇA ERP PDV",
+    "ALIANÇA ERP PLUGGTO","ALIANÇA ERP TRAY","ALIANÇA ERP KONCILI",
+    "ALIANÇA ERP JETCOMMERCE",
+    "ADDON AFV PESQUISA MERCADO","ADDON AFV ORÇAMENTO WEB","ADDON AFV AGENDA",
+    "ADDON AFV IARA","ADDON AFV MULTILOJAS","ADDON AFV LOJA B2B",
+    "ADDON AFV PROPOSTA WEB","GUARANI PDV MARKET",
+}
+
+# Colunas CNPJ extras (ocultas por padrão mas presentes nos dados)
+CNPJ_EXTRAS = ["CNPJ 1","CNPJ 2","CNPJ 3","CNPJ 4","CNPJ 5","CNPJ 6",
+               "CNPJ 7","CNPJ 8","CNPJ 9","CNPJ 10","CNPJ 11","CNPJ 12","CNPJ 13"]
+
+
 def val(v):
     if v is None:
         return ""
@@ -113,9 +135,8 @@ def ler_dados():
     ws = wb["Clientes"]
     rows = list(ws.iter_rows(values_only=True))
     wb.close()
-
     dados = []
-    for row in rows[1:]:  # pular cabeçalho
+    for row in rows[1:]:
         if all(c is None for c in row):
             continue
         rec = {COLUNAS[i]: val(row[i]) for i in range(min(len(COLUNAS), len(row)))}
@@ -125,7 +146,10 @@ def ler_dados():
 
 def gerar_html(dados):
     n = len(dados)
-    json_dados = json.dumps(dados, ensure_ascii=False)
+    json_dados  = json.dumps(dados,    ensure_ascii=False)
+    json_colunas = json.dumps(COLUNAS, ensure_ascii=False)
+    json_bool   = json.dumps(list(BOOL_COLS), ensure_ascii=False)
+    json_cnpj   = json.dumps(CNPJ_EXTRAS,    ensure_ascii=False)
 
     html = f"""<!DOCTYPE html>
 <html lang="pt-BR">
@@ -136,68 +160,57 @@ def gerar_html(dados):
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
   *{{margin:0;padding:0;box-sizing:border-box}}
-  body{{font-family:'Inter',sans-serif;background:#f4f6f9;color:#1a2332;padding:24px}}
+  body{{font-family:'Inter',sans-serif;background:#f4f6f9;color:#1a2332;padding:20px}}
 
-  /* HEADER */
-  .header{{background:#1a2332;color:#fff;padding:20px 28px;border-radius:10px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}}
-  .header h1{{font-size:18px;font-weight:600;letter-spacing:.3px}}
-  .badge{{background:#3b82f6;color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:500}}
+  .header{{background:#1a2332;color:#fff;padding:18px 24px;border-radius:10px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}}
+  .header h1{{font-size:17px;font-weight:600;letter-spacing:.3px}}
+  .badge{{background:#3b82f6;color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:500;white-space:nowrap}}
 
-  /* CONTROLS */
-  .controls{{display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap}}
-  input[type=text]{{flex:1;min-width:200px;padding:10px 14px;border:1px solid #dde3ec;border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border .2s}}
+  .controls{{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;align-items:center}}
+  input[type=text]{{flex:1;min-width:180px;padding:9px 13px;border:1px solid #dde3ec;border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border .2s}}
   input[type=text]:focus{{border-color:#3b82f6}}
-  select{{padding:10px 14px;border:1px solid #dde3ec;border-radius:8px;font-size:13px;font-family:inherit;outline:none;background:#fff;cursor:pointer}}
+  select{{padding:9px 12px;border:1px solid #dde3ec;border-radius:8px;font-size:12px;font-family:inherit;outline:none;background:#fff;cursor:pointer}}
   select:focus{{border-color:#3b82f6}}
+  .btn{{padding:9px 14px;border:1px solid #dde3ec;border-radius:8px;font-size:12px;font-family:inherit;background:#fff;cursor:pointer;color:#1a2332;white-space:nowrap}}
+  .btn:hover{{background:#f0f7ff;border-color:#3b82f6;color:#3b82f6}}
+  .btn.active{{background:#3b82f6;color:#fff;border-color:#3b82f6}}
 
-  .count{{font-size:12px;color:#64748b;padding:10px 0;margin-bottom:4px}}
+  .count{{font-size:12px;color:#64748b;margin-bottom:8px}}
 
-  /* TABLE */
-  .table-wrap{{overflow-x:auto;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07)}}
-  table{{width:100%;border-collapse:collapse;background:#fff}}
-  thead tr{{background:#1a2332;color:#fff}}
-  th{{padding:11px 14px;text-align:left;font-size:11px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;user-select:none;white-space:nowrap}}
+  .table-wrap{{overflow:auto;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);max-height:calc(100vh - 200px)}}
+  table{{border-collapse:collapse;background:#fff;font-size:12px;white-space:nowrap}}
+  thead tr{{background:#1a2332;color:#fff;position:sticky;top:0;z-index:10}}
+  th{{padding:10px 12px;text-align:left;font-size:10px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;user-select:none;border-right:1px solid #273449}}
   th:hover{{background:#273449}}
-  th.asc::after{{content:' ▲';font-size:10px}}
-  th.desc::after{{content:' ▼';font-size:10px}}
-  td{{padding:9px 14px;font-size:12px;border-bottom:1px solid #f0f3f7;white-space:nowrap}}
+  th.asc::after{{content:' ▲';font-size:9px;opacity:.8}}
+  th.desc::after{{content:' ▼';font-size:9px;opacity:.8}}
+  th.frozen{{position:sticky;left:0;z-index:20;background:#1a2332}}
+  th.frozen2{{position:sticky;left:52px;z-index:20;background:#1a2332;min-width:220px}}
+
+  td{{padding:8px 12px;border-bottom:1px solid #f0f3f7;border-right:1px solid #f5f7fa;vertical-align:middle}}
   tr:last-child td{{border-bottom:none}}
-  tbody tr:hover{{background:#f0f7ff;cursor:pointer}}
-  .hidden{{display:none}}
+  tbody tr:hover{{background:#f0f7ff}}
 
-  /* BADGES SIM/NÃO */
-  .sim{{display:inline-block;background:#dcfce7;color:#16a34a;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}}
-  .nao{{display:inline-block;background:#fee2e2;color:#dc2626;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}}
-  .vip{{display:inline-block;background:#fef3c7;color:#d97706;font-size:10px;font-weight:600;padding:2px 7px;border-radius:10px}}
+  td.frozen{{position:sticky;left:0;background:#fff;z-index:5;color:#64748b;font-weight:500;width:52px;min-width:52px}}
+  td.frozen2{{position:sticky;left:52px;background:#fff;z-index:5;min-width:220px;max-width:260px;overflow:hidden;text-overflow:ellipsis}}
+  tbody tr:hover td.frozen,
+  tbody tr:hover td.frozen2{{background:#f0f7ff}}
 
-  .id-col{{color:#64748b;font-weight:500;width:50px}}
-  .cnpj-col{{font-family:monospace;font-size:11px;color:#475569}}
-  .razao-col{{min-width:220px;white-space:normal!important;line-height:1.3}}
+  .sim{{display:inline-block;background:#dcfce7;color:#16a34a;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px}}
+  .nao{{display:inline-block;background:#f1f5f9;color:#94a3b8;font-size:10px;padding:1px 6px;border-radius:8px}}
+  .vip-tag{{display:inline-block;background:#fef3c7;color:#d97706;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px}}
+  .ativo-sim{{display:inline-block;background:#dcfce7;color:#16a34a;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px}}
+  .ativo-nao{{display:inline-block;background:#fee2e2;color:#dc2626;font-size:10px;font-weight:600;padding:1px 6px;border-radius:8px}}
 
-  /* MODAL */
-  .overlay{{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;justify-content:center;align-items:flex-start;padding:40px 20px;overflow-y:auto}}
-  .overlay.open{{display:flex}}
-  .modal{{background:#fff;border-radius:12px;width:100%;max-width:900px;box-shadow:0 8px 32px rgba(0,0,0,.2);overflow:hidden}}
-  .modal-head{{background:#1a2332;color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center}}
-  .modal-head h2{{font-size:15px;font-weight:600}}
-  .close-btn{{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;padding:0 4px}}
-  .close-btn:hover{{color:#3b82f6}}
-  .modal-body{{padding:20px 24px;max-height:75vh;overflow-y:auto}}
+  .hidden-col{{display:none}}
 
-  /* SEÇÕES DO MODAL */
-  .sec{{margin-bottom:20px}}
-  .sec-title{{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:#3b82f6;margin-bottom:10px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}}
-  .grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}}
-  .field{{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 10px}}
-  .field-label{{font-size:10px;color:#64748b;font-weight:500;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}}
-  .field-val{{font-size:12px;color:#1a2332;font-weight:500;word-break:break-word;white-space:normal}}
-  .field-val.sim-v{{color:#16a34a;font-weight:600}}
-  .field-val.nao-v{{color:#dc2626}}
-  .field-val.empty{{color:#94a3b8;font-style:italic}}
-
-  /* CNPJS extras */
-  .cnpj-list{{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}}
-  .cnpj-tag{{font-family:monospace;font-size:11px;background:#e2e8f0;color:#1a2332;padding:2px 8px;border-radius:4px}}
+  /* painel de colunas */
+  .col-panel{{display:none;background:#fff;border:1px solid #dde3ec;border-radius:10px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}}
+  .col-panel.open{{display:block}}
+  .col-panel h3{{font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}}
+  .col-grid{{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}}
+  .col-item{{display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:3px 0}}
+  .col-item input{{cursor:pointer;accent-color:#3b82f6}}
 </style>
 </head>
 <body>
@@ -208,302 +221,224 @@ def gerar_html(dados):
 </div>
 
 <div class="controls">
-  <input type="text" id="search" placeholder="Pesquisar por razão social, CNPJ, cidade, vendedor..." oninput="filtrar()">
-  <select id="filtro-ativo" onchange="filtrar()">
+  <input type="text" id="search" placeholder="Pesquisar por razão, CNPJ, cidade, vendedor..." oninput="filtrar()">
+  <select id="f-ativo" onchange="filtrar()">
     <option value="">Todos (Ativo)</option>
     <option value="SIM">Ativos</option>
-    <option value="NÃO">Inativos</option>
+    <option value="NAO">Inativos</option>
   </select>
-  <select id="filtro-uf" onchange="filtrar()">
+  <select id="f-uf" onchange="filtrar()">
     <option value="">Todos (UF)</option>
   </select>
-  <select id="filtro-vendedor" onchange="filtrar()">
+  <select id="f-vend" onchange="filtrar()">
     <option value="">Todos (Vendedor)</option>
   </select>
+  <button class="btn" id="btn-cols" onclick="toggleCols()">⚙ Colunas</button>
+</div>
+
+<div class="col-panel" id="col-panel">
+  <h3>Exibir / Ocultar Colunas</h3>
+  <div class="col-grid" id="col-grid"></div>
 </div>
 
 <div class="count" id="count">Carregando...</div>
 
 <div class="table-wrap">
-<table>
-  <thead>
-    <tr>
-      <th onclick="sort(0)">ID</th>
-      <th onclick="sort(1)">Razão Social</th>
-      <th onclick="sort(2)">CNPJ Principal</th>
-      <th onclick="sort(3)">Cidade</th>
-      <th onclick="sort(4)">UF</th>
-      <th onclick="sort(5)">Vendedor</th>
-      <th onclick="sort(6)">Responsável</th>
-      <th onclick="sort(7)">Ativo</th>
-      <th onclick="sort(8)">ERP</th>
-      <th onclick="sort(9)">AFV</th>
-      <th onclick="sort(10)">BI</th>
-      <th onclick="sort(11)">B2B</th>
-      <th onclick="sort(12)">CLOUD</th>
-      <th onclick="sort(13)">Qtde Usr ERP</th>
-      <th onclick="sort(14)">VIP</th>
-      <th onclick="sort(15)">Segmento</th>
-    </tr>
-  </thead>
-  <tbody id="tbody"></tbody>
-</table>
-</div>
-
-<!-- MODAL -->
-<div class="overlay" id="overlay" onclick="fecharModal(event)">
-  <div class="modal" id="modal">
-    <div class="modal-head">
-      <h2 id="modal-title">Detalhes do Cliente</h2>
-      <button class="close-btn" onclick="fecharModal()">✕</button>
-    </div>
-    <div class="modal-body" id="modal-body"></div>
-  </div>
+  <table id="tabela">
+    <thead><tr id="thead-row"></tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
 </div>
 
 <script>
-const DADOS = {json_dados};
+const DADOS   = {json_dados};
+const COLUNAS = {json_colunas};
+const BOOL_COLS = new Set({json_bool});
+const CNPJ_EXTRAS = new Set({json_cnpj});
 
-const COLS_TABLE = [
-  "ID","RAZÃO","CNPJ PRINCIPAL","CIDADE","UF","VENDEDOR","RESPONSÁVEL",
-  "ATIVO","MÓDULO GUARANI ERP","MÓDULO GUARANI AFV","MÓDULO GUARANI BI",
-  "MÓDULO GUARANI B2B","MÓDULO GUARANI CLOUD","QTDE USUÁRIO ERP","VIP","SEGMENTO"
-];
-
-// Seções para o modal
-const SECOES = [
-  {{
-    titulo: "Identificação",
-    campos: ["QTDE","ID","IMPLANTADO","CONTRATANTE","RAZÃO","CLIENTE","VIP","VENDEDOR","RESPONSÁVEL","DATA ASSINATURA CONTRATO","ATIVO","SEGMENTO","RAMO ATIVIDADE","BÔNUS","COUNT"]
-  }},
-  {{
-    titulo: "Localização",
-    campos: ["CIDADE","UF","LOGRADOURO","BAIRRO","CEP"]
-  }},
-  {{
-    titulo: "CNPJs",
-    campos: ["CNPJ PRINCIPAL","CNPJ 1","CNPJ 2","CNPJ 3","CNPJ 4","CNPJ 5","CNPJ 6","CNPJ 7","CNPJ 8","CNPJ 9","CNPJ 10","CNPJ 11","CNPJ 12","CNPJ 13"]
-  }},
-  {{
-    titulo: "Contato — Sócio",
-    campos: ["NOME SÓCIO","EMAIL SÓCIO","WHATSAPP SÓCIO"]
-  }},
-  {{
-    titulo: "Contato — Decisor",
-    campos: ["NOME DECISOR","E-MAIL DECISOR","WHATSAPP DECISOR"]
-  }},
-  {{
-    titulo: "Contato — Usuário Chave",
-    campos: ["NOME USUÁRIO CHAVE","E-MAIL USUÁRIO CHAVE","WHATSAPP USUÁRIO CHAVE"]
-  }},
-  {{
-    titulo: "Módulos Principais",
-    campos: ["MÓDULO GUARANI ERP","MÓDULO GUARANI AFV","MÓDULO GUARANI BI","MÓDULO GUARANI B2B","MÓDULO GUARANI CLOUD"]
-  }},
-  {{
-    titulo: "Add-ons ERP",
-    campos: ["ADDON ERP PCP","ADDON ERP WMS","ADDON ERP MDFE","ADDON ERP TELEMARKETING","ADDON ERP CONTÁBIL","ADDON ERP CIAP","ADDON ERP MDE","ADDON ERP IMPORTAÇÃO XML","ADDON ERP LINK PAGAMENTO","ADDON ERP BOLETO WHATSAPP","ADDON ERP CTE"]
-  }},
-  {{
-    titulo: "Alianças ERP",
-    campos: ["ALIANÇA ERP CONCIL","ALIANÇA ERP ROUTEASY","ALIANÇA ERP PDV","ALIANÇA ERP PLUGGTO","ALIANÇA ERP TRAY","ALIANÇA ERP KONCILI","ALIANÇA ERP JETCOMMERCE"]
-  }},
-  {{
-    titulo: "Add-ons AFV",
-    campos: ["ADDON AFV PESQUISA MERCADO","ADDON AFV ORÇAMENTO WEB","ADDON AFV AGENDA","ADDON AFV IARA","ADDON AFV MULTILOJAS","ADDON AFV LOJA B2B","ADDON AFV PROPOSTA WEB"]
-  }},
-  {{
-    titulo: "PDV",
-    campos: ["GUARANI PDV MARKET"]
-  }},
-  {{
-    titulo: "Quantidades",
-    campos: ["QTDE USUÁRIO ERP","QTDE GUARANI B2B","QTDE GUARANI BI","QTDE USUÁRIO AFV","QTDE USUÁRIO AFV PREPOSTO","QTDE USUÁRIO WMS","QTDE USUÁRIO PDV","QTDE USUÁRIO TELEMARKETING","TS CLOUD","QTDE USUÁRIO CONTÁBIL"]
-  }},
-  {{
-    titulo: "Online",
-    campos: ["SITE/REDES SOCIAIS"]
-  }}
-];
-
-const SIM_NOMES = new Set([
+// Colunas visíveis por padrão (as mais relevantes)
+const DEFAULT_VIS = new Set([
+  "ID","RAZÃO","CNPJ PRINCIPAL","IMPLANTADO","ATIVO","VIP","VENDEDOR","RESPONSÁVEL",
+  "DATA ASSINATURA CONTRATO","CIDADE","UF",
+  "NOME SÓCIO","EMAIL SÓCIO","WHATSAPP SÓCIO",
+  "NOME DECISOR","E-MAIL DECISOR","WHATSAPP DECISOR",
+  "NOME USUÁRIO CHAVE","E-MAIL USUÁRIO CHAVE","WHATSAPP USUÁRIO CHAVE",
   "MÓDULO GUARANI ERP","MÓDULO GUARANI AFV","MÓDULO GUARANI BI","MÓDULO GUARANI B2B","MÓDULO GUARANI CLOUD",
   "ADDON ERP PCP","ADDON ERP WMS","ADDON ERP MDFE","ADDON ERP TELEMARKETING","ADDON ERP CONTÁBIL",
   "ADDON ERP CIAP","ADDON ERP MDE","ADDON ERP IMPORTAÇÃO XML","ADDON ERP LINK PAGAMENTO",
   "ADDON ERP BOLETO WHATSAPP","ADDON ERP CTE",
   "ALIANÇA ERP CONCIL","ALIANÇA ERP ROUTEASY","ALIANÇA ERP PDV","ALIANÇA ERP PLUGGTO",
   "ALIANÇA ERP TRAY","ALIANÇA ERP KONCILI","ALIANÇA ERP JETCOMMERCE",
-  "ADDON AFV PESQUISA MERCADO","ADDON AFV ORÇAMENTO WEB","ADDON AFV AGENDA","ADDON AFV IARA",
-  "ADDON AFV MULTILOJAS","ADDON AFV LOJA B2B","ADDON AFV PROPOSTA WEB",
-  "GUARANI PDV MARKET","ATIVO","IMPLANTADO","VIP"
+  "ADDON AFV PESQUISA MERCADO","ADDON AFV ORÇAMENTO WEB","ADDON AFV AGENDA",
+  "ADDON AFV IARA","ADDON AFV MULTILOJAS","ADDON AFV LOJA B2B","ADDON AFV PROPOSTA WEB",
+  "GUARANI PDV MARKET",
+  "QTDE USUÁRIO ERP","QTDE GUARANI B2B","QTDE GUARANI BI","QTDE USUÁRIO AFV",
+  "QTDE USUÁRIO AFV PREPOSTO","QTDE USUÁRIO WMS","QTDE USUÁRIO PDV",
+  "QTDE USUÁRIO TELEMARKETING","TS CLOUD","QTDE USUÁRIO CONTÁBIL",
+  "SEGMENTO","RAMO ATIVIDADE","SITE/REDES SOCIAIS","BÔNUS","COUNT","QTDE",
+  "CONTRATANTE","CLIENTE","LOGRADOURO","BAIRRO","CEP"
 ]);
 
+let visivel = new Set(DEFAULT_VIS);
 let sortCol = -1, sortAsc = true;
 let filtrados = [...DADOS];
 
-// Popular selects
+// ── Selects ───────────────────────────────────────────────────────────────────
 function popularSelects() {{
-  const ufs = [...new Set(DADOS.map(d=>d["UF"]).filter(Boolean))].sort();
-  const sel_uf = document.getElementById("filtro-uf");
-  ufs.forEach(u => {{ const o=document.createElement("option"); o.value=u; o.textContent=u; sel_uf.appendChild(o); }});
-
+  const ufs  = [...new Set(DADOS.map(d=>d["UF"]).filter(Boolean))].sort();
   const vends = [...new Set(DADOS.map(d=>d["VENDEDOR"]).filter(Boolean))].sort();
-  const sel_v = document.getElementById("filtro-vendedor");
-  vends.forEach(v => {{ const o=document.createElement("option"); o.value=v; o.textContent=v; sel_v.appendChild(o); }});
+  const su = document.getElementById("f-uf");
+  const sv = document.getElementById("f-vend");
+  ufs.forEach(u  => {{ const o=document.createElement("option"); o.value=u; o.textContent=u; su.appendChild(o); }});
+  vends.forEach(v => {{ const o=document.createElement("option"); o.value=v; o.textContent=v; sv.appendChild(o); }});
 }}
 
-function simNao(v) {{
-  if(!v) return '<span class="nao">NÃO</span>';
-  const u = v.toString().toUpperCase().trim();
-  if(u==="SIM"||u==="1"||u==="X") return '<span class="sim">SIM</span>';
-  if(u==="NÃO"||u==="NAO"||u==="0"||u===""||u==="-") return '<span class="nao">NÃO</span>';
-  return `<span class="sim">{{v}}</span>`;
+// ── Painel de colunas ─────────────────────────────────────────────────────────
+function toggleCols() {{
+  const p = document.getElementById("col-panel");
+  const b = document.getElementById("btn-cols");
+  p.classList.toggle("open");
+  b.classList.toggle("active");
+}}
+
+function buildColPanel() {{
+  const grid = document.getElementById("col-grid");
+  grid.innerHTML = "";
+  COLUNAS.forEach(c => {{
+    const lbl = document.createElement("label");
+    lbl.className = "col-item";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = visivel.has(c);
+    cb.onchange = () => {{
+      if(cb.checked) visivel.add(c); else visivel.delete(c);
+      renderHeader();
+      renderTabela();
+    }};
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(c));
+    grid.appendChild(lbl);
+  }});
+}}
+
+// ── Render cabeçalho ─────────────────────────────────────────────────────────
+function renderHeader() {{
+  const tr = document.getElementById("thead-row");
+  tr.innerHTML = "";
+  COLUNAS.forEach((c, i) => {{
+    if(!visivel.has(c)) return;
+    const th = document.createElement("th");
+    th.textContent = c;
+    if(c === "ID")   th.className = "frozen";
+    if(c === "RAZÃO") th.className = "frozen2";
+    th.onclick = () => sort(i);
+    tr.appendChild(th);
+  }});
+  // Atualizar indicador de sort
+  atualizarSortIndicador();
+}}
+
+function atualizarSortIndicador() {{
+  document.querySelectorAll("th").forEach(th => th.classList.remove("asc","desc"));
+  if(sortCol < 0) return;
+  const col = COLUNAS[sortCol];
+  const ths = [...document.querySelectorAll("#thead-row th")];
+  const nomes = [...document.querySelectorAll("#thead-row th")].map(t=>t.textContent.replace(/[ ▲▼]/g,''));
+  const idx = nomes.indexOf(col);
+  if(idx>=0) ths[idx].classList.add(sortAsc?"asc":"desc");
+}}
+
+// ── Render tabela ─────────────────────────────────────────────────────────────
+function celula(col, val) {{
+  if(col === "ID")    return `<td class="frozen">${{val||""}}</td>`;
+  if(col === "RAZÃO") return `<td class="frozen2" title="${{val||""}}">${{val||""}}</td>`;
+
+  if(col === "ATIVO") {{
+    const u = (val||"").toUpperCase().trim();
+    const ok = u==="SIM"||u==="1"||u==="X";
+    return `<td>${{ok?'<span class="ativo-sim">SIM</span>':'<span class="ativo-nao">NÃO</span>'}}</td>`;
+  }}
+  if(col === "VIP") {{
+    const u = (val||"").toUpperCase().trim();
+    const ok = u==="SIM"||u==="1"||u==="X";
+    return `<td>${{ok?'<span class="vip-tag">VIP</span>':val||""}}</td>`;
+  }}
+  if(BOOL_COLS.has(col)) {{
+    const u = (val||"").toUpperCase().trim();
+    const ok = u==="SIM"||u==="1"||u==="X";
+    return `<td style="text-align:center">${{ok?'<span class="sim">✓</span>':'<span class="nao">—</span>'}}</td>`;
+  }}
+  return `<td>${{val||""}}</td>`;
 }}
 
 function renderTabela() {{
   const tbody = document.getElementById("tbody");
-  if(!filtrados.length){{
-    tbody.innerHTML = '<tr><td colspan="16" style="text-align:center;padding:30px;color:#94a3b8">Nenhum resultado encontrado.</td></tr>';
+  if(!filtrados.length) {{
+    tbody.innerHTML = '<tr><td colspan="99" style="text-align:center;padding:30px;color:#94a3b8">Nenhum resultado.</td></tr>';
     document.getElementById("count").textContent = "Nenhum resultado.";
     return;
   }}
-  const linhas = filtrados.map((d,i) => {{
-    const ativo = d["ATIVO"]||"";
-    const aU = ativo.toUpperCase().trim();
-    const ativoHtml = (aU==="SIM"||aU==="1"||aU==="X") ? '<span class="sim">SIM</span>' : '<span class="nao">NÃO</span>';
-    const vip = d["VIP"]||"";
-    const vipHtml = vip && (vip.toUpperCase().trim()==="SIM"||vip==="1"||vip==="X") ? '<span class="vip">VIP</span>' : (vip||"—");
-
-    const modBadge = k => {{
-      const v=(d[k]||"").toUpperCase().trim();
-      return (v==="SIM"||v==="1"||v==="X") ? '<span class="sim">✓</span>' : '<span class="nao">—</span>';
-    }};
-
-    return `<tr onclick="abrirModal(${{i}})">
-      <td class="id-col">${{d["ID"]||""}}</td>
-      <td class="razao-col">${{d["RAZÃO"]||d["CLIENTE"]||"—"}}</td>
-      <td class="cnpj-col">${{d["CNPJ PRINCIPAL"]||""}}</td>
-      <td>${{d["CIDADE"]||""}}</td>
-      <td>${{d["UF"]||""}}</td>
-      <td>${{d["VENDEDOR"]||""}}</td>
-      <td>${{d["RESPONSÁVEL"]||""}}</td>
-      <td>${{ativoHtml}}</td>
-      <td style="text-align:center">${{modBadge("MÓDULO GUARANI ERP")}}</td>
-      <td style="text-align:center">${{modBadge("MÓDULO GUARANI AFV")}}</td>
-      <td style="text-align:center">${{modBadge("MÓDULO GUARANI BI")}}</td>
-      <td style="text-align:center">${{modBadge("MÓDULO GUARANI B2B")}}</td>
-      <td style="text-align:center">${{modBadge("MÓDULO GUARANI CLOUD")}}</td>
-      <td style="text-align:center">${{d["QTDE USUÁRIO ERP"]||""}}</td>
-      <td>${{vipHtml}}</td>
-      <td>${{d["SEGMENTO"]||""}}</td>
-    </tr>`;
-  }}).join("");
-  tbody.innerHTML = linhas;
-  const total = DADOS.length;
-  document.getElementById("count").textContent = `Exibindo ${{filtrados.length}} de ${{total}} clientes`;
+  const cols = COLUNAS.filter(c => visivel.has(c));
+  tbody.innerHTML = filtrados.map(d =>
+    `<tr>${{cols.map(c => celula(c, d[c]||"")).join("")}}</tr>`
+  ).join("");
+  document.getElementById("count").textContent =
+    `Exibindo ${{filtrados.length}} de ${{DADOS.length}} clientes`;
 }}
 
+// ── Filtrar ───────────────────────────────────────────────────────────────────
 function filtrar() {{
-  const q = document.getElementById("search").value.toLowerCase().trim();
-  const ativo = document.getElementById("filtro-ativo").value.toUpperCase().trim();
-  const uf = document.getElementById("filtro-uf").value;
-  const vend = document.getElementById("filtro-vendedor").value;
+  const q    = document.getElementById("search").value.toLowerCase().trim();
+  const fAtivo = document.getElementById("f-ativo").value;
+  const fUf    = document.getElementById("f-uf").value;
+  const fVend  = document.getElementById("f-vend").value;
 
   filtrados = DADOS.filter(d => {{
     if(q) {{
-      const texto = [d["RAZÃO"],d["CLIENTE"],d["CNPJ PRINCIPAL"],d["CIDADE"],d["VENDEDOR"],d["RESPONSÁVEL"],d["SEGMENTO"]].join(" ").toLowerCase();
-      if(!texto.includes(q)) return false;
+      const txt = [d["RAZÃO"],d["CLIENTE"],d["CNPJ PRINCIPAL"],d["CIDADE"],
+                   d["VENDEDOR"],d["RESPONSÁVEL"],d["SEGMENTO"],d["NOME SÓCIO"],
+                   d["NOME DECISOR"],d["NOME USUÁRIO CHAVE"]].join(" ").toLowerCase();
+      if(!txt.includes(q)) return false;
     }}
-    if(ativo) {{
-      const a=(d["ATIVO"]||"").toUpperCase().trim();
-      const eAtivo=(a==="SIM"||a==="1"||a==="X");
-      if(ativo==="SIM" && !eAtivo) return false;
-      if(ativo==="NÃO" && eAtivo) return false;
+    if(fAtivo) {{
+      const a = (d["ATIVO"]||"").toUpperCase().trim();
+      const ok = a==="SIM"||a==="1"||a==="X";
+      if(fAtivo==="SIM" && !ok) return false;
+      if(fAtivo==="NAO" && ok)  return false;
     }}
-    if(uf && d["UF"]!==uf) return false;
-    if(vend && d["VENDEDOR"]!==vend) return false;
+    if(fUf   && d["UF"]      !== fUf)   return false;
+    if(fVend && d["VENDEDOR"] !== fVend) return false;
     return true;
   }});
 
-  if(sortCol>=0) aplicarSort();
+  if(sortCol >= 0) aplicarSort();
   else renderTabela();
 }}
 
-function sort(col) {{
-  const ths = document.querySelectorAll("th");
-  ths.forEach((t,i)=>{{t.classList.remove("asc","desc")}});
-  if(sortCol===col) sortAsc=!sortAsc;
-  else {{ sortCol=col; sortAsc=true; }}
-  ths[col].classList.add(sortAsc?"asc":"desc");
+// ── Ordenar ───────────────────────────────────────────────────────────────────
+function sort(colIdx) {{
+  if(sortCol === colIdx) sortAsc = !sortAsc;
+  else {{ sortCol = colIdx; sortAsc = true; }}
   aplicarSort();
+  atualizarSortIndicador();
 }}
 
-const SORT_KEYS = ["ID","RAZÃO","CNPJ PRINCIPAL","CIDADE","UF","VENDEDOR","RESPONSÁVEL","ATIVO",
-  "MÓDULO GUARANI ERP","MÓDULO GUARANI AFV","MÓDULO GUARANI BI","MÓDULO GUARANI B2B","MÓDULO GUARANI CLOUD",
-  "QTDE USUÁRIO ERP","VIP","SEGMENTO"];
-
 function aplicarSort() {{
-  const key = SORT_KEYS[sortCol];
+  const key = COLUNAS[sortCol];
   filtrados.sort((a,b) => {{
     const va = (a[key]||"").toString().toLowerCase();
     const vb = (b[key]||"").toString().toLowerCase();
-    const na=parseFloat(va), nb=parseFloat(vb);
+    const na = parseFloat(va), nb = parseFloat(vb);
     const cmp = (!isNaN(na)&&!isNaN(nb)) ? na-nb : va.localeCompare(vb,"pt-BR");
     return sortAsc ? cmp : -cmp;
   }});
   renderTabela();
 }}
 
-function abrirModal(idx) {{
-  const d = filtrados[idx];
-  const razao = d["RAZÃO"]||d["CLIENTE"]||"Cliente";
-  document.getElementById("modal-title").textContent = razao;
-
-  let html = "";
-  SECOES.forEach(sec => {{
-    const temDados = sec.campos.some(c => d[c] && d[c].toString().trim()!=="");
-    if(!temDados) return;
-
-    if(sec.titulo==="CNPJs") {{
-      const cnpjs = sec.campos.map(c=>d[c]).filter(v=>v&&v.trim());
-      if(!cnpjs.length) return;
-      html += `<div class="sec"><div class="sec-title">${{sec.titulo}}</div><div class="cnpj-list">`;
-      cnpjs.forEach(cn => {{ html += `<span class="cnpj-tag">${{cn}}</span>`; }});
-      html += `</div></div>`;
-      return;
-    }}
-
-    html += `<div class="sec"><div class="sec-title">${{sec.titulo}}</div><div class="grid">`;
-    sec.campos.forEach(campo => {{
-      const v = (d[campo]||"").toString().trim();
-      let valHtml;
-      if(SIM_NOMES.has(campo)) {{
-        const u=v.toUpperCase();
-        if(u==="SIM"||u==="1"||u==="X") valHtml=`<span class="field-val sim-v">✓ SIM</span>`;
-        else if(!v||u==="NÃO"||u==="NAO"||u==="-"||u==="0") valHtml=`<span class="field-val nao-v">— NÃO</span>`;
-        else valHtml=`<span class="field-val">${{v}}</span>`;
-      }} else {{
-        valHtml = v ? `<span class="field-val">${{v}}</span>` : `<span class="field-val empty">—</span>`;
-      }}
-      html += `<div class="field"><div class="field-label">${{campo}}</div>${{valHtml}}</div>`;
-    }});
-    html += `</div></div>`;
-  }});
-
-  document.getElementById("modal-body").innerHTML = html;
-  document.getElementById("overlay").classList.add("open");
-}}
-
-function fecharModal(e) {{
-  if(!e || e.target===document.getElementById("overlay") || e.currentTarget===document.querySelector(".close-btn")) {{
-    document.getElementById("overlay").classList.remove("open");
-  }}
-}}
-
-document.addEventListener("keydown", e => {{ if(e.key==="Escape") document.getElementById("overlay").classList.remove("open"); }});
-
-// INIT
+// ── Init ──────────────────────────────────────────────────────────────────────
 popularSelects();
+buildColPanel();
+renderHeader();
 filtrar();
 </script>
 </body>
