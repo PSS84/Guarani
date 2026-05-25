@@ -31,7 +31,12 @@ app = Flask(__name__, template_folder=str(TEMPLATE_DIR))
 
 
 def _csv_instagram():
-    """Retorna o CSV crmoportunidades mais recente em dados/."""
+    """Retorna o CSV de oportunidades da API (api_leads2b).
+    Fallback para crmoportunidades*.csv se o arquivo da API não existir."""
+    api_csv = BASE_DIR / "dados" / "api_leads2b" / "oportunidades_base.csv"
+    if api_csv.exists():
+        return str(api_csv)
+    # fallback: exportação manual antiga
     arquivos = glob.glob(str(DADOS_DIR / "crmoportunidades*.csv"))
     if not arquivos:
         return None
