@@ -57,10 +57,10 @@ COLUNAS = [
     "MÓDULO GUARANI CLOUD",        # 43
     "ADDON ERP PCP",               # 44
     "ADDON ERP WMS",               # 45
-    "ADDON ERP MDFE",              # 46
+    "ADDON ERP MDFE/CTE",           # 46
     "ADDON ERP TELEMARKETING",     # 47
     "ADDON ERP CONTÁBIL",          # 48
-    "ADDON ERP CIAP",              # 49
+    "ADDON ERP CIAP/ATIVO_IMOBILIZADO",              # 49
     "ADDON ERP MDE",               # 50
     "ALIANÇA ERP CONCIL",          # 51
     "ALIANÇA ERP ROUTEASY",        # 52
@@ -68,10 +68,10 @@ COLUNAS = [
     "ALIANÇA ERP PLUGGTO",         # 54
     "ALIANÇA ERP TRAY",            # 55
     "ADDON ERP IMPORTAÇÃO XML",    # 56
-    "ADDON ERP LINK PAGAMENTO",    # 57
-    "ALIANÇA ERP KONCILI",         # 58
+    "ALIANÇA ERP LINK PAGAMENTO",    # 57
+    "ALIANÇA ERP KONCILLI",         # 58
     "ADDON ERP BOLETO WHATSAPP",   # 59
-    "ADDON ERP CTE",               # 60
+    "_CTE_SKIP",                   # 60 — fundido em MDFE/CTE
     "ALIANÇA ERP JETCOMMERCE",     # 61
     "ADDON AFV PESQUISA MERCADO",  # 62
     "ADDON AFV ORÇAMENTO WEB",     # 63
@@ -96,22 +96,41 @@ COLUNAS = [
     "SITE/REDES SOCIAIS",          # 82
     "BÔNUS",                       # 83
     "COUNT",                       # 84
+    "ADDON ERP QUALIDADE",         # 85
+    "ADDON ERP MANUTENÇÃO",        # 86
+    "ALIANÇA ERP INTELIPOST",      # 87
+    "ALIANÇA ERP XMODAL",          # 88
+    "ALIANÇA ERP SSW",             # 89
+    "ALIANÇA ERP MAGIS5",          # 90
+    "ALIANÇA ERP LEXOS",           # 91
+    "ALIANÇA ERP ZNIA",            # 92
+    "ALIANÇA ERP BITRIX",          # 93
+    "ALIANÇA ERP VORTICE",         # 94
+    "ALIANÇA ERP RDSTATION",       # 95
+    "ALIANÇA ERP PLOMES",          # 96
+    "ALIANÇA ERP SERRANO",         # 97
+    "ALIANÇA ERP BLUEEZ",          # 98
 ]
 
 BOOL_COLS = {
     "IMPLANTADO","VIP","ATIVO",
     "MÓDULO GUARANI ERP","MÓDULO GUARANI AFV","MÓDULO GUARANI BI",
     "MÓDULO GUARANI B2B","MÓDULO GUARANI CLOUD",
-    "ADDON ERP PCP","ADDON ERP WMS","ADDON ERP MDFE","ADDON ERP TELEMARKETING",
-    "ADDON ERP CONTÁBIL","ADDON ERP CIAP","ADDON ERP MDE",
-    "ADDON ERP IMPORTAÇÃO XML","ADDON ERP LINK PAGAMENTO",
-    "ADDON ERP BOLETO WHATSAPP","ADDON ERP CTE",
+    "ADDON ERP PCP","ADDON ERP WMS","ADDON ERP MDFE/CTE","ADDON ERP TELEMARKETING",
+    "ADDON ERP CONTÁBIL","ADDON ERP CIAP/ATIVO_IMOBILIZADO","ADDON ERP MDE",
+    "ADDON ERP IMPORTAÇÃO XML","ALIANÇA ERP LINK PAGAMENTO",
+    "ADDON ERP BOLETO WHATSAPP",
     "ALIANÇA ERP CONCIL","ALIANÇA ERP ROUTEASY","ALIANÇA ERP PDV",
-    "ALIANÇA ERP PLUGGTO","ALIANÇA ERP TRAY","ALIANÇA ERP KONCILI",
+    "ALIANÇA ERP PLUGGTO","ALIANÇA ERP TRAY","ALIANÇA ERP KONCILLI",
     "ALIANÇA ERP JETCOMMERCE",
     "ADDON AFV PESQUISA MERCADO","ADDON AFV ORÇAMENTO WEB","ADDON AFV AGENDA",
     "ADDON AFV IARA","ADDON AFV MULTILOJAS","ADDON AFV LOJA B2B",
     "ADDON AFV PROPOSTA WEB","GUARANI PDV MARKET",
+    "ADDON ERP QUALIDADE","ADDON ERP MANUTENÇÃO",
+    "ALIANÇA ERP INTELIPOST","ALIANÇA ERP XMODAL","ALIANÇA ERP SSW",
+    "ALIANÇA ERP MAGIS5","ALIANÇA ERP LEXOS","ALIANÇA ERP ZNIA",
+    "ALIANÇA ERP BITRIX","ALIANÇA ERP VORTICE","ALIANÇA ERP RDSTATION",
+    "ALIANÇA ERP PLOMES","ALIANÇA ERP SERRANO","ALIANÇA ERP BLUEEZ",
 }
 
 # Colunas com dropdown de valores únicos
@@ -119,25 +138,66 @@ DROPDOWN_COLS = {"UF","VENDEDOR","RESPONSÁVEL","SEGMENTO","RAMO ATIVIDADE","CID
 
 DEFAULT_VIS = {
     "ID","RAZÃO","CNPJ PRINCIPAL","IMPLANTADO","ATIVO","VIP","VENDEDOR","RESPONSÁVEL",
-    "DATA ASSINATURA CONTRATO","CIDADE","UF",
+    "DATA ASSINATURA CONTRATO","CIDADE","UF","CEP",
     "NOME SÓCIO","EMAIL SÓCIO","WHATSAPP SÓCIO",
     "NOME DECISOR","E-MAIL DECISOR","WHATSAPP DECISOR",
     "NOME USUÁRIO CHAVE","E-MAIL USUÁRIO CHAVE","WHATSAPP USUÁRIO CHAVE",
     "MÓDULO GUARANI ERP","MÓDULO GUARANI AFV","MÓDULO GUARANI BI","MÓDULO GUARANI B2B","MÓDULO GUARANI CLOUD",
-    "ADDON ERP PCP","ADDON ERP WMS","ADDON ERP MDFE","ADDON ERP TELEMARKETING","ADDON ERP CONTÁBIL",
-    "ADDON ERP CIAP","ADDON ERP MDE","ADDON ERP IMPORTAÇÃO XML","ADDON ERP LINK PAGAMENTO",
-    "ADDON ERP BOLETO WHATSAPP","ADDON ERP CTE",
+    "ADDON ERP PCP","ADDON ERP WMS","ADDON ERP MDFE/CTE","ADDON ERP TELEMARKETING","ADDON ERP CONTÁBIL",
+    "ADDON ERP CIAP/ATIVO_IMOBILIZADO","ADDON ERP MDE","ADDON ERP IMPORTAÇÃO XML","ALIANÇA ERP LINK PAGAMENTO",
+    "ADDON ERP BOLETO WHATSAPP",
     "ALIANÇA ERP CONCIL","ALIANÇA ERP ROUTEASY","ALIANÇA ERP PDV","ALIANÇA ERP PLUGGTO",
-    "ALIANÇA ERP TRAY","ALIANÇA ERP KONCILI","ALIANÇA ERP JETCOMMERCE",
+    "ALIANÇA ERP TRAY","ALIANÇA ERP KONCILLI","ALIANÇA ERP JETCOMMERCE",
     "ADDON AFV PESQUISA MERCADO","ADDON AFV ORÇAMENTO WEB","ADDON AFV AGENDA",
     "ADDON AFV IARA","ADDON AFV MULTILOJAS","ADDON AFV LOJA B2B","ADDON AFV PROPOSTA WEB",
-    "GUARANI PDV MARKET",
-    "QTDE USUÁRIO ERP","QTDE GUARANI B2B","QTDE GUARANI BI","QTDE USUÁRIO AFV",
-    "QTDE USUÁRIO AFV PREPOSTO","QTDE USUÁRIO WMS","QTDE USUÁRIO PDV",
-    "QTDE USUÁRIO TELEMARKETING","TS CLOUD","QTDE USUÁRIO CONTÁBIL",
-    "SEGMENTO","RAMO ATIVIDADE","SITE/REDES SOCIAIS","BÔNUS","COUNT","QTDE",
-    "CONTRATANTE","CLIENTE","LOGRADOURO","BAIRRO","CEP",
+    "GUARANI PDV MARKET","ADDON ERP QUALIDADE","ADDON ERP MANUTENÇÃO",
+    "ALIANÇA ERP INTELIPOST","ALIANÇA ERP XMODAL","ALIANÇA ERP SSW",
+    "ALIANÇA ERP MAGIS5","ALIANÇA ERP LEXOS","ALIANÇA ERP ZNIA",
+    "ALIANÇA ERP BITRIX","ALIANÇA ERP VORTICE","ALIANÇA ERP RDSTATION",
+    "ALIANÇA ERP PLOMES","ALIANÇA ERP SERRANO","ALIANÇA ERP BLUEEZ",
+    "QTDE USUÁRIO ERP","QTDE USUÁRIO AFV","QTDE USUÁRIO AFV PREPOSTO",
+    "QTDE USUÁRIO WMS","QTDE USUÁRIO PDV","TS CLOUD",
+    "SEGMENTO","RAMO ATIVIDADE","SITE/REDES SOCIAIS",
+    "CONTRATANTE","CLIENTE","CEP",
 }
+
+# Ordem de exibição das colunas na tabela (independente do mapeamento do Excel)
+COLUNAS_DISPLAY = [
+    # ── Identificação ──────────────────────────────────────────────────────────
+    "ID","RAZÃO","CNPJ PRINCIPAL",
+    "CNPJ 1","CNPJ 2","CNPJ 3","CNPJ 4","CNPJ 5","CNPJ 6",
+    "CNPJ 7","CNPJ 8","CNPJ 9","CNPJ 10","CNPJ 11","CNPJ 12","CNPJ 13",
+    "CONTRATANTE","CLIENTE","IMPLANTADO","ATIVO","VIP",
+    "VENDEDOR","RESPONSÁVEL","DATA ASSINATURA CONTRATO",
+    "CIDADE","UF","CEP",
+    "SEGMENTO","RAMO ATIVIDADE","SITE/REDES SOCIAIS",
+    # ── Contatos ───────────────────────────────────────────────────────────────
+    "NOME SÓCIO","EMAIL SÓCIO","WHATSAPP SÓCIO",
+    "NOME DECISOR","E-MAIL DECISOR","WHATSAPP DECISOR",
+    "NOME USUÁRIO CHAVE","E-MAIL USUÁRIO CHAVE","WHATSAPP USUÁRIO CHAVE",
+    # ── Módulos Principais ─────────────────────────────────────────────────────
+    "MÓDULO GUARANI ERP","MÓDULO GUARANI AFV","MÓDULO GUARANI BI",
+    "MÓDULO GUARANI B2B","MÓDULO GUARANI CLOUD",
+    # ── ADDON ERP ──────────────────────────────────────────────────────────────
+    "ADDON ERP PCP","ADDON ERP WMS","ADDON ERP MDFE/CTE",
+    "ADDON ERP TELEMARKETING","ADDON ERP CONTÁBIL","ADDON ERP CIAP/ATIVO_IMOBILIZADO",
+    "ADDON ERP MDE","ADDON ERP IMPORTAÇÃO XML","ADDON ERP BOLETO WHATSAPP",
+    "GUARANI PDV MARKET","ADDON ERP QUALIDADE","ADDON ERP MANUTENÇÃO",
+    # ── ALIANÇA ERP ────────────────────────────────────────────────────────────
+    "ALIANÇA ERP CONCIL","ALIANÇA ERP ROUTEASY","ALIANÇA ERP PDV",
+    "ALIANÇA ERP PLUGGTO","ALIANÇA ERP TRAY","ALIANÇA ERP KONCILLI",
+    "ALIANÇA ERP JETCOMMERCE","ALIANÇA ERP LINK PAGAMENTO",
+    "ALIANÇA ERP INTELIPOST","ALIANÇA ERP XMODAL","ALIANÇA ERP SSW",
+    "ALIANÇA ERP MAGIS5","ALIANÇA ERP LEXOS","ALIANÇA ERP ZNIA",
+    "ALIANÇA ERP BITRIX","ALIANÇA ERP VORTICE","ALIANÇA ERP RDSTATION",
+    "ALIANÇA ERP PLOMES","ALIANÇA ERP SERRANO","ALIANÇA ERP BLUEEZ",
+    # ── ADDON AFV ──────────────────────────────────────────────────────────────
+    "ADDON AFV PESQUISA MERCADO","ADDON AFV ORÇAMENTO WEB","ADDON AFV AGENDA",
+    "ADDON AFV IARA","ADDON AFV MULTILOJAS","ADDON AFV LOJA B2B","ADDON AFV PROPOSTA WEB",
+    # ── Quantidades / Usuários ─────────────────────────────────────────────────
+    "QTDE USUÁRIO ERP","QTDE USUÁRIO AFV","QTDE USUÁRIO AFV PREPOSTO",
+    "QTDE USUÁRIO WMS","QTDE USUÁRIO PDV","TS CLOUD",
+]
 
 
 def val(v):
@@ -146,6 +206,12 @@ def val(v):
     if isinstance(v, float) and v == int(v):
         return str(int(v))
     return str(v).strip()
+
+
+def is_marcado(v):
+    """Retorna True se o valor representa SIM/marcado no Excel."""
+    u = (v or "").strip().upper()
+    return u in ("SIM", "1", "X", "TRUE", "VERDADEIRO")
 
 
 def ler_dados():
@@ -159,6 +225,15 @@ def ler_dados():
         if all(c is None for c in row):
             continue
         rec = {COLUNAS[i]: val(row[i]) for i in range(min(len(COLUNAS), len(row)))}
+
+        # ── Merge MDFE/CTE ───────────────────────────────────────────────
+        # Coluna 46 = "ADDON ERP MDFE/CTE", coluna 60 = "_CTE_SKIP"
+        # Se qualquer um estiver marcado → campo unificado recebe "SIM"
+        cte_orig = rec.pop("_CTE_SKIP", "")
+        if is_marcado(cte_orig) and not is_marcado(rec.get("ADDON ERP MDFE/CTE", "")):
+            rec["ADDON ERP MDFE/CTE"] = "SIM"
+        # ─────────────────────────────────────────────────────────────────
+
         dados.append(rec)
     return dados
 
@@ -166,7 +241,7 @@ def ler_dados():
 def gerar_html(dados):
     n = len(dados)
     json_dados    = json.dumps(dados,             ensure_ascii=False)
-    json_colunas  = json.dumps(COLUNAS,           ensure_ascii=False)
+    json_colunas  = json.dumps(COLUNAS_DISPLAY,    ensure_ascii=False)
     json_bool     = json.dumps(list(BOOL_COLS),   ensure_ascii=False)
     json_dropdown = json.dumps(list(DROPDOWN_COLS), ensure_ascii=False)
     json_default  = json.dumps(list(DEFAULT_VIS), ensure_ascii=False)
