@@ -421,7 +421,11 @@ def _processar_funil_mes(vendedor=None, mes=None, ano=None):
     }
 
 
-def _processar_metas(vendedor=None):
+def _processar_metas(vendedor=None, mes=None):
+    """
+    mes: número do mês (1-12) ou None para todos os meses.
+    Quando fornecido, filtra QtdeMetas até esse mês (inclusive) e passa mes ao funil_mes.
+    """
     planilha = BASE_DIR / "dados" / "Vendas2026.xlsx"
     df = pd.read_excel(planilha, sheet_name="QtdeMetas")
     df2026 = df[df["Ano"] == 2026].dropna(subset=["Vendedor"]).copy()
@@ -439,6 +443,10 @@ def _processar_metas(vendedor=None):
         return {"vendedores": vendedores}
 
     vdf = df2026[df2026["Vendedor"] == vendedor].sort_values("Mês")
+
+    # Filtro de período: retorna apenas até o mês selecionado
+    if mes:
+        vdf = vdf[vdf["Mês"].dt.month <= int(mes)]
     MESES_PT = {1:"Jan",2:"Fev",3:"Mar",4:"Abr",5:"Mai",6:"Jun",7:"Jul",8:"Ago",9:"Set",10:"Out",11:"Nov",12:"Dez"}
 
     def pct(val):
@@ -588,7 +596,8 @@ def _processar_metas(vendedor=None):
         "pendencias":           pendencias,
         "total_contratos_pendentes": sum(1 for p in pendencias if p["origem"] == "contrato"),
         "total_perfil_indef":        sum(1 for p in pendencias if p["origem"] == "crm"),
-        "funil_mes":                 _processar_funil_mes(vendedor=vendedor),
+        "funil_mes":                 _processar_funil_mes(vendedor=vendedor, mes=int(mes) if mes else None),
+        "mes_filtro":                int(mes) if mes else None,
     }
 
 
@@ -781,7 +790,8 @@ def dashboard_metas_teste():
 def api_metas_vendedor():
     try:
         vendedor = request.args.get("vendedor")
-        payload = _processar_metas(vendedor=vendedor)
+        mes = request.args.get("mes", type=int)   # 1-indexed (1=Jan … 12=Dez), None = todos
+        payload = _processar_metas(vendedor=vendedor, mes=mes)
         resp = jsonify(payload)
         resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
         resp.headers["Pragma"] = "no-cache"

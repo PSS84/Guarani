@@ -139,7 +139,7 @@ body {
   box-shadow:0 1px 0 var(--border), 0 2px 8px rgba(0,0,0,0.04);
   flex-shrink:0; gap:16px;
 }
-.topbar-left  { display:flex; align-items:center; gap:10px; }
+.topbar-left  { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .topbar-right { display:flex; align-items:center; gap:12px; }
 
 .tb-select {
@@ -326,6 +326,9 @@ body {
       <select class="tb-select" id="vendedorSelect">
         <option value="">— selecione o vendedor —</option>
       </select>
+      <select class="tb-select" id="mesSelect" style="min-width:150px;display:none;">
+        <option value="">— todos os meses —</option>
+      </select>
     </div>
     <span class="topbar-title" id="topbarMes"></span>
     <div class="topbar-right">
@@ -346,6 +349,13 @@ body {
 
 <script>
 Chart.register(ChartDataLabels);
+
+// ── Meses PT ──────────────────────────────────────────────────────────────────
+const MESES_FULL_MAP = {
+  Jan:'Janeiro', Fev:'Fevereiro', Mar:'Março',    Abr:'Abril',
+  Mai:'Maio',    Jun:'Junho',     Jul:'Julho',     Ago:'Agosto',
+  Set:'Setembro',Out:'Outubro',   Nov:'Novembro',  Dez:'Dezembro'
+};
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const FOTO_MAP = {
@@ -494,11 +504,15 @@ function renderSidebar(d, indVal, apresVal, propVal, eqVal, prospVal) {
   document.getElementById('sidebarFooter').textContent = 'Atualizado ' + now();
   document.getElementById('topbarTs').textContent = 'Atualizado ' + now();
 
-  const MESES_FULL = {Jan:'Janeiro',Fev:'Fevereiro',Mar:'Março',Abr:'Abril',Mai:'Maio',
-    Jun:'Junho',Jul:'Julho',Ago:'Agosto',Set:'Setembro',Out:'Outubro',Nov:'Novembro',Dez:'Dezembro'};
   const mesAbrev = Array.isArray(d.meses) && d.meses.length ? d.meses[d.meses.length - 1] : '';
   const ano = new Date().getFullYear();
-  document.getElementById('topbarMes').textContent = mesAbrev ? `${MESES_FULL[mesAbrev] || mesAbrev} ${ano}` : '';
+  const mesFullLabel = MESES_FULL_MAP[mesAbrev] || mesAbrev;
+  const totalMeses = _mesesDisponiveis.length || (d.meses || []).length;
+  const mesAtual   = (d.meses || []).length;
+  const periodoLabel = (mesAtual < totalMeses)
+    ? `${mesFullLabel} / ${ano} — ${mesAtual} de ${totalMeses} meses`
+    : `${mesFullLabel} / ${ano}`;
+  document.getElementById('topbarMes').textContent = mesAbrev ? periodoLabel : '';
 }
 
 // ── Alerts — por criticidade ──────────────────────────────────────────────────
@@ -1070,20 +1084,76 @@ function renderDashboard(d) {
 }
 
 // ── Bootstrap — troca de vendedor sempre busca dados frescos da API ──
-/** Persiste o vendedor escolhido para sobreviver a F5 / atualização do navegador (mesma aba). */
 const METAS_VENDEDOR_STORAGE_KEY = 'guarani_dashboard_metas_vendedor';
+const METAS_MES_STORAGE_KEY      = 'guarani_dashboard_metas_mes';
 let ultimoVendedorCarregado = null;
+
+// Meses disponíveis (populados na primeira carga sem filtro)
+let _mesesDisponiveis = []; // ex: [{label:'Janeiro', num:1}, ...]
 
 function persistVendedorNoStorage(v) {
   try {
     if (v) sessionStorage.setItem(METAS_VENDEDOR_STORAGE_KEY, v);
     else sessionStorage.removeItem(METAS_VENDEDOR_STORAGE_KEY);
-  } catch (e) { /* modo privado etc. */ }
+  } catch (e) {}
 }
 
-function aplicarMetas(json) {
+// ── Filtro de mês ─────────────────────────────────────────────────────────────
+const MESES_NUM = {Jan:1,Fev:2,Mar:3,Abr:4,Mai:5,Jun:6,Jul:7,Ago:8,Set:9,Out:10,Nov:11,Dez:12};
+
+/** Retorna o número do mês (1-12) selecionado, ou null se "todos". */
+function getMesNum() {
+  const sel = document.getElementById('mesSelect');
+  if (!sel || sel.value === '') return null;
+  const n = parseInt(sel.value, 10);
+  return isNaN(n) ? null : n;
+}
+
+/** Popula o seletor com os meses disponíveis (feito apenas uma vez na carga inicial). */
+function populateMesSelect(meses) {
+  const sel = document.getElementById('mesSelect');
+  if (!sel) return;
+
+  // Converte abreviações p/ {num, label}
+  _mesesDisponiveis = (meses || []).map(m => ({
+    num: MESES_NUM[m] || 0,
+    label: MESES_FULL_MAP[m] || m,
+  })).filter(x => x.num > 0);
+
+  sel.innerHTML = '<option value="">— todos os meses —</option>';
+  _mesesDisponiveis.forEach(({num, label}) => {
+    const o = document.createElement('option');
+    o.value = num; o.textContent = label;
+    sel.appendChild(o);
+  });
+
+  // Restaurar sessão anterior ou ir para o último mês disponível
+  let salvoMes = null;
+  try { salvoMes = sessionStorage.getItem(METAS_MES_STORAGE_KEY); } catch(e){}
+  const ultimoNum = _mesesDisponiveis.length ? _mesesDisponiveis[_mesesDisponiveis.length - 1].num : null;
+  if (salvoMes !== null && salvoMes !== '' && _mesesDisponiveis.some(x => x.num === parseInt(salvoMes,10))) {
+    sel.value = salvoMes;
+  } else if (ultimoNum) {
+    sel.value = ultimoNum;
+  }
+  sel.style.display = '';
+}
+
+function aplicarMetas(json, ehCargaInicial) {
   if (json.erro) { console.error(json.erro); return; }
   ultimoVendedorCarregado = json.vendedor || null;
+
+  if (ehCargaInicial) {
+    // Popula o select com todos os meses disponíveis
+    populateMesSelect(json.meses || []);
+    // Verifica se há mês salvo na sessão; se sim, re-fetch com esse mês
+    const mesSelAtual = getMesNum();
+    if (mesSelAtual) {
+      carregarMetas(json.vendedor, mesSelAtual, false);
+      return; // aguarda o próximo aplicarMetas (sem ehCargaInicial)
+    }
+  }
+
   renderDashboard(json);
 }
 
@@ -1101,40 +1171,59 @@ function estadoSemVendedor() {
     <div class="profile-name" style="color:rgba(255,255,255,0.3);font-size:11px;">Nenhum vendedor</div>`;
   document.getElementById('sidebarFooter').textContent = '—';
   document.getElementById('topbarTs').textContent = '—';
+  document.getElementById('mesSelect').style.display = 'none';
 }
 
-function carregarMetas(v) {
+/**
+ * Busca dados do vendedor na API.
+ * mes: número do mês 1-12 (1-indexed) ou null para todos.
+ * ehCargaInicial: true → popula o select de meses.
+ */
+function carregarMetas(v, mes, ehCargaInicial) {
   if (!v) return;
-  fetch(`/api/metas-vendedor?vendedor=${encodeURIComponent(v)}`)
+  let url = `/api/metas-vendedor?vendedor=${encodeURIComponent(v)}`;
+  if (mes) url += `&mes=${mes}`;
+  fetch(url)
     .then(r=>r.json())
-    .then(aplicarMetas)
+    .then(json => aplicarMetas(json, ehCargaInicial))
     .catch(console.error);
 }
 
 fetch('/api/metas-vendedor')
   .then(r=>r.json())
   .then(d=>{
-    const sel = document.getElementById('vendedorSelect');
+    const sel    = document.getElementById('vendedorSelect');
+    const selMes = document.getElementById('mesSelect');
     sel.setAttribute('autocomplete', 'off');
     (d.vendedores||[]).forEach(v=>{
       const o=document.createElement('option');
       o.value=v; o.textContent=v; sel.appendChild(o);
     });
+
+    // Troca de vendedor → busca SEM filtro de mês (carga inicial para popular o select de meses)
     sel.addEventListener('change', ()=>{
       persistVendedorNoStorage(sel.value);
-      if (!sel.value) {
-        estadoSemVendedor();
-        return;
-      }
-      carregarMetas(sel.value);
+      if (!sel.value) { estadoSemVendedor(); return; }
+      carregarMetas(sel.value, null, true); // carga inicial: sem mes, popula select
     });
 
+    // Troca de mês → re-fetch com mes selecionado
+    selMes.addEventListener('change', () => {
+      const v = sel.value;
+      if (!v) return;
+      const mes = getMesNum(); // 1-12 ou null
+      try { sessionStorage.setItem(METAS_MES_STORAGE_KEY, mes !== null ? mes : ''); } catch(e){}
+      carregarMetas(v, mes, false); // não repopula select de meses
+    });
+
+    // Restaurar vendedor da sessão anterior
     let salvo = null;
     try { salvo = sessionStorage.getItem(METAS_VENDEDOR_STORAGE_KEY); } catch (e) {}
     const nomes = new Set((d.vendedores||[]));
     if (salvo && nomes.has(salvo)) {
       sel.value = salvo;
-      carregarMetas(salvo);
+      // Carga inicial: busca TODOS os meses para popular o select, depois re-fetch com mês salvo
+      carregarMetas(salvo, null, true);
     }
   })
   .catch(console.error);
