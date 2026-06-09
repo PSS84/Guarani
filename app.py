@@ -912,6 +912,11 @@ def manual_vendedor():
     )
 
 
+@app.route("/guarani/templates/arvore_produto")
+def arvore_produto():
+    return send_from_directory(str(BASE_DIR / "guarani" / "templates"), "arvore_produto.html")
+
+
 @app.route("/guarani/crm/diagnostico")
 def diagnostico_prospectos():
     return send_from_directory(str(BASE_DIR / "guarani" / "crm"), "diagnostico_prospecteleads.html")
