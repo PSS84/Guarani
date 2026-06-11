@@ -296,10 +296,16 @@
   }
   .opor-filter-reset:hover { background: #f1efe8; }
   .opor-count { font-size: 11px; color: #b4b2a9; }
-  .opor-table { width: 100%; border-collapse: collapse; }
-  .opor-table th { font-size: 10px; font-weight: 500; color: #b4b2a9; text-align: left; padding: 0 10px 10px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
-  .opor-table td { font-size: 12.5px; color: #1a1a18; padding: 8px 10px; border-top: 0.5px solid rgba(0,0,0,0.06); vertical-align: middle; }
+  .opor-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .opor-table th { font-size: 10px; font-weight: 500; color: #b4b2a9; text-align: left; padding: 0 6px 10px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+  .opor-table td { font-size: 12px; color: #1a1a18; padding: 7px 6px; border-top: 0.5px solid rgba(0,0,0,0.06); vertical-align: middle; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .opor-table tr:hover td { background: #fafaf8; }
+  .opor-table col.col-titulo   { width: 22%; }
+  .opor-table col.col-vendedor { width: 15%; }
+  .opor-table col.col-etapa    { width: 20%; }
+  .opor-table col.col-tags     { width: 22%; }
+  .opor-table col.col-status   { width: 9%; }
+  .opor-table col.col-data     { width: 12%; }
   .status-badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
   .status-badge.ativo    { background: rgba(29,158,117,0.1);  color: #155c41; }
   .status-badge.perdido  { background: rgba(163,45,45,0.1);   color: #A32D2D; }
@@ -389,7 +395,10 @@
   <div class="header">
     <span class="header-dot" aria-hidden="true">◈</span>
     <span class="header-label" id="headerLabel">CRM · Filtro: tag Instagram · carregando…</span>
-    <span style="margin-left:auto; background:#185FA5; color:#fff; font-size:10px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.05em;">INSTAGRAM</span>
+    <span id="badgeAtualizacao" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:10px;color:#73726c;background:#f5f4f0;border:0.5px solid rgba(0,0,0,0.12);padding:3px 10px;border-radius:20px;white-space:nowrap;">
+      ⟳ <span id="ultimaAtualizacao">carregando…</span>
+    </span>
+    <span style="background:#185FA5; color:#fff; font-size:10px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.05em;">INSTAGRAM</span>
   </div>
   <div style="margin-top:-12px; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
     <span style="font-size:11px; color:#854F0B; background:rgba(239,159,39,0.1); border:0.5px solid rgba(239,159,39,0.3); border-radius:6px; padding:4px 12px; font-weight:500;">
@@ -1008,22 +1017,33 @@ function renderDashboard(d) {
     <div class="card" style="margin-top:16px;">
       <p class="card-title">Todas as Oportunidades — Instagram · ${MES_LABEL}</p>
       <p class="card-sub" id="oporCount">${k.total} oportunidade${k.total !== 1 ? 's' : ''} com tag Instagram no período · ordenado por data de criação</p>
-      <div class="opor-filters">
-        <input class="opor-filter-input" id="oporFiltroBusca" type="search" placeholder="🔍 Buscar título…" style="min-width:160px;">
-        <select class="opor-filter-select" id="oporFiltroVendedor"><option value="">Vendedor</option></select>
-        <select class="opor-filter-select" id="oporFiltroEtapa"><option value="">Etapa no funil</option></select>
-        <select class="opor-filter-select" id="oporFiltroPerfil"><option value="">Perfil</option></select>
-        <select class="opor-filter-select" id="oporFiltroStatus"><option value="">Status</option></select>
-        <button class="opor-filter-reset" id="oporFiltroReset">Limpar</button>
+      <div class="opor-filters" style="display:flex;flex-wrap:nowrap;gap:5px;align-items:center;">
+        <input class="opor-filter-input" id="oporFiltroBusca" type="search" placeholder="🔍 Título…" style="flex:1;min-width:0;">
+        <select class="opor-filter-select" id="oporFiltroVendedor" style="max-width:110px;"><option value="">Vendedor</option></select>
+        <select class="opor-filter-select" id="oporFiltroEtapa"    style="max-width:90px;"><option value="">Etapa</option></select>
+        <select class="opor-filter-select" id="oporFiltroPerfil"   style="max-width:90px;"><option value="">Perfil</option></select>
+        <select class="opor-filter-select" id="oporFiltroStatus"   style="max-width:80px;"><option value="">Status</option></select>
+        <input class="opor-filter-input" id="oporFiltroDesde" type="date" title="De" style="width:110px;padding:5px 4px;">
+        <input class="opor-filter-input" id="oporFiltroAte"   type="date" title="Até" style="width:110px;padding:5px 4px;">
+        <button class="opor-filter-reset" id="oporFiltroReset" style="white-space:nowrap;">Limpar</button>
       </div>
       <div style="overflow-x:auto;">
         <table class="opor-table">
+          <colgroup>
+            <col class="col-titulo">
+            <col class="col-vendedor">
+            <col class="col-etapa">
+            <col class="col-tags">
+            <col class="col-status">
+            <col class="col-data">
+          </colgroup>
           <thead><tr>
             <th>Título do negócio</th>
             <th>Vendedor</th>
             <th>Etapa no funil</th>
             <th>Tags</th>
             <th>Status</th>
+            <th>Data criação</th>
           </tr></thead>
           <tbody id="oportunidadesBody"></tbody>
         </table>
@@ -1086,19 +1106,33 @@ function popularSelects(lista) {
   preencher('oporFiltroPerfil',   perfis);
 }
 
+function parseDMY(str) {
+  if (!str || str === '—') return null;
+  const [d, m, y] = str.split('/');
+  return new Date(`${y}-${m}-${d}`);
+}
+
 function aplicarFiltrosOpor() {
   const busca   = (document.getElementById('oporFiltroBusca')?.value   || '').toLowerCase();
   const vendedor= (document.getElementById('oporFiltroVendedor')?.value || '');
   const etapa   = (document.getElementById('oporFiltroEtapa')?.value   || '');
   const status  = (document.getElementById('oporFiltroStatus')?.value  || '');
   const perfil  = (document.getElementById('oporFiltroPerfil')?.value  || '');
+  const desde   = document.getElementById('oporFiltroDesde')?.value || '';
+  const ate     = document.getElementById('oporFiltroAte')?.value   || '';
 
   const filtrada = _todasOpor.filter(o => {
-    if (busca    && !o.titulo.toLowerCase().includes(busca))   return false;
-    if (vendedor && o.vendedor !== vendedor)                    return false;
-    if (etapa    && o.etapa !== etapa)                          return false;
-    if (status   && o.status !== status)                        return false;
+    if (busca    && !o.titulo.toLowerCase().includes(busca))              return false;
+    if (vendedor && o.vendedor !== vendedor)                               return false;
+    if (etapa    && o.etapa !== etapa)                                     return false;
+    if (status   && o.status !== status)                                   return false;
     if (perfil   && !o.tags.toLowerCase().includes(perfil.toLowerCase())) return false;
+    if (desde || ate) {
+      const dc = parseDMY(o.criacao);
+      if (!dc) return false;
+      if (desde && dc < new Date(desde)) return false;
+      if (ate   && dc > new Date(ate))   return false;
+    }
     return true;
   });
 
@@ -1112,11 +1146,12 @@ function aplicarFiltrosOpor() {
     return;
   }
   el.innerHTML = filtrada.map(o => `<tr>
-    <td style="font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${o.titulo}">${o.titulo}</td>
-    <td style="color:#73726c;white-space:nowrap;">${o.vendedor}</td>
-    <td style="color:#73726c;">${o.etapa}</td>
-    <td style="max-width:220px;">${renderTags(o.tags)}</td>
+    <td style="font-weight:500;" title="${o.titulo}">${o.titulo}</td>
+    <td style="color:#73726c;" title="${o.vendedor}">${o.vendedor}</td>
+    <td style="color:#73726c;" title="${o.etapa}">${o.etapa}</td>
+    <td>${renderTags(o.tags)}</td>
     <td>${statusBadge(o.status)}</td>
+    <td style="color:#73726c;">${o.criacao}</td>
   </tr>`).join('');
 }
 
@@ -1126,12 +1161,12 @@ function renderOportunidades(lista) {
   if (!el) return;
   popularSelects(_todasOpor);
 
-  ['oporFiltroBusca','oporFiltroVendedor','oporFiltroEtapa','oporFiltroStatus','oporFiltroPerfil'].forEach(id => {
+  ['oporFiltroBusca','oporFiltroVendedor','oporFiltroEtapa','oporFiltroStatus','oporFiltroPerfil','oporFiltroDesde','oporFiltroAte'].forEach(id => {
     document.getElementById(id)?.addEventListener('input',  aplicarFiltrosOpor);
     document.getElementById(id)?.addEventListener('change', aplicarFiltrosOpor);
   });
   document.getElementById('oporFiltroReset')?.addEventListener('click', () => {
-    ['oporFiltroBusca','oporFiltroVendedor','oporFiltroEtapa','oporFiltroStatus','oporFiltroPerfil']
+    ['oporFiltroBusca','oporFiltroVendedor','oporFiltroEtapa','oporFiltroStatus','oporFiltroPerfil','oporFiltroDesde','oporFiltroAte']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     aplicarFiltrosOpor();
   });
@@ -1451,6 +1486,15 @@ document.getElementById('btnCampanha').addEventListener('click', () => {
   document.getElementById('btnCampanha').classList.add('active');
   carregarDados();
 });
+
+// Última atualização dos dados
+fetch('/api/ultima-atualizacao')
+  .then(r => r.json())
+  .then(d => {
+    const el = document.getElementById('ultimaAtualizacao');
+    if (el) el.textContent = `Dados atualizados em ${d.ultima}`;
+  })
+  .catch(() => {});
 
 // Carrega filtro Campanha por padrão (21/05/2026 até hoje)
 document.getElementById('btnCampanha').click();
