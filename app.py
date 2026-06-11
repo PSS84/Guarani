@@ -43,8 +43,11 @@ def _csv_instagram():
     return max(arquivos, key=os.path.getmtime)
 
 
-def _semanas_instagram(ig):
-    """Agrega atividade semana a semana (segunda a domingo) para leads Instagram."""
+def _semanas_instagram(ig, desde=None, ate=None):
+    """Agrega atividade semana a semana (segunda a domingo) para leads Instagram.
+    Se `desde` for informado, usa como início exato.
+    Se `ate`   for informado, usa como fim exato (senão usa hoje).
+    """
     ig = ig.copy()
 
     def parse(col):
@@ -56,17 +59,30 @@ def _semanas_instagram(ig):
     ig["_dp"]  = parse("Data Proposta")
     ig["_dfg"] = parse("Data de Perda/Ganho")
 
-    # Coleta todas as datas relevantes para definir o intervalo
-    todas = pd.concat([ig["_dc"], ig["_da1"], ig["_da2"], ig["_dp"]]).dropna()
-    if todas.empty:
+    # Para perdidos sem data de perda/ganho, usa data de criação como fallback
+    ig["_dperd"] = ig["_dfg"].where(ig["_dfg"].notna(), ig["_dc"])
+
+    if ig["_dc"].dropna().empty:
         return []
 
-    # Segunda-feira da primeira e última semana
     def proxima_segunda(dt):
         return dt - pd.Timedelta(days=dt.weekday())
 
-    inicio = proxima_segunda(todas.min()).normalize()
-    fim    = proxima_segunda(todas.max()).normalize()
+    hoje = pd.Timestamp.now().normalize()
+
+    if desde:
+        inicio = pd.Timestamp(desde).normalize()
+    else:
+        inicio = proxima_segunda(ig["_dc"].dropna().min()).normalize()
+
+    if ate:
+        fim = proxima_segunda(pd.Timestamp(ate).normalize()).normalize()
+    else:
+        fim = proxima_segunda(hoje).normalize()
+
+    # Garante que a semana atual (com hoje) sempre seja incluída
+    if fim < proxima_segunda(hoje).normalize():
+        fim = proxima_segunda(hoje).normalize()
 
     semanas = []
     atual = inicio
@@ -86,7 +102,12 @@ def _semanas_instagram(ig):
             ((ig["Status"] == "Ganho") & (ig["_dfg"] >= atual) & (ig["_dfg"] <= fim_sem)).sum()
         )
 
-        if novos or apres or prop or ganhos:
+        # Perdidos: usa _dperd (data de perda/ganho com fallback para criação)
+        perdidos = int(
+            ((ig["Status"] == "Perdido") & (ig["_dperd"] >= atual) & (ig["_dperd"] <= fim_sem)).sum()
+        )
+
+        if novos or apres or prop or ganhos or perdidos:
             semanas.append({
                 "label":  f"{atual.strftime('%d/%m')}–{fim_sem.strftime('%d/%m')}",
                 "inicio": atual.strftime("%Y-%m-%d"),
@@ -95,11 +116,48 @@ def _semanas_instagram(ig):
                 "apresentacoes": apres,
                 "propostas": prop,
                 "ganhos": ganhos,
+                "perdidos": perdidos,
             })
 
         atual += pd.Timedelta(days=7)
 
     return semanas
+
+
+def _dias_instagram(ig):
+    """Retorna contagem diária dos últimos 7 dias para o gráfico."""
+    from datetime import date, timedelta
+    ig = ig.copy()
+
+    def parse(col):
+        return pd.to_datetime(ig[col], dayfirst=True, errors="coerce")
+
+    ig["_dc"]  = parse("Data de Criação")
+    ig["_da1"] = parse("DataApresentação1")
+    ig["_da2"] = parse("DataApresentação2")
+    ig["_dp"]  = parse("Data Proposta")
+    ig["_dfg"] = parse("Data de Perda/Ganho")
+    ig["_dperd"] = ig["_dfg"].where(ig["_dfg"].notna(), ig["_dc"])
+
+    hoje = date.today()
+    dias = []
+    for i in range(6, -1, -1):
+        d   = hoje - timedelta(days=i)
+        dt  = pd.Timestamp(d)
+        novos    = int(((ig["_dc"].dt.date)  == d).sum())
+        apres    = int(((ig["_da1"].dt.date) == d).sum()) + int(((ig["_da2"].dt.date) == d).sum())
+        prop     = int(((ig["_dp"].dt.date)  == d).sum())
+        ganhos   = int(((ig["Status"] == "Ganho")   & (ig["_dfg"].dt.date  == d)).sum())
+        perdidos = int(((ig["Status"] == "Perdido") & (ig["_dperd"].dt.date == d)).sum())
+        dias.append({
+            "label":         d.strftime("%d/%m"),
+            "novos":         novos,
+            "apresentacoes": apres,
+            "propostas":     prop,
+            "ganhos":        ganhos,
+            "perdidos":      perdidos,
+        })
+    return dias
 
 
 def _perfis_instagram(df):
@@ -120,7 +178,7 @@ def _perfis_instagram(df):
     for perfil, grp in perfil_df.groupby("_perfil"):
         leads_list = []
         for _, row in grp.iterrows():
-            titulo = row.get("Título do negócio") or row.get("Nome do Contato") or "—"
+            titulo = next((str(v) for v in [row.get("Título do negócio"), row.get("Razão social"), row.get("Nome do Cliente"), row.get("Nome do Contato")] if pd.notna(v) and len(str(v).strip()) > 1 and not str(v).strip().isdigit()), "—")
             tempo  = row.get("Tempo como oportunidade")
             leads_list.append({
                 "titulo": str(titulo) if pd.notna(titulo) else "—",
@@ -152,7 +210,7 @@ def _propostas_ativas(df, incluir_vendedor=True):
         dias = int((hoje - dp).days) if pd.notna(dp) else None
         item = {
             "id":            str(row.get("ID Oportunidade", "")),
-            "titulo":        str(row.get("Título do negócio") or "—"),
+            "titulo":        next((str(v) for v in [row.get("Título do negócio"), row.get("Razão social"), row.get("Nome do Cliente"), row.get("Nome do Contato")] if pd.notna(v) and len(str(v).strip()) > 1 and not str(v).strip().isdigit()), "—"),
             "data_proposta": dp.strftime("%d/%m/%Y") if pd.notna(dp) else "—",
             "dias_proposta": dias,
             "ult_contato":   row["_ult"].strftime("%d/%m/%Y") if pd.notna(row["_ult"]) else None,
@@ -164,15 +222,23 @@ def _propostas_ativas(df, incluir_vendedor=True):
     return result
 
 
-def _processar_instagram(csv_path, mes=None):
-    """Processa leads Instagram do CSV. mes = 'YYYY-MM' para filtrar por mês de criação."""
+def _processar_instagram(csv_path, mes=None, desde=None, ate=None):
+    """Processa leads Instagram do CSV.
+    mes   = 'YYYY-MM' para filtrar por mês de criação.
+    desde = 'YYYY-MM-DD' e ate = 'YYYY-MM-DD' para filtrar por período."""
     df = pd.read_csv(csv_path, encoding="utf-8-sig", low_memory=False)
 
     ig = df[df["TAGS"].fillna("").str.contains("Instagram", case=False)].copy()
 
+    ig["_criacao"] = pd.to_datetime(ig["Data de Criação"], dayfirst=True, errors="coerce")
+
     if mes:
-        ig["_criacao"] = pd.to_datetime(ig["Data de Criação"], dayfirst=True, errors="coerce")
         ig = ig[ig["_criacao"].dt.to_period("M").astype(str) == mes]
+    elif desde or ate:
+        if desde:
+            ig = ig[ig["_criacao"] >= pd.Timestamp(desde)]
+        if ate:
+            ig = ig[ig["_criacao"] <= pd.Timestamp(ate) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)]
 
     total = len(ig)
     ativos = int((ig["Status"] == "Ativo").sum())
@@ -212,15 +278,27 @@ def _processar_instagram(csv_path, mes=None):
             {"label": "Propostas negociadas", "value": propostas},
             {"label": "Em negociação ativa",  "value": negociacao_ativa},
             {"label": "Contratos assinados",  "value": ganhos},
+            {"label": "Leads perdidos",        "value": perdidos},
         ],
         "ranking_todos":    ranking(perdidos_df),
         "ranking_proposta": ranking(perdidos_com_prop),
         "total_perdidos":           len(perdidos_df),
         "total_perdidos_proposta":  len(perdidos_com_prop),
-        "semanas": _semanas_instagram(ig),
+        "semanas": _semanas_instagram(ig, desde=desde, ate=ate),
+        "dias":    _dias_instagram(ig),
         "mes": mes,
         "propostas_ativas": _propostas_ativas(ig),
         "perfis": _perfis_instagram(ig),
+        "oportunidades": [
+            {
+                "titulo":   next((str(v) for v in [row.get("Título do negócio"), row.get("Razão social"), row.get("Nome do Cliente"), row.get("Nome do Contato")] if pd.notna(v) and len(str(v).strip()) > 1 and not str(v).strip().isdigit()), "—"),
+                "vendedor": str(row.get("Responsável") or "—") if pd.notna(row.get("Responsável")) else "—",
+                "etapa":    str(row.get("Etapa do funil de vendas") or "—") if pd.notna(row.get("Etapa do funil de vendas")) else "—",
+                "tags":     str(row.get("TAGS") or "—") if pd.notna(row.get("TAGS")) else "—",
+                "status":   str(row.get("Status") or "—") if pd.notna(row.get("Status")) else "—",
+            }
+            for _, row in ig.sort_values("Data de Criação", ascending=False).iterrows()
+        ],
     }
 
 
@@ -279,7 +357,7 @@ def _processar_vendedor(csv_path, vendedor=None):
     for perfil, grp in perfil_df.groupby("_perfil"):
         leads = []
         for _, row in grp.iterrows():
-            titulo = row.get("Título do negócio") or row.get("Nome do Contato") or "—"
+            titulo = next((str(v) for v in [row.get("Título do negócio"), row.get("Razão social"), row.get("Nome do Cliente"), row.get("Nome do Contato")] if pd.notna(v) and len(str(v).strip()) > 1 and not str(v).strip().isdigit()), "—")
             tempo  = row.get("Tempo como oportunidade")
             leads.append({
                 "titulo": str(titulo) if pd.notna(titulo) else "—",
@@ -563,7 +641,7 @@ def _processar_metas(vendedor=None, mes=None):
                 tempo = row.get("Tempo como oportunidade")
                 pendencias.append({
                     "origem":  "crm",
-                    "titulo":  str(row.get("Título do negócio") or row.get("Nome do Contato") or "—"),
+                    "titulo":  str(next((str(v) for v in [row.get("Título do negócio"), row.get("Razão social"), row.get("Nome do Cliente"), row.get("Nome do Contato")] if pd.notna(v) and len(str(v).strip()) > 1 and not str(v).strip().isdigit()), "—")),
                     "data":    dc or "—",
                     "dias":    int(tempo) if pd.notna(tempo) else None,
                     "produto": "Instagram · Perfil Indefinido",
@@ -897,8 +975,10 @@ def api_instagram_data():
     if not csv_path:
         return jsonify({"erro": "Nenhum arquivo crmoportunidades*.csv encontrado em dados/"}), 404
     try:
-        mes = request.args.get("mes")  # ex: "2026-05"
-        dados = _processar_instagram(csv_path, mes=mes)
+        mes   = request.args.get("mes")    # ex: "2026-05"
+        desde = request.args.get("desde")  # ex: "2026-05-01"
+        ate   = request.args.get("ate")    # ex: "2026-05-31"
+        dados = _processar_instagram(csv_path, mes=mes, desde=desde, ate=ate)
         return jsonify(dados)
     except Exception as exc:
         return jsonify({"erro": str(exc)}), 500

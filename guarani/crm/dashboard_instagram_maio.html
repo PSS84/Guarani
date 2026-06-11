@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard CRM — Instagram · Maio/2026</title>
+<title>Dashboard CRM — Instagram</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -77,6 +77,21 @@
   .funnel-fill { height: 100%; border-radius: 4px; }
   .funnel-val { font-size: 12px; font-weight: 500; color: #1a1a18; min-width: 28px; text-align: right; }
   .funnel-pct { font-size: 11px; color: #b4b2a9; min-width: 36px; }
+  .funnel-conv { font-size: 10px; color: #b4b2a9; min-width: 60px; text-align: right; white-space: nowrap; }
+  .funnel-separator {
+    display: flex; align-items: center; gap: 10px;
+    margin: 10px 0 10px;
+  }
+  .funnel-sep-line { flex: 1; height: 1px; background: rgba(0,0,0,0.1); }
+  .funnel-subtotal {
+    display: flex; gap: 16px; padding: 8px 12px;
+    background: #fafaf8; border: 0.5px solid #eeede7;
+    border-radius: 8px; margin-bottom: 10px;
+  }
+  .funnel-sub-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .funnel-sub-label { font-size: 10px; color: #73726c; text-transform: uppercase; letter-spacing: .05em; font-weight: 500; }
+  .funnel-sub-val { font-size: 18px; font-weight: 600; line-height: 1; }
+  .funnel-sub-pct { font-size: 10px; color: #b4b2a9; }
 
   .analysis-section {
     background: #ffffff;
@@ -221,6 +236,146 @@
   .chart-toggle-btn.off { opacity: 0.3; text-decoration: line-through; }
   .chart-toggle-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.6); }
 
+  /* ── filtro de período ────────────────────────────── */
+  .periodo-bar {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    background: #fff; border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 12px; padding: 12px 18px; margin-bottom: 20px;
+  }
+  .periodo-toggle { display: flex; gap: 4px; }
+  .periodo-toggle-btn {
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+    padding: 5px 14px; border-radius: 20px;
+    border: 0.5px solid rgba(0,0,0,0.15); background: #fafaf8;
+    color: #73726c; cursor: pointer; transition: all .15s;
+  }
+  .periodo-toggle-btn.active { background: #1a1a18; color: #fff; border-color: #1a1a18; }
+  .periodo-inputs { display: flex; align-items: center; gap: 8px; }
+  .periodo-inputs input[type="month"],
+  .periodo-inputs input[type="date"] {
+    font-family: 'Inter', sans-serif; font-size: 12px; color: #1a1a18;
+    border: 0.5px solid rgba(0,0,0,0.15); border-radius: 8px;
+    padding: 6px 10px; background: #fafaf8; outline: none; cursor: pointer;
+  }
+  .periodo-inputs input:focus { border-color: #185FA5; background: #fff; }
+  .periodo-label { font-size: 11px; color: #73726c; white-space: nowrap; }
+  .periodo-apply {
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+    padding: 6px 16px; border-radius: 20px;
+    background: #185FA5; color: #fff; border: none; cursor: pointer;
+    margin-left: auto; transition: opacity .15s;
+  }
+  .periodo-apply:hover { opacity: 0.85; }
+  .campanha-btn {
+    font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600;
+    padding: 6px 14px; border-radius: 20px;
+    background: rgba(239,159,39,0.15); color: #854F0B;
+    border: 0.5px solid rgba(239,159,39,0.4); cursor: pointer; transition: all .15s;
+  }
+  .campanha-btn:hover { background: rgba(239,159,39,0.25); }
+  .campanha-btn.active { background: #854F0B; color: #fff; border-color: #854F0B; }
+
+  /* ── grid de oportunidades ───────────────────────── */
+  .opor-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+  .opor-filter-input {
+    font-family: 'Inter', sans-serif; font-size: 11px; color: #1a1a18;
+    border: 0.5px solid rgba(0,0,0,0.15); border-radius: 8px;
+    padding: 5px 10px; background: #fafaf8; outline: none;
+  }
+  .opor-filter-input:focus { border-color: #185FA5; background: #fff; }
+  .opor-filter-select {
+    font-family: 'Inter', sans-serif; font-size: 11px; color: #1a1a18;
+    border: 0.5px solid rgba(0,0,0,0.15); border-radius: 8px;
+    padding: 5px 10px; background: #fafaf8; outline: none; cursor: pointer;
+  }
+  .opor-filter-select:focus { border-color: #185FA5; }
+  .opor-filter-reset {
+    font-family: 'Inter', sans-serif; font-size: 11px; color: #73726c;
+    border: 0.5px solid rgba(0,0,0,0.12); border-radius: 8px;
+    padding: 5px 10px; background: none; cursor: pointer; margin-left: auto;
+  }
+  .opor-filter-reset:hover { background: #f1efe8; }
+  .opor-count { font-size: 11px; color: #b4b2a9; }
+  .opor-table { width: 100%; border-collapse: collapse; }
+  .opor-table th { font-size: 10px; font-weight: 500; color: #b4b2a9; text-align: left; padding: 0 10px 10px; letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+  .opor-table td { font-size: 12.5px; color: #1a1a18; padding: 8px 10px; border-top: 0.5px solid rgba(0,0,0,0.06); vertical-align: middle; }
+  .opor-table tr:hover td { background: #fafaf8; }
+  .status-badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 20px; white-space: nowrap; }
+  .status-badge.ativo    { background: rgba(29,158,117,0.1);  color: #155c41; }
+  .status-badge.perdido  { background: rgba(163,45,45,0.1);   color: #A32D2D; }
+  .status-badge.ganho    { background: rgba(59,109,17,0.1);   color: #3B6D11; }
+  .status-badge.outro    { background: rgba(136,135,128,0.1); color: #73726c; }
+  .tag-pill { display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 20px; background: #f1efe8; color: #73726c; margin: 1px 2px 1px 0; white-space: nowrap; }
+
+  /* ── Saúde da Campanha ───────────────────────────────── */
+  .saude-section {
+    background: #fff;
+    border: 0.5px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 16px;
+  }
+  .saude-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 14px;
+    border-bottom: 0.5px solid rgba(0,0,0,0.10);
+    margin-bottom: 18px;
+  }
+  .saude-header-left { display: flex; align-items: center; gap: 8px; }
+  .saude-header-label {
+    font-size: 12px; font-weight: 500; color: #444441;
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  .saude-badge {
+    font-size: 10px; font-weight: 700; padding: 3px 10px;
+    border-radius: 20px; background: rgba(239,159,39,0.12); color: #854F0B;
+    border: 0.5px solid rgba(239,159,39,0.3);
+  }
+  .saude-kpi-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 10px; margin-bottom: 18px;
+  }
+  .saude-kpi {
+    background: #fafaf8; border: 0.5px solid #eeede7;
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .saude-kpi-label { font-size: 10px; font-weight: 600; color: #73726c; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .saude-kpi-val   { font-size: 22px; font-weight: 600; line-height: 1; margin-bottom: 4px; }
+  .saude-kpi-sub   { font-size: 10px; color: #b4b2a9; }
+  .saude-kpi-delta { font-size: 10px; font-weight: 600; }
+  .saude-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+  .saude-box {
+    background: #fafaf8; border: 0.5px solid #eeede7;
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .saude-box-title { font-size: 11px; font-weight: 600; color: #444441; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 12px; }
+  .saude-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 0.5px solid rgba(0,0,0,0.05); }
+  .saude-row:last-child { border-bottom: none; }
+  .saude-row-label { font-size: 12px; color: #5f5e5a; }
+  .saude-row-val   { font-size: 12px; font-weight: 600; color: #1a1a18; }
+  .saude-roi-box {
+    background: linear-gradient(135deg, rgba(59,109,17,0.06) 0%, rgba(29,158,117,0.06) 100%);
+    border: 0.5px solid rgba(29,158,117,0.25);
+    border-radius: 10px; padding: 16px 20px;
+    display: flex; align-items: center; gap: 16px; margin-bottom: 14px;
+  }
+  .saude-roi-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(29,158,117,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px; color: #155c41; }
+  .saude-roi-title { font-size: 13px; font-weight: 600; color: #155c41; margin-bottom: 4px; }
+  .saude-roi-body  { font-size: 12px; color: #5f5e5a; line-height: 1.5; }
+  .saude-roi-val   { font-size: 28px; font-weight: 700; color: #155c41; margin-left: auto; flex-shrink: 0; }
+  .saude-alerta-box {
+    background: rgba(239,159,39,0.06); border: 0.5px solid rgba(239,159,39,0.25);
+    border-radius: 10px; padding: 12px 16px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .saude-alerta-body { font-size: 12px; color: #5f5e5a; line-height: 1.6; }
+  .saude-alerta-body strong { color: #1a1a18; }
+  .saude-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .saude-bar-label { font-size: 11px; color: #73726c; min-width: 130px; flex-shrink: 0; }
+  .saude-bar-track { flex: 1; height: 8px; background: #e8e7e0; border-radius: 99px; overflow: hidden; }
+  .saude-bar-fill  { height: 100%; border-radius: 99px; }
+  .saude-bar-val   { font-size: 11px; font-weight: 600; min-width: 50px; text-align: right; }
+
   @media print {
     body { background: #fff; padding: 16px; }
     .card, .analysis-section { break-inside: avoid; }
@@ -233,8 +388,33 @@
 
   <div class="header">
     <span class="header-dot" aria-hidden="true">◈</span>
-    <span class="header-label" id="headerLabel">CRM · Filtro: tag Instagram · Maio/2026 · carregando…</span>
-    <span style="margin-left:auto; background:#185FA5; color:#fff; font-size:10px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.05em;">VERSÃO &gt; MAIO</span>
+    <span class="header-label" id="headerLabel">CRM · Filtro: tag Instagram · carregando…</span>
+    <span style="margin-left:auto; background:#185FA5; color:#fff; font-size:10px; font-weight:600; padding:3px 10px; border-radius:20px; letter-spacing:.05em;">INSTAGRAM</span>
+  </div>
+  <div style="margin-top:-12px; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+    <span style="font-size:11px; color:#854F0B; background:rgba(239,159,39,0.1); border:0.5px solid rgba(239,159,39,0.3); border-radius:6px; padding:4px 12px; font-weight:500;">
+      📅 Início da campanha: <strong>21/05/2026</strong> · "Depoimentos ERP (05/2026) - novo"
+    </span>
+  </div>
+
+  <!-- Filtro de período -->
+  <div class="periodo-bar">
+    <div class="periodo-toggle">
+      <button class="periodo-toggle-btn active" id="modoMes">Por mês</button>
+      <button class="periodo-toggle-btn" id="modoPeriodo">Por período</button>
+    </div>
+    <div class="periodo-inputs" id="inputsMes">
+      <span class="periodo-label">Mês:</span>
+      <input type="month" id="filtroMes" value="2026-05">
+    </div>
+    <div class="periodo-inputs" id="inputsPeriodo" style="display:none;">
+      <span class="periodo-label">De:</span>
+      <input type="date" id="filtroDesde" value="2026-05-01">
+      <span class="periodo-label">até:</span>
+      <input type="date" id="filtroAte" value="2026-05-31">
+    </div>
+    <button class="campanha-btn" id="btnCampanha">📣 Campanha</button>
+    <button class="periodo-apply" id="aplicarFiltro">Atualizar</button>
   </div>
 
   <div id="conteudo">
@@ -244,8 +424,9 @@
 </div>
 
 <script>
-const MES_LABEL = 'Maio/2026';
-const FUNIL_CORES = ['#378ADD','#1D9E75','#EF9F27','#D85A30','#888780'];
+let MES_LABEL = 'Maio/2026';
+let _modoAtual = 'mes'; // 'mes' ou 'periodo'
+const FUNIL_CORES = ['#378ADD','#1D9E75','#EF9F27','#D85A30','#888780','#A32D2D'];
 
 // ── Perfis ───────────────────────────────────────────────────────────────────
 const PERFIL_CORES = { 'Dentro Perfil': '#1D9E75', 'Fora Perfil': '#A32D2D', 'Perfil Indefinido': '#EF9F27' };
@@ -382,8 +563,28 @@ function buildFunil(containerId, funil) {
   const base = funil[0]?.value || 1;
   const el = document.getElementById(containerId);
   if (!el) return;
-  funil.forEach((d, i) => {
-    const pct = base > 0 ? Math.round(d.value / base * 100) : 0;
+
+  // Separa perdidos do restante
+  const etapas   = funil.filter(d => d.label !== 'Leads perdidos');
+  const perdidos = funil.find(d => d.label === 'Leads perdidos');
+
+  // Subtotal: ativos = total - perdidos - ganhos
+  const total   = funil[0]?.value || 0;
+  const nPerd   = perdidos?.value || 0;
+  const ganhos  = funil.find(d => d.label === 'Contratos assinados')?.value || 0;
+  const ativos  = total - nPerd - ganhos;
+  const pctPerd = base > 0 ? Math.round(nPerd / base * 100) : 0;
+  const pctAtiv = base > 0 ? Math.round(ativos / base * 100) : 0;
+  const pctGan  = base > 0 ? Math.round(ganhos / base * 100) : 0;
+
+  // Renderiza etapas do funil (exceto perdidos)
+  etapas.forEach((d, i) => {
+    const pct  = base > 0 ? Math.round(d.value / base * 100) : 0;
+    const prev = i > 0 ? etapas[i - 1].value : null;
+    const conv = (prev !== null && prev > 0) ? Math.round(d.value / prev * 100) : null;
+    const convTxt = conv !== null
+      ? `<span class="funnel-conv" title="conversão da etapa anterior">${conv}% do anterior</span>`
+      : `<span class="funnel-conv"></span>`;
     el.innerHTML += `
       <div class="funnel-row">
         <span class="funnel-label">${d.label}</span>
@@ -392,8 +593,51 @@ function buildFunil(containerId, funil) {
         </div>
         <span class="funnel-val">${d.value}</span>
         <span class="funnel-pct">${pct}%</span>
+        ${convTxt}
       </div>`;
   });
+
+  // Subtotal
+  el.innerHTML += `
+    <div class="funnel-separator">
+      <div class="funnel-sep-line"></div>
+      <span style="font-size:10px;color:#b4b2a9;white-space:nowrap;font-weight:500;">RESUMO DO PIPELINE</span>
+      <div class="funnel-sep-line"></div>
+    </div>
+    <div class="funnel-subtotal">
+      <div class="funnel-sub-item">
+        <span class="funnel-sub-label">Em pipeline</span>
+        <span class="funnel-sub-val" style="color:#185FA5;">${ativos}</span>
+        <span class="funnel-sub-pct">${pctAtiv}% do total</span>
+      </div>
+      <div style="width:0.5px;background:rgba(0,0,0,0.1);align-self:stretch;"></div>
+      <div class="funnel-sub-item">
+        <span class="funnel-sub-label">Contratos</span>
+        <span class="funnel-sub-val" style="color:#3B6D11;">${ganhos}</span>
+        <span class="funnel-sub-pct">${pctGan}% do total</span>
+      </div>
+      <div style="width:0.5px;background:rgba(0,0,0,0.1);align-self:stretch;"></div>
+      <div class="funnel-sub-item">
+        <span class="funnel-sub-label">Perdidos</span>
+        <span class="funnel-sub-val" style="color:#A32D2D;">${nPerd}</span>
+        <span class="funnel-sub-pct">${pctPerd}% do total</span>
+      </div>
+    </div>`;
+
+  // Linha de perdidos
+  if (perdidos) {
+    const pct = base > 0 ? Math.round(perdidos.value / base * 100) : 0;
+    el.innerHTML += `
+      <div class="funnel-row">
+        <span class="funnel-label" style="color:#A32D2D;">${perdidos.label}</span>
+        <div class="funnel-track">
+          <div class="funnel-fill" style="width:${pct}%; background:#A32D2D; min-width:${perdidos.value > 0 ? '4px' : '0'};"></div>
+        </div>
+        <span class="funnel-val" style="color:#A32D2D;">${perdidos.value}</span>
+        <span class="funnel-pct" style="color:#A32D2D;">${pct}%</span>
+        <span class="funnel-conv"></span>
+      </div>`;
+  }
 }
 
 function renderAnalise(d) {
@@ -434,7 +678,7 @@ function renderAnalise(d) {
           <i class="ti ti-receipt analysis-icon muted" aria-hidden="true"></i>
           <div>
             <p class="analysis-title">Propostas no mês</p>
-            <p class="analysis-body">${k.propostas} proposta(s) negociada(s) — ${k.negociacao_ativa} em negociação ativa.${propPerdidos > 0
+            <p class="analysis-body">${k.propostas} proposta(s) negociada(s) — ${k.negociacao_ativa} em fechamento.${propPerdidos > 0
               ? ` ${propPerdidos} perdida(s) após proposta${topProp1 ? ` (motivo principal: "${topProp1.label}")` : ''}.`
               : ' Sem perdas com proposta no mês até o momento.'
             }</p>
@@ -477,13 +721,23 @@ function evDelta(atual, prev) {
 function renderEvKpis(semanas) {
   const el = document.getElementById('evKpis');
   if (!el) return;
-  const last = semanas[semanas.length - 1] || null;
-  const prev = semanas.length > 1 ? semanas[semanas.length - 2] : null;
   const nSem = semanas.length;
-  const periodo = nSem > 0 ? `${semanas[0].label.split('–')[0]} – ${semanas[nSem-1].label.split('–')[1] || ''}` : '—';
+
+  // Semana atual: a que contém hoje
+  const hoje = new Date().toISOString().slice(0, 10);
+  const idxAtual = semanas.findIndex(s => s.inicio <= hoje && s.fim >= hoje);
+  const semAtual = idxAtual >= 0 ? semanas[idxAtual] : semanas[nSem - 1] || null;
+  const semAnterior = idxAtual > 0 ? semanas[idxAtual - 1] : (idxAtual < 0 && nSem > 1 ? semanas[nSem - 2] : null);
+
+  // Atualiza título com o período da semana atual
+  const tituloEl = document.getElementById('evTitulo');
+  if (tituloEl && semAtual) {
+    tituloEl.textContent = `Evolução Semanal – Funil de Vendas · ${semAtual.label}`;
+  }
+
   function card(icon, color, label, key) {
-    const val = last ? last[key] : 0;
-    const pv  = prev ? prev[key] : null;
+    const val = semAtual ? (semAtual[key] || 0) : 0;
+    const pv  = semAnterior ? (semAnterior[key] || 0) : null;
     return `<div class="ev-kpi-card">
       <p class="ev-kpi-icon-label"><i class="ti ${icon}" style="color:${color}"></i> ${label}</p>
       <p class="ev-kpi-value" style="color:${color}">${val}</p>
@@ -495,11 +749,7 @@ function renderEvKpis(semanas) {
     card('ti-presentation','#1D9E75', 'Apresentações', 'apresentacoes') +
     card('ti-file-text',   '#EF9F27', 'Propostas',     'propostas') +
     card('ti-check',       '#3B6D11', 'Contratos',     'ganhos') +
-    `<div class="ev-kpi-card">
-       <p class="ev-kpi-icon-label"><i class="ti ti-calendar" style="color:#73726c"></i> Período</p>
-       <p class="ev-kpi-value" style="font-size:13px;color:#1a1a18;margin-top:4px;">${periodo}</p>
-       <p class="ev-kpi-vs">${nSem} semana${nSem !== 1 ? 's' : ''}</p>
-     </div>`;
+    card('ti-user-x',      '#A32D2D', 'Perdidos',      'perdidos');
 }
 
 function renderEvTable(semanas) {
@@ -516,6 +766,7 @@ function renderEvTable(semanas) {
       ${cell(s.apresentacoes, 'cell-apres')}
       ${cell(s.propostas, 'cell-prop')}
       ${cell(s.ganhos, 'cell-contrato')}
+      <td class="${(s.perdidos||0) === 0 ? 'cell-zero' : ''}" style="${(s.perdidos||0) > 0 ? 'color:#A32D2D;font-weight:600;' : ''}">${s.perdidos || 0}</td>
       <td>${badge}</td>
     </tr>`;
   }).join('');
@@ -566,6 +817,7 @@ function buildEvCharts(semanas) {
           { label: 'Apresentações', data: semanas.map(s => s.apresentacoes), borderColor: '#1D9E75', borderWidth: 2, pointRadius: 3, tension: 0.3, fill: false },
           { label: 'Propostas',     data: semanas.map(s => s.propostas),     borderColor: '#EF9F27', borderWidth: 2, pointRadius: 3, tension: 0.3, fill: false },
           { label: 'Contratos',     data: semanas.map(s => s.ganhos),        borderColor: '#3B6D11', borderWidth: 2, pointRadius: 3, tension: 0.3, fill: false },
+          { label: 'Perdidos',      data: semanas.map(s => s.perdidos || 0), borderColor: '#A32D2D', borderWidth: 2, pointRadius: 3, tension: 0.3, fill: false, borderDash: [4,3] },
         ],
       },
       options: {
@@ -583,7 +835,7 @@ function buildEvCharts(semanas) {
     });
     const togglesEl = document.getElementById('chartLineToggles');
     if (togglesEl) {
-      const series = [{ label: 'Leads novos', color: '#378ADD' }, { label: 'Apresentações', color: '#1D9E75' }, { label: 'Propostas', color: '#EF9F27' }, { label: 'Contratos', color: '#3B6D11' }];
+      const series = [{ label: 'Leads novos', color: '#378ADD' }, { label: 'Apresentações', color: '#1D9E75' }, { label: 'Propostas', color: '#EF9F27' }, { label: 'Contratos', color: '#3B6D11' }, { label: 'Perdidos', color: '#A32D2D' }];
       togglesEl.innerHTML = series.map((s, i) => `<button class="chart-toggle-btn" data-idx="${i}" style="background:${s.color}"><span class="chart-toggle-dot"></span>${s.label}</button>`).join('');
       togglesEl.querySelectorAll('.chart-toggle-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -603,8 +855,8 @@ function buildEvCharts(semanas) {
     _chartBar = new Chart(ctxBar, {
       type: 'bar',
       data: {
-        labels: ['Leads novos', 'Apresentações', 'Propostas', 'Contratos'],
-        datasets: [{ data: [avg('novos'), avg('apresentacoes'), avg('propostas'), avg('ganhos')], backgroundColor: ['rgba(55,138,221,0.75)','rgba(29,158,117,0.75)','rgba(239,159,39,0.75)','rgba(59,109,17,0.75)'], borderRadius: 4, borderSkipped: false }],
+        labels: ['Leads novos', 'Apresentações', 'Propostas', 'Contratos', 'Perdidos'],
+        datasets: [{ data: [avg('novos'), avg('apresentacoes'), avg('propostas'), avg('ganhos'), avg('perdidos')], backgroundColor: ['rgba(55,138,221,0.75)','rgba(29,158,117,0.75)','rgba(239,159,39,0.75)','rgba(59,109,17,0.75)','rgba(163,45,45,0.75)'], borderRadius: 4, borderSkipped: false }],
       },
       options: {
         indexAxis: 'y', responsive: true, maintainAspectRatio: false,
@@ -624,17 +876,8 @@ function renderSemanas(semanas) {
   const min = semanas[0].inicio, max = semanas[semanas.length - 1].inicio;
   return `
     <div class="semanas-section">
-      <p class="ev-title">Evolução Semanal – Funil de Vendas · ${MES_LABEL}</p>
+      <p class="ev-title" id="evTitulo">Evolução Semanal – Funil de Vendas</p>
       <div class="ev-kpi-grid" id="evKpis"></div>
-      <div class="ev-filter">
-        <span class="ev-filter-label">Período:</span>
-        <input type="date" id="filtroInicio" min="${min}" max="${max}" value="${min}">
-        <span class="ev-filter-label">até</span>
-        <input type="date" id="filtroFim" min="${min}" max="${max}" value="${max}">
-        <button class="ev-filter-quick" id="filtro7d">7 dias</button>
-        <button class="ev-filter-quick" id="filtro30d">30 dias</button>
-        <button class="ev-filter-reset" id="filtroReset">Limpar filtro</button>
-      </div>
       <div class="ev-charts-grid">
         <div class="ev-chart-card">
           <p class="ev-section-label">Evolução Semanal</p>
@@ -651,7 +894,7 @@ function renderSemanas(semanas) {
       <p class="ev-section-label">Desempenho Semanal Detalhado</p>
       <div style="max-height:320px;overflow-y:auto;">
         <table class="semanas-table">
-          <thead><tr><th style="text-align:left;padding-left:0;">Semana</th><th>Leads novos</th><th>Apresentações</th><th>Propostas</th><th>Contratos</th><th>Performance</th></tr></thead>
+          <thead><tr><th style="text-align:left;padding-left:0;">Semana</th><th>Leads novos</th><th>Apresentações</th><th>Propostas</th><th>Contratos</th><th style="color:#A32D2D;">Perdidos</th><th>Performance</th></tr></thead>
           <tbody id="evTableBody"></tbody>
         </table>
       </div>
@@ -661,40 +904,18 @@ function renderSemanas(semanas) {
     </div>`;
 }
 
-function setupSemanas(semanas) {
-  function filtrados() {
-    const ini = document.getElementById('filtroInicio')?.value || '';
-    const fim = document.getElementById('filtroFim')?.value    || '';
-    return _allSemanas.filter(s => (!ini || s.inicio >= ini) && (!fim || s.inicio <= fim));
-  }
-  function atualizar() { const f = filtrados(); renderEvKpis(f); renderEvTable(f); renderEvInsights(f); buildEvCharts(f); }
-  function setQuickActive(id) { ['filtro7d','filtro30d'].forEach(b => document.getElementById(b)?.classList.remove('active')); if (id) document.getElementById(id)?.classList.add('active'); }
-  function aplicarJanela(dias) {
-    const hoje = new Date(); hoje.setHours(0,0,0,0);
-    const dtInicio = new Date(hoje); dtInicio.setDate(hoje.getDate() - dias + 1);
-    const toISO = d => d.toISOString().slice(0,10);
-    document.getElementById('filtroInicio').value = toISO(dtInicio);
-    document.getElementById('filtroFim').value    = toISO(hoje);
-    atualizar();
-  }
-  document.getElementById('filtroInicio')?.addEventListener('change', () => { setQuickActive(null); atualizar(); });
-  document.getElementById('filtroFim')?.addEventListener('change',    () => { setQuickActive(null); atualizar(); });
-  document.getElementById('filtro7d')?.addEventListener('click',  () => { setQuickActive('filtro7d');  aplicarJanela(7);  });
-  document.getElementById('filtro30d')?.addEventListener('click', () => { setQuickActive('filtro30d'); aplicarJanela(30); });
-  document.getElementById('filtroReset')?.addEventListener('click', () => {
-    setQuickActive(null);
-    document.getElementById('filtroInicio').value = _allSemanas[0]?.inicio || '';
-    document.getElementById('filtroFim').value    = _allSemanas[_allSemanas.length - 1]?.inicio || '';
-    atualizar();
-  });
-  atualizar();
+function setupSemanas(semanas, dias) {
+  renderEvKpis(semanas);
+  renderEvTable(semanas);
+  renderEvInsights(semanas);
+  buildEvCharts(dias && dias.length ? dias : semanas);
 }
 
 function renderDashboard(d) {
   const k = d.kpis;
 
   document.getElementById('headerLabel').textContent =
-    `CRM · Filtro: tag Instagram · ${MES_LABEL} · ${d.csv}`;
+    `CRM · Filtro: tag Instagram · ${d.csv}`;
 
   document.getElementById('conteudo').innerHTML = `
     <div class="kpi-grid">
@@ -719,7 +940,7 @@ function renderDashboard(d) {
         <p class="kpi-value">${k.propostas}</p>
       </div>
       <div class="kpi-card">
-        <p class="kpi-label">Em negociação ativa</p>
+        <p class="kpi-label">Em fechamento</p>
         <p class="kpi-value amber">${k.negociacao_ativa}</p>
         <p class="kpi-sub">proposta + status ativo</p>
       </div>
@@ -782,30 +1003,457 @@ function renderDashboard(d) {
         </table>
       </div>
     </div>
+
+    <!-- Todas as oportunidades -->
+    <div class="card" style="margin-top:16px;">
+      <p class="card-title">Todas as Oportunidades — Instagram · ${MES_LABEL}</p>
+      <p class="card-sub" id="oporCount">${k.total} oportunidade${k.total !== 1 ? 's' : ''} com tag Instagram no período · ordenado por data de criação</p>
+      <div class="opor-filters">
+        <input class="opor-filter-input" id="oporFiltroBusca" type="search" placeholder="🔍 Buscar título…" style="min-width:160px;">
+        <select class="opor-filter-select" id="oporFiltroVendedor"><option value="">Vendedor</option></select>
+        <select class="opor-filter-select" id="oporFiltroEtapa"><option value="">Etapa no funil</option></select>
+        <select class="opor-filter-select" id="oporFiltroPerfil"><option value="">Perfil</option></select>
+        <select class="opor-filter-select" id="oporFiltroStatus"><option value="">Status</option></select>
+        <button class="opor-filter-reset" id="oporFiltroReset">Limpar</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="opor-table">
+          <thead><tr>
+            <th>Título do negócio</th>
+            <th>Vendedor</th>
+            <th>Etapa no funil</th>
+            <th>Tags</th>
+            <th>Status</th>
+          </tr></thead>
+          <tbody id="oportunidadesBody"></tbody>
+        </table>
+      </div>
+    </div>
   `;
 
   buildRanking('rankingTodos',    d.ranking_todos,    d.total_perdidos || 1,         '#F09595');
   buildRanking('rankingProposta', d.ranking_proposta, d.total_perdidos_proposta || 1, '#AFA9EC');
   buildFunil('funnel', d.funil);
-  if (d.semanas?.length) setupSemanas(d.semanas);
+  if (d.semanas?.length) setupSemanas(d.semanas, d.dias);
   renderPropostasAtivas(d.propostas_ativas || []);
   if (d.perfis?.length) setupPerfis(d.perfis);
+  renderOportunidades(d.oportunidades || []);
+  renderSaudeCampanha(d.kpis, d.perfis || []);
 }
 
-fetch('/api/instagram-data?mes=2026-05')
-  .then(r => r.json())
-  .then(d => {
-    if (d.erro) {
-      document.getElementById('conteudo').innerHTML =
-        `<div class="estado">Erro: ${d.erro}</div>`;
-      return;
-    }
-    renderDashboard(d);
-  })
-  .catch(err => {
-    document.getElementById('conteudo').innerHTML =
-      `<div class="estado">Falha ao buscar dados: ${err.message}</div>`;
+function statusBadge(s) {
+  const cls = s === 'Ativo' ? 'ativo' : s === 'Perdido' ? 'perdido' : s === 'Ganho' ? 'ganho' : 'outro';
+  return `<span class="status-badge ${cls}">${s}</span>`;
+}
+
+const TAG_CORES = {
+  'instagram':        { bg: 'rgba(24,95,165,0.1)',   color: '#185FA5' },
+  'dentro perfil':    { bg: 'rgba(29,158,117,0.1)',  color: '#155c41' },
+  'fora perfil':      { bg: 'rgba(163,45,45,0.1)',   color: '#A32D2D' },
+  'perfil indefinido':{ bg: 'rgba(239,159,39,0.1)',  color: '#854F0B' },
+};
+
+function renderTags(tagStr) {
+  if (!tagStr || tagStr === '—') return '—';
+  const unicas = [...new Set(
+    tagStr.split(';').map(t => t.trim()).filter(Boolean)
+  )];
+  return unicas.map(t => {
+    const cor = TAG_CORES[t.toLowerCase()] || { bg: '#f1efe8', color: '#73726c' };
+    return `<span class="tag-pill" style="background:${cor.bg};color:${cor.color};font-weight:600;">${t}</span>`;
+  }).join('');
+}
+
+let _todasOpor = [];
+
+function popularSelects(lista) {
+  const vendedores = [...new Set(lista.map(o => o.vendedor).filter(v => v && v !== '—'))].sort();
+  const etapas     = [...new Set(lista.map(o => o.etapa).filter(e => e && e !== '—'))].sort();
+  const statuses   = [...new Set(lista.map(o => o.status).filter(s => s && s !== '—'))].sort();
+  const perfis     = [...new Set(lista.flatMap(o =>
+    o.tags.split(';').map(t => t.trim()).filter(t => t && t.toLowerCase() !== 'instagram')
+  ))].sort();
+
+  function preencher(id, opcoes) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = `<option value="">Todos</option>` +
+      opcoes.map(v => `<option value="${v}">${v}</option>`).join('');
+  }
+  preencher('oporFiltroVendedor', vendedores);
+  preencher('oporFiltroEtapa',    etapas);
+  preencher('oporFiltroStatus',   statuses);
+  preencher('oporFiltroPerfil',   perfis);
+}
+
+function aplicarFiltrosOpor() {
+  const busca   = (document.getElementById('oporFiltroBusca')?.value   || '').toLowerCase();
+  const vendedor= (document.getElementById('oporFiltroVendedor')?.value || '');
+  const etapa   = (document.getElementById('oporFiltroEtapa')?.value   || '');
+  const status  = (document.getElementById('oporFiltroStatus')?.value  || '');
+  const perfil  = (document.getElementById('oporFiltroPerfil')?.value  || '');
+
+  const filtrada = _todasOpor.filter(o => {
+    if (busca    && !o.titulo.toLowerCase().includes(busca))   return false;
+    if (vendedor && o.vendedor !== vendedor)                    return false;
+    if (etapa    && o.etapa !== etapa)                          return false;
+    if (status   && o.status !== status)                        return false;
+    if (perfil   && !o.tags.toLowerCase().includes(perfil.toLowerCase())) return false;
+    return true;
   });
+
+  const el = document.getElementById('oportunidadesBody');
+  const cnt = document.getElementById('oporCount');
+  if (cnt) cnt.textContent = `${filtrada.length} de ${_todasOpor.length} oportunidade${_todasOpor.length !== 1 ? 's' : ''}`;
+
+  if (!el) return;
+  if (!filtrada.length) {
+    el.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#b4b2a9;padding:20px;">Nenhuma oportunidade encontrada.</td></tr>';
+    return;
+  }
+  el.innerHTML = filtrada.map(o => `<tr>
+    <td style="font-weight:500;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${o.titulo}">${o.titulo}</td>
+    <td style="color:#73726c;white-space:nowrap;">${o.vendedor}</td>
+    <td style="color:#73726c;">${o.etapa}</td>
+    <td style="max-width:220px;">${renderTags(o.tags)}</td>
+    <td>${statusBadge(o.status)}</td>
+  </tr>`).join('');
+}
+
+function renderOportunidades(lista) {
+  _todasOpor = lista || [];
+  const el = document.getElementById('oportunidadesBody');
+  if (!el) return;
+  popularSelects(_todasOpor);
+
+  ['oporFiltroBusca','oporFiltroVendedor','oporFiltroEtapa','oporFiltroStatus','oporFiltroPerfil'].forEach(id => {
+    document.getElementById(id)?.addEventListener('input',  aplicarFiltrosOpor);
+    document.getElementById(id)?.addEventListener('change', aplicarFiltrosOpor);
+  });
+  document.getElementById('oporFiltroReset')?.addEventListener('click', () => {
+    ['oporFiltroBusca','oporFiltroVendedor','oporFiltroEtapa','oporFiltroStatus','oporFiltroPerfil']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    aplicarFiltrosOpor();
+  });
+
+  aplicarFiltrosOpor();
+}
+
+// ── Saúde da Campanha ──────────────────────────────────────────────────────
+function renderSaudeCampanha(kpis, perfis) {
+  // Data da última análise (atualizar a cada reunião com marketing)
+  const DATA_ANALISE    = '2026-06-10';
+  // Dados fixos da campanha (PDF marketing)
+  const INVEST          = 3345.56;
+  const LEADS_CAMP      = kpis.total;   // usa dado real do CRM
+  const CPL_HIST        = 575.57;
+  const HIST_DENTRO_PCT = 48.2;
+
+  // Perfis: calculado a partir dos dados reais do CRM (d.perfis)
+  const perfilDentro  = perfis.find(p => p.tag && p.tag.toLowerCase().includes('dentro')) || null;
+  const DENTRO_PERFIL = perfilDentro ? perfilDentro.total : 0;
+  const DENTRO_PCT    = LEADS_CAMP > 0 ? +((DENTRO_PERFIL / LEADS_CAMP) * 100).toFixed(1) : 0;
+
+  // CPL Geral: dinâmico (investimento / total leads do CRM)
+  const CPL_GERAL  = LEADS_CAMP > 0 ? +(INVEST / LEADS_CAMP).toFixed(2) : 0;
+  // CPL Qualificado: investimento / dentro perfil total
+  const CPL_QUALIF = DENTRO_PERFIL > 0 ? +(INVEST / DENTRO_PERFIL).toFixed(2) : 0;
+
+  // CPL Ativo Qualificado: investimento / (dentro perfil - perdidos dentro perfil)
+  const DENTRO_PERDIDO = perfilDentro ? (perfilDentro.perdido || 0) : 0;
+  const DENTRO_ATIVO   = Math.max(1, DENTRO_PERFIL - DENTRO_PERDIDO);
+  const CPL_ATIVO_QUAL = +(INVEST / DENTRO_ATIVO).toFixed(2);
+
+  // CPL Pipeline Ativo: investimento / (total - perdidos)
+  const PIPELINE_ATIVO = Math.max(1, LEADS_CAMP - kpis.perdidos);
+  const CPL_PIPELINE   = +(INVEST / PIPELINE_ATIVO).toFixed(2);
+
+  // Custo diário: dias desde início da campanha (21/05/2026)
+  const INICIO_CAMP = new Date('2026-05-21');
+  const HOJE        = new Date(); HOJE.setHours(0,0,0,0);
+  const DIAS_CAMP   = Math.max(1, Math.round((HOJE - INICIO_CAMP) / 86400000) + 1);
+  const CPD         = +(INVEST / DIAS_CAMP).toFixed(2); // custo por dia
+
+  // Proposta em negociação (Ricali)
+  const PROPOSTA_PROJETO    = 82160.00;
+  const PROPOSTA_MENSAL     = 7305.76;
+  const ROI_X               = (PROPOSTA_PROJETO / INVEST).toFixed(1);
+  const ROI_PCT             = Math.round((PROPOSTA_PROJETO / INVEST - 1) * 100);
+  const RECEITA_12M         = PROPOSTA_PROJETO + PROPOSTA_MENSAL * 12;
+
+  const fmtBRL = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  // CPL delta vs histórico
+  const cplDelta = Math.round((CPL_QUALIF / CPL_HIST - 1) * 100);
+  const dentroColor = DENTRO_PCT >= HIST_DENTRO_PCT ? '#3B6D11' : '#A32D2D';
+
+  // Adiciona seção ao conteudo
+  const existing = document.getElementById('saudeCampanha');
+  if (existing) existing.remove();
+
+  const div = document.createElement('div');
+  div.id = 'saudeCampanha';
+  div.innerHTML = `
+    <div class="saude-section">
+      <div class="saude-header">
+        <div class="saude-header-left">
+          <i class="ti ti-heart-rate-monitor" style="font-size:18px;color:#73726c;"></i>
+          <span class="saude-header-label">Saúde da Campanha · Justificativa Comercial</span>
+        </div>
+        <span class="saude-badge">📣 Campanha Instagram · Mai/2026</span>
+        <span class="saude-badge" style="background:rgba(24,95,165,0.08);color:#185FA5;">📅 Análise: ${DATA_ANALISE.split('-').reverse().join('/')}</span>
+      </div>
+
+      <!-- KPIs principais — todos na mesma linha -->
+      ${(()=>{
+        const FORA_PCT  = +(100 - DENTRO_PCT).toFixed(1);
+        const corD      = DENTRO_PCT >= HIST_DENTRO_PCT ? '#1D9E75' : '#EF9F27';
+        const bgD       = DENTRO_PCT >= HIST_DENTRO_PCT ? 'rgba(29,158,117,0.06)' : 'rgba(239,159,39,0.06)';
+        const bdD       = DENTRO_PCT >= HIST_DENTRO_PCT ? 'rgba(29,158,117,0.3)'  : 'rgba(239,159,39,0.3)';
+        const diffTxt   = DENTRO_PCT >= HIST_DENTRO_PCT
+          ? `+${(DENTRO_PCT - HIST_DENTRO_PCT).toFixed(1)} p.p. acima do histórico`
+          : `${(DENTRO_PCT - HIST_DENTRO_PCT).toFixed(1)} p.p. abaixo do histórico`;
+        const corCPL    = CPL_QUALIF <= CPL_HIST ? '#1D9E75' : CPL_QUALIF <= CPL_HIST*1.3 ? '#EF9F27' : '#A32D2D';
+        const bgCPL     = CPL_QUALIF <= CPL_HIST ? 'rgba(29,158,117,0.04)' : CPL_QUALIF <= CPL_HIST*1.3 ? 'rgba(239,159,39,0.04)' : 'rgba(163,45,45,0.04)';
+        const bdCPL     = CPL_QUALIF <= CPL_HIST ? 'rgba(29,158,117,0.25)' : CPL_QUALIF <= CPL_HIST*1.3 ? 'rgba(239,159,39,0.3)' : 'rgba(163,45,45,0.25)';
+        return `
+      <div class="saude-kpi-grid" style="grid-template-columns:repeat(5,1fr);">
+
+        <div class="saude-kpi" style="border-color:rgba(24,95,165,0.3);background:rgba(24,95,165,0.04);">
+          <p class="saude-kpi-label">Custo / Dia</p>
+          <p class="saude-kpi-val" style="color:#185FA5;font-size:24px;">${fmtBRL(CPD)}</p>
+          <p class="saude-kpi-sub" style="margin-top:6px;">
+            <span style="font-weight:600;color:#1a1a18;">${DIAS_CAMP} dias</span>
+            <span style="color:#b4b2a9;"> desde 21/05</span>
+          </p>
+          <p class="saude-kpi-sub" style="margin-top:3px;color:#73726c;">Total: <strong>${fmtBRL(INVEST)}</strong></p>
+        </div>
+
+        <div class="saude-kpi" title="Custo médio para gerar qualquer lead da campanha, independente do perfil ou status.">
+          <p class="saude-kpi-label">CPL Geral <span style="font-size:10px;color:#b4b2a9;cursor:help;">ⓘ</span></p>
+          <p class="saude-kpi-val" style="color:#1a1a18;font-size:24px;">${fmtBRL(CPL_GERAL)}</p>
+          <span style="display:inline-block;margin-top:6px;font-size:10px;background:#f1efe8;color:#73726c;padding:2px 8px;border-radius:20px;font-weight:600;font-family:monospace;">invest ÷ total leads</span>
+          <p class="saude-kpi-sub" style="margin-top:5px;font-size:10px;color:#b4b2a9;line-height:1.4;">Sem filtro de qualidade.</p>
+        </div>
+
+        <div class="saude-kpi" style="border-color:${bdCPL};background:${bgCPL};" title="Custo por lead classificado como Dentro do Perfil ideal.">
+          <p class="saude-kpi-label">CPL Qualificado <span style="font-size:10px;color:#b4b2a9;cursor:help;">ⓘ</span></p>
+          <p class="saude-kpi-val" style="color:${corCPL};font-size:24px;">${fmtBRL(CPL_QUALIF)}</p>
+          <span style="display:inline-block;margin-top:6px;font-size:10px;background:rgba(163,45,45,0.08);color:${corCPL};padding:2px 8px;border-radius:20px;font-weight:600;font-family:monospace;">invest ÷ d.perfil</span>
+          <p class="saude-kpi-sub saude-kpi-delta" style="color:${corCPL};margin-top:5px;">+${cplDelta}% vs histórico</p>
+        </div>
+
+        <div class="saude-kpi" style="border-color:${bdD};background:${bgD};">
+          <p class="saude-kpi-label">Dentro do Perfil</p>
+          <p class="saude-kpi-val" style="color:${corD};font-size:24px;">${DENTRO_PCT}%</p>
+          <p class="saude-kpi-sub" style="margin-top:4px;">${DENTRO_PERFIL} de ${LEADS_CAMP} leads</p>
+          <p class="saude-kpi-sub saude-kpi-delta" style="color:${corD};margin-top:2px;">${diffTxt}</p>
+        </div>
+
+        <div class="saude-kpi" style="border-color:rgba(163,45,45,0.25);background:rgba(163,45,45,0.04);">
+          <p class="saude-kpi-label">Fora do Perfil</p>
+          <p class="saude-kpi-val" style="color:#A32D2D;font-size:24px;">${FORA_PCT}%</p>
+          <p class="saude-kpi-sub" style="margin-top:4px;">${LEADS_CAMP - DENTRO_PERFIL} de ${LEADS_CAMP} leads</p>
+          <p class="saude-kpi-sub" style="color:#b4b2a9;margin-top:2px;font-size:10px;">diferença de ${DENTRO_PCT}%</p>
+        </div>
+
+      </div>`;
+      })()}
+
+      <!-- ROI Potencial destaque -->
+      <div class="saude-roi-box">
+        <div class="saude-roi-icon"><i class="ti ti-trending-up"></i></div>
+        <div>
+          <p class="saude-roi-title">ROI Potencial — Proposta em Fechamento</p>
+          <p class="saude-roi-body">
+            Projeto único + contrato recorrente mensal · Receita 12 meses projetada em escala<br>
+            <span style="color:#888780;">1 conversão já justifica 100% do investimento da campanha.</span>
+          </p>
+        </div>
+        <div style="text-align:center;">
+          <div class="saude-roi-val">${ROI_X}×</div>
+          <div style="font-size:10px;color:#73726c;margin-top:2px;">retorno potencial</div>
+        </div>
+      </div>
+
+      <!-- Comparativo + Funil pipeline -->
+      <div class="saude-grid2">
+        <div class="saude-box">
+          <p class="saude-box-title">Comparativo Histórico</p>
+          ${(()=>{
+            /* CPL: menor é melhor */
+            const maxCPL  = Math.max(CPL_QUALIF, CPL_HIST);
+            const wHist   = Math.round(CPL_HIST   / maxCPL * 100);
+            const wAtual  = Math.round(CPL_QUALIF / maxCPL * 100);
+            const cCPLat  = CPL_QUALIF <= CPL_HIST ? '#1D9E75'
+                          : CPL_QUALIF <= CPL_HIST * 1.3 ? '#EF9F27' : '#A32D2D';
+            /* Dentro do Perfil: maior é melhor */
+            const maxPCT  = Math.max(DENTRO_PCT, HIST_DENTRO_PCT);
+            const wHPCT   = Math.round(HIST_DENTRO_PCT / maxPCT * 100);
+            const wAPCT   = Math.round(DENTRO_PCT      / maxPCT * 100);
+            const cPCTat  = DENTRO_PCT >= HIST_DENTRO_PCT ? '#1D9E75'
+                          : DENTRO_PCT >= HIST_DENTRO_PCT * 0.8 ? '#EF9F27' : '#A32D2D';
+            return `
+          <div style="margin-bottom:14px;">
+            <p style="font-size:11px;color:#73726c;margin-bottom:8px;">CPL Qualificado (R$) — menor é melhor</p>
+            <div class="saude-bar-row">
+              <span class="saude-bar-label">Histórico (média)</span>
+              <div class="saude-bar-track"><div class="saude-bar-fill" style="width:${wHist}%;background:#1D9E75;"></div></div>
+              <span class="saude-bar-val" style="color:#1D9E75;">${fmtBRL(CPL_HIST)}</span>
+            </div>
+            <div class="saude-bar-row">
+              <span class="saude-bar-label">Mai/2026 atual</span>
+              <div class="saude-bar-track"><div class="saude-bar-fill" style="width:${wAtual}%;background:${cCPLat};"></div></div>
+              <span class="saude-bar-val" style="color:${cCPLat};">${fmtBRL(CPL_QUALIF)}</span>
+            </div>
+          </div>
+          <div>
+            <p style="font-size:11px;color:#73726c;margin-bottom:8px;">Leads Dentro do Perfil (%) — maior é melhor</p>
+            <div class="saude-bar-row">
+              <span class="saude-bar-label">Histórico (média)</span>
+              <div class="saude-bar-track"><div class="saude-bar-fill" style="width:${wHPCT}%;background:#1D9E75;"></div></div>
+              <span class="saude-bar-val" style="color:#1D9E75;">${HIST_DENTRO_PCT}%</span>
+            </div>
+            <div class="saude-bar-row">
+              <span class="saude-bar-label">Mai/2026 atual</span>
+              <div class="saude-bar-track"><div class="saude-bar-fill" style="width:${wAPCT}%;background:${cPCTat};"></div></div>
+              <span class="saude-bar-val" style="color:${cPCTat};">${DENTRO_PCT}%</span>
+            </div>
+          </div>`;
+          })()}
+        </div>
+
+        <div class="saude-box">
+          <p class="saude-box-title">Pipeline da Campanha</p>
+          <div class="saude-row"><span class="saude-row-label">Leads captados</span><span class="saude-row-val">${LEADS_CAMP}</span></div>
+          <div class="saude-row"><span class="saude-row-label">Dentro do perfil</span><span class="saude-row-val" style="color:#1D9E75;">${DENTRO_PERFIL}</span></div>
+          <div class="saude-row"><span class="saude-row-label">Em fechamento</span><span class="saude-row-val" style="color:#854F0B;">${kpis.negociacao_ativa}</span></div>
+          <div class="saude-row"><span class="saude-row-label">Com proposta enviada</span><span class="saude-row-val" style="color:#185FA5;">${kpis.propostas}</span></div>
+          <div class="saude-row" style="margin-top:6px;padding-top:10px;border-top:0.5px solid rgba(0,0,0,0.08);">
+            <span class="saude-row-label" style="font-weight:600;">Em fechamento</span>
+            <span class="saude-row-val" style="color:#3B6D11;">Ricali &nbsp;·&nbsp; ROI ${ROI_X}×</span>
+          </div>
+          <div class="saude-row"><span class="saude-row-label">Contrato recorrente</span><span class="saude-row-val" style="color:#3B6D11;">✓ mensal</span></div>
+        </div>
+      </div>
+
+      <!-- Alerta/Recomendação dinâmico -->
+      ${(()=>{
+        const cplOk    = CPL_QUALIF <= CPL_HIST;
+        const cplLeve  = !cplOk && CPL_QUALIF <= CPL_HIST * 1.3;
+        const dentroOk = DENTRO_PCT >= HIST_DENTRO_PCT;
+        const positivo = cplOk || dentroOk;
+        const corBulb  = positivo ? '#3B6D11' : '#854F0B';
+        const bgBox    = positivo ? 'rgba(59,109,17,0.05)' : 'rgba(239,159,39,0.06)';
+        const bdBox    = positivo ? 'rgba(59,109,17,0.2)'  : 'rgba(239,159,39,0.25)';
+
+        const cplTxt = cplOk
+          ? `CPL qualificado <strong>${fmtBRL(CPL_QUALIF)}</strong> abaixo do histórico de ${fmtBRL(CPL_HIST)} — campanha eficiente no custo`
+          : cplLeve
+            ? `CPL qualificado <strong>+${cplDelta}% acima do histórico</strong> (${fmtBRL(CPL_QUALIF)} vs ${fmtBRL(CPL_HIST)}) — variação aceitável`
+            : `CPL qualificado <strong>+${cplDelta}% acima do histórico</strong> (${fmtBRL(CPL_QUALIF)} vs ${fmtBRL(CPL_HIST)}) — requer atenção`;
+
+        const dentroTxt = dentroOk
+          ? `taxa de qualificação <strong>${DENTRO_PCT}%</strong>, acima do histórico de ${HIST_DENTRO_PCT}% (+${(DENTRO_PCT - HIST_DENTRO_PCT).toFixed(1)} p.p.)`
+          : `taxa de qualificação <strong>${DENTRO_PCT}%</strong>, abaixo do histórico de ${HIST_DENTRO_PCT}% (${(DENTRO_PCT - HIST_DENTRO_PCT).toFixed(1)} p.p.)`;
+
+        const recomTxt = positivo
+          ? `A qualificação acima da média histórica reforça a continuidade da campanha — 1 conversão já representa <strong>${ROI_X}× o retorno</strong> sobre o investimento de ${fmtBRL(INVEST)}.`
+          : `Recomenda-se revisar segmentação e criativo buscando qualificação acima de ${HIST_DENTRO_PCT}%. Mesmo assim, 1 conversão representa <strong>${ROI_X}× o retorno</strong> sobre o investimento de ${fmtBRL(INVEST)}.`;
+
+        return `
+      <div class="saude-alerta-box" style="background:${bgBox};border-color:${bdBox};">
+        <i class="ti ti-bulb" style="font-size:18px;color:${corBulb};flex-shrink:0;margin-top:1px;"></i>
+        <p class="saude-alerta-body">
+          <strong>Justificativa para continuidade:</strong>
+          ${cplTxt}, com ${dentroTxt}.
+          Com <strong>1 proposta em fechamento</strong> (Ricali · ROI ${ROI_X}×), ${recomTxt}
+        </p>
+      </div>`;
+      })()}
+    </div>`;
+
+  document.getElementById('conteudo').appendChild(div);
+}
+
+function carregarDados() {
+  document.getElementById('conteudo').innerHTML = '<div class="estado">Carregando dados…</div>';
+
+  let url, label;
+  if (_modoAtual === 'mes') {
+    const mes = document.getElementById('filtroMes').value; // YYYY-MM
+    const [ano, m] = mes.split('-');
+    const nomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    label = `${nomes[+m - 1]}/${ano}`;
+    url = `/api/instagram-data?mes=${mes}`;
+  } else {
+    const desde = document.getElementById('filtroDesde').value;
+    const ate   = document.getElementById('filtroAte').value;
+    const fmt = d => d.split('-').reverse().join('/');
+    label = `${fmt(desde)} – ${fmt(ate)}`;
+    url = `/api/instagram-data?desde=${desde}&ate=${ate}`;
+  }
+
+  MES_LABEL = label;
+  document.getElementById('headerLabel').textContent =
+    `CRM · Filtro: tag Instagram · carregando…`;
+
+  fetch(url)
+    .then(r => r.json())
+    .then(d => {
+      if (d.erro) {
+        document.getElementById('conteudo').innerHTML =
+          `<div class="estado">Erro: ${d.erro}</div>`;
+        return;
+      }
+      renderDashboard(d);
+    })
+    .catch(err => {
+      document.getElementById('conteudo').innerHTML =
+        `<div class="estado">Falha ao buscar dados: ${err.message}</div>`;
+    });
+}
+
+// ── Controles do filtro ────────────────────────────────────────────────────
+document.getElementById('modoMes').addEventListener('click', () => {
+  _modoAtual = 'mes';
+  document.getElementById('modoMes').classList.add('active');
+  document.getElementById('modoPeriodo').classList.remove('active');
+  document.getElementById('inputsMes').style.display = '';
+  document.getElementById('inputsPeriodo').style.display = 'none';
+});
+
+document.getElementById('modoPeriodo').addEventListener('click', () => {
+  _modoAtual = 'periodo';
+  document.getElementById('modoPeriodo').classList.add('active');
+  document.getElementById('modoMes').classList.remove('active');
+  document.getElementById('inputsPeriodo').style.display = '';
+  document.getElementById('inputsMes').style.display = 'none';
+});
+
+document.getElementById('aplicarFiltro').addEventListener('click', () => {
+  document.getElementById('btnCampanha').classList.remove('active');
+  carregarDados();
+});
+
+document.getElementById('btnCampanha').addEventListener('click', () => {
+  // Ativa modo período com início da campanha: 21/05/2026
+  _modoAtual = 'periodo';
+  document.getElementById('modoPeriodo').classList.add('active');
+  document.getElementById('modoMes').classList.remove('active');
+  document.getElementById('inputsPeriodo').style.display = '';
+  document.getElementById('inputsMes').style.display = 'none';
+
+  const hoje = new Date().toISOString().slice(0, 10);
+  document.getElementById('filtroDesde').value = '2026-05-21';
+  document.getElementById('filtroAte').value   = hoje;
+
+  document.getElementById('btnCampanha').classList.add('active');
+  carregarDados();
+});
+
+// Carrega filtro Campanha por padrão (21/05/2026 até hoje)
+document.getElementById('btnCampanha').click();
 </script>
 </body>
 </html>
