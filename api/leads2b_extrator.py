@@ -723,8 +723,11 @@ def extrair_leads(desde: str = None, ate: str = None, saida: str = None):
     leads_raw: list[dict] = []
     for start, finish in _janelas(ini, fim, dias=7):
         print(f"  janela {start[:10]} a {finish[:10]}")
-        lote = _buscar_paginas("/leads/list", {"start_at": start, "finish_at": finish})
-        leads_raw.extend(lote)
+        try:
+            lote = _buscar_paginas("/leads/list", {"start_at": start, "finish_at": finish})
+            leads_raw.extend(lote)
+        except Exception as exc:
+            print(f"  [AVISO] janela {start[:10]} a {finish[:10]} ignorada: {exc}")
         time.sleep(PAUSA)
 
     # Remove duplicatas por lead_id

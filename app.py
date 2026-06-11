@@ -296,8 +296,9 @@ def _processar_instagram(csv_path, mes=None, desde=None, ate=None):
                 "etapa":    str(row.get("Etapa do funil de vendas") or "—") if pd.notna(row.get("Etapa do funil de vendas")) else "—",
                 "tags":     str(row.get("TAGS") or "—") if pd.notna(row.get("TAGS")) else "—",
                 "status":   str(row.get("Status") or "—") if pd.notna(row.get("Status")) else "—",
+                "criacao":  row["_criacao"].strftime("%d/%m/%Y") if pd.notna(row["_criacao"]) else "—",
             }
-            for _, row in ig.sort_values("Data de Criação", ascending=False).iterrows()
+            for _, row in ig.sort_values("_criacao", ascending=False).iterrows()
         ],
     }
 
@@ -890,6 +891,27 @@ def vendas_static_files(filename):
     if ".." in filename or filename.startswith(("/", "\\")):
         return ("", 404)
     return send_from_directory(str(BASE_DIR / "guarani" / "vendas"), filename)
+
+
+@app.route("/api/ultima-atualizacao")
+def api_ultima_atualizacao():
+    arquivos = {
+        "oportunidades": BASE_DIR / "dados" / "api_leads2b" / "oportunidades_base.csv",
+        "leads":         BASE_DIR / "dados" / "api_leads2b" / "leads_base.csv",
+        "prospects":     BASE_DIR / "dados" / "api_leads2b" / "prospects_base.csv",
+        "pos_vendas":    BASE_DIR / "dados" / "api_leads2b" / "pos_vendas_base.csv",
+    }
+    resultado = {}
+    mais_recente = None
+    for nome, path in arquivos.items():
+        if path.exists():
+            ts = path.stat().st_mtime
+            dt = datetime.fromtimestamp(ts)
+            resultado[nome] = dt.strftime("%d/%m/%Y %H:%M")
+            if mais_recente is None or dt > mais_recente:
+                mais_recente = dt
+    resultado["ultima"] = mais_recente.strftime("%d/%m/%Y %H:%M") if mais_recente else "—"
+    return jsonify(resultado)
 
 
 @app.route("/api/ranking-vendedores")
