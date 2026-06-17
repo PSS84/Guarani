@@ -16,3 +16,6 @@ guarani/base/
 
 # Arquivos de material de apoio — hospedados no Google Drive
 guarani/rh/integracao/material_de_apoio/
+
+# Script de uso exclusivamente local
+api/script_apr_proposta.py
