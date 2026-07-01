@@ -865,6 +865,20 @@ def dashboard_metas_teste():
     return resp
 
 
+@app.route("/guarani/vendas/apuracao-v2")
+def apuracao_metas_v2():
+    resp = send_from_directory(str(BASE_DIR / "guarani" / "vendas"), "apuracao_metas_v2.html")
+    resp.headers["Cache-Control"] = "no-cache, max-age=0, must-revalidate"
+    return resp
+
+
+@app.route("/guarani/vendas/apuracao-v3")
+def apuracao_metas_v3():
+    resp = send_from_directory(str(BASE_DIR / "guarani" / "vendas"), "apuracao_metas_v3.html")
+    resp.headers["Cache-Control"] = "no-cache, max-age=0, must-revalidate"
+    return resp
+
+
 @app.route("/api/metas-vendedor")
 def api_metas_vendedor():
     try:
