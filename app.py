@@ -1033,6 +1033,16 @@ def arvore_produto():
     return send_from_directory(str(BASE_DIR / "guarani" / "templates"), "arvore_produto.html")
 
 
+@app.route("/guarani/mapa-mental")
+def mapa_mental():
+    return send_from_directory(str(BASE_DIR / "guarani" / "templates"), "mapa_mental.html")
+
+
+@app.route("/guarani/mapa-mental-projeto")
+def mapa_mental_projeto():
+    return send_from_directory(str(BASE_DIR / "guarani" / "templates"), "mapa-mental-projeto.html")
+
+
 @app.route("/guarani/crm/diagnostico")
 def diagnostico_prospectos():
     return send_from_directory(str(BASE_DIR / "guarani" / "crm"), "diagnostico_prospecteleads.html")
