@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise de Situação — Guarani</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:      #10233F;
+  --navy-2:    #16304F;
+  --bg:        #EEF2F6;
+  --surface:   #FFFFFF;
+  --border:    #E2E8F0;
+  --text:      #0F172A;
+  --label:     #334155;
+  --muted:     #64748B;
+  --sub:       #94A3B8;
+
+  --blue:      #2563EB;
+  --red:       #DC2626;
+  --orange:    #F97316;
+  --amber:     #F59E0B;
+  --green:     #16A34A;
+  --purple:    #7C3AED;
+  --teal:      #0891B2;
+  --pink:      #DB2777;
+
+  --shadow: 0 1px 2px rgba(15,23,42,.04), 0 6px 20px rgba(15,23,42,.06);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+.topbar {
+  background: var(--navy);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 16px 28px;
+  flex-wrap: wrap;
+}
+.topbar-brand { display: flex; align-items: center; gap: 14px; margin-right: auto; }
+.topbar-brand .icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.topbar-brand .icon svg { width: 24px; height: 24px; }
+.topbar-brand h1 { font-size: 17px; font-weight: 800; letter-spacing: .02em; line-height: 1.3; }
+.topbar-brand small { display: block; font-size: 11px; font-weight: 500; color: rgba(255,255,255,.55); letter-spacing: .04em; }
+
+.topbar-field { min-width: 150px; }
+.topbar-field .tf-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.5); letter-spacing: .06em; margin-bottom: 4px; }
+.topbar-field .tf-value { font-size: 15px; font-weight: 700; }
+
+#orgSelect {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  padding-right: 22px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 16px;
+}
+#orgSelect option { color: #0F172A; font-weight: 500; }
+
+.topbar-export {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff; font-family: inherit; font-size: 13px; font-weight: 700;
+  padding: 10px 16px; border-radius: 10px; cursor: pointer;
+  letter-spacing: .03em;
+}
+.topbar-export:hover { background: rgba(255,255,255,.2); }
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.wrap { padding: 20px 28px 90px; max-width: 1600px; margin: 0 auto; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+}
+.card-title {
+  font-size: 12px; font-weight: 700; color: var(--label);
+  letter-spacing: .05em; text-transform: uppercase; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* Row: saúde + KPIs */
+.row-top { display: grid; grid-template-columns: 260px 1fr; gap: 16px; margin-bottom: 16px; }
+.saude-card {
+  background: var(--navy); color: #fff; border-radius: 14px; padding: 18px 20px;
+  display: flex; flex-direction: column;
+}
+.saude-title { font-size: 12px; font-weight: 700; letter-spacing: .05em; color: rgba(255,255,255,.7); margin-bottom: 4px; }
+.gauge-wrap { position: relative; height: 100px; margin: 4px 0 2px; }
+.gauge-pct {
+  position: absolute; left: 0; right: 0; bottom: 4px; text-align: center;
+  font-size: 30px; font-weight: 900; line-height: 1;
+}
+.gauge-label {
+  text-align: center; font-size: 12px; font-weight: 800; letter-spacing: .08em; margin-bottom: 8px;
+}
+.saude-desc { font-size: 12px; color: rgba(255,255,255,.65); text-align: center; line-height: 1.4; }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; }
+.kpi {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: var(--shadow); padding: 16px 14px;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
+}
+.kpi .kpi-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.kpi .kpi-icon svg { width: 20px; height: 20px; }
+.kpi .kpi-num { font-size: 26px; font-weight: 900; line-height: 1; }
+.kpi .kpi-label { font-size: 10.5px; font-weight: 700; color: var(--muted); letter-spacing: .03em; line-height: 1.25; }
+.kpi .kpi-bar { width: 32px; height: 3px; border-radius: 2px; margin-top: 2px; }
+
+/* Row: 3 gráficos */
+.row-charts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.legend-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--label); }
+.legend-item .dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.legend-item .li-count { margin-left: auto; font-weight: 700; }
+.thresh-legend { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 10px; font-size: 11px; color: var(--muted); }
+.thresh-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.thresh-legend .dot { width: 9px; height: 9px; border-radius: 50%; }
+
+/* Row: painéis (ações, interações, observações) */
+.row-panels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+
+/* Row: tabela de chamados (largura total) */
+.row-tabela { margin-bottom: 16px; }
+.table-wrap { display: flex; flex-direction: column; min-height: 0; }
+.table-scroll { overflow: auto; max-height: 480px; border-radius: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+thead th {
+  position: sticky; top: 0; z-index: 2;
+  text-align: left; font-size: 10.5px; font-weight: 700; color: var(--muted);
+  letter-spacing: .04em; text-transform: uppercase; padding: 8px 10px;
+  background: var(--surface); box-shadow: 0 2px 0 var(--border); white-space: nowrap;
+}
+tbody td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:hover { background: #F8FAFC; }
+.chave-cell { white-space: nowrap; }
+.chave-link, .interacao-chave { font-weight: 700; color: var(--blue); text-decoration: none; }
+.chave-link:hover, .interacao-chave:hover { text-decoration: underline; }
+.badge {
+  display: inline-block; padding: 3px 9px; border-radius: 20px;
+  font-size: 10.5px; font-weight: 700; white-space: nowrap;
+}
+.resumo-cell { max-width: 220px; }
+.dito-cell { max-width: 260px; color: var(--muted); }
+.nowrap { white-space: nowrap; }
+
+/* Linha de filtros por coluna */
+.filtro-row th {
+  position: sticky; z-index: 1;
+  background: var(--surface); box-shadow: 0 2px 0 var(--border);
+  padding: 6px 8px 10px; text-transform: none; font-weight: 400;
+}
+.filtro-input {
+  width: 100%; min-width: 90px; font-family: inherit; font-size: 11.5px; font-weight: 500;
+  color: var(--text); background: var(--bg); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 7px; outline: none;
+}
+.filtro-input:focus { border-color: var(--blue); background: #fff; }
+.filtro-select { cursor: pointer; }
+.btn-limpar-filtro {
+  border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+  font-family: inherit; font-size: 11px; font-weight: 700; padding: 4px 10px;
+  border-radius: 6px; cursor: pointer; white-space: nowrap;
+}
+.btn-limpar-filtro:hover { background: #F1F5F9; color: var(--text); }
+
+/* Indicador de propostas comerciais (ano corrente) + volume anual */
+.row-comercial { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; margin-bottom: 16px; align-items: start; }
+.comercial-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 14px; }
+.comercial-stat { text-align: center; padding: 12px 10px; border-radius: 10px; background: var(--bg); }
+.cs-num { font-size: 28px; font-weight: 900; line-height: 1; }
+.cs-label { font-size: 10.5px; font-weight: 700; color: var(--muted); letter-spacing: .03em; margin-top: 5px; text-transform: uppercase; }
+.comercial-subtitulo { font-size: 10.5px; font-weight: 700; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; margin: 12px 0 8px; }
+.comercial-subtitulo:first-of-type { margin-top: 0; }
+.comercial-motivos { display: flex; flex-direction: column; gap: 6px; }
+.motivo-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; font-size: 12px; color: var(--label); padding: 8px 12px; background: var(--bg); border-radius: 8px; }
+.motivo-item .mi-total { font-weight: 800; color: var(--red); flex-shrink: 0; }
+.motivo-item .mi-detalhe { font-size: 10.5px; color: var(--sub); font-weight: 600; }
+.motivo-chaves { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.motivo-chaves a { font-size: 10.5px; font-weight: 700; color: var(--blue); text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 2px 6px; }
+.motivo-chaves a:hover { text-decoration: underline; }
+
+/* Ranking por módulo */
+.row-modulo { margin-bottom: 16px; }
+.modulo-total { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.modulo-lista { column-count: 2; column-gap: 28px; }
+.modulo-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--label); padding: 8px 0; break-inside: avoid; }
+.modulo-item .dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.modulo-item .mod-total { margin-left: auto; font-weight: 800; }
+@media (max-width: 700px) { .modulo-lista { column-count: 1; } }
+
+/* Chamados encerrados */
+.row-encerrados { margin-bottom: 16px; }
+
+/* Balão de texto longo (resumo / última interação) */
+.balao-trunc {
+  display: inline-block; max-width: 100%;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  vertical-align: bottom; cursor: pointer;
+  border-bottom: 1px dashed var(--sub);
+}
+.balao-tooltip {
+  position: fixed; z-index: 100; max-width: 320px;
+  background: var(--navy); color: #fff;
+  font-size: 12px; line-height: 1.45; padding: 10px 12px;
+  border-radius: 10px; box-shadow: 0 8px 24px rgba(15,23,42,.28);
+  white-space: pre-wrap; word-break: break-word;
+  opacity: 0; pointer-events: none; transform: translateY(4px);
+  transition: opacity .12s ease, transform .12s ease;
+}
+.balao-tooltip.show { opacity: 1; transform: translateY(0); }
+.balao-tooltip::after {
+  content: ''; position: absolute; left: 50%; margin-left: -6px;
+  border: 6px solid transparent;
+}
+.balao-tooltip.pos-top::after { top: 100%; border-top-color: var(--navy); }
+.balao-tooltip.pos-bottom::after { bottom: 100%; border-bottom-color: var(--navy); }
+
+.acao-item {
+  display: flex; gap: 10px; padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.acao-item:last-child { border-bottom: none; padding-bottom: 0; }
+.acao-nivel {
+  flex-shrink: 0; font-size: 9.5px; font-weight: 800; letter-spacing: .04em;
+  padding: 3px 8px; border-radius: 6px; height: fit-content; color: #fff; white-space: nowrap;
+}
+.acao-desc { font-size: 12px; color: var(--text); line-height: 1.35; margin-bottom: 4px; }
+.acao-meta { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.acao-prazo { font-weight: 800; }
+
+.interacao-item { padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.interacao-item:last-child { border-bottom: none; padding-bottom: 0; }
+.interacao-head { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
+.interacao-data { color: var(--sub); font-size: 11px; white-space: nowrap; }
+.interacao-autor { color: var(--label); font-weight: 600; font-size: 11.5px; }
+.interacao-texto { color: var(--muted); font-size: 11.5px; line-height: 1.35; margin-top: 2px; }
+
+.obs-list { display: flex; flex-direction: column; gap: 10px; }
+.obs-item { display: flex; gap: 8px; font-size: 12.5px; color: var(--label); line-height: 1.4; }
+.obs-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); margin-top: 6px; flex-shrink: 0; }
+.empty-note { font-size: 12px; color: var(--sub); font-style: italic; }
+
+/* ── FOOTER ─────────────────────────────────────────────── */
+.footer {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  background: var(--navy); color: #fff;
+  padding: 14px 28px;
+  display: flex; align-items: center; gap: 34px; flex-wrap: wrap;
+  box-shadow: 0 -6px 20px rgba(0,0,0,.15);
+  z-index: 20;
+}
+.footer-metric { display: flex; flex-direction: column; gap: 2px; }
+.footer-metric .fm-label { font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,.5); letter-spacing: .05em; text-transform: uppercase; }
+.footer-metric .fm-value { font-size: 18px; font-weight: 900; }
+.footer-divider { width: 1px; align-self: stretch; background: rgba(255,255,255,.12); }
+.footer-check { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-left: auto; }
+.footer-check-item { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; }
+.footer-check-item svg { width: 15px; height: 15px; color: #4ADE80; flex-shrink: 0; }
+
+/* ── ABAS ───────────────────────────────────────────────── */
+.tabnav {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; gap: 4px; padding: 0 28px;
+}
+.tabnav-item {
+  display: inline-block; padding: 12px 16px; font-size: 13px; font-weight: 700;
+  color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent;
+}
+.tabnav-item.active { color: var(--navy); border-bottom-color: var(--blue); }
+.tabnav-item:hover { color: var(--text); }
+
+/* ── ESTADOS ────────────────────────────────────────────── */
+.state-banner {
+  max-width: 1600px; margin: 0 auto; padding: 14px 28px 0;
+}
+.state-banner .box {
+  border-radius: 10px; padding: 12px 16px; font-size: 13px; font-weight: 600;
+}
+.state-loading .box { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.state-error .box { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+.hidden { display: none !important; }
+
+@media (max-width: 1100px) {
+  .row-top { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+  .row-charts { grid-template-columns: 1fr; }
+  .row-panels { grid-template-columns: 1fr; }
+  .comercial-grid { grid-template-columns: repeat(2, 1fr); }
+  .row-comercial { grid-template-columns: 1fr; }
+}
+
+@media print {
+  .footer, .topbar-export, #orgSelect, .tabnav { display: none !important; }
+  .wrap { padding-bottom: 20px; }
+  body { background: #fff; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
+    </div>
+    <div>
+      <h1>ANÁLISE DE SITUAÇÃO</h1>
+      <small>DEMANDAS DO CLIENTE</small>
+    </div>
+  </div>
+
+  <div class="topbar-field">
+    <div class="tf-label">CLIENTE</div>
+    <select id="orgSelect"><option>Carregando…</option></select>
+  </div>
+
+  <div class="topbar-field">
+    <div class="tf-label">RESPONSÁVEL COMERCIAL</div>
+    <div class="tf-value" id="fldResponsavel">—</div>
+  </div>
+
+  <div class="topbar-field">
+    <div class="tf-label">DATA DE REFERÊNCIA</div>
+    <div class="tf-value" id="fldData">—</div>
+  </div>
+
+  <button class="topbar-export" id="btnExportar" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:15px;height:15px"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+    EXPORTAR
+  </button>
+</header>
+
+<nav class="tabnav">
+  <a href="/guarani/templates/analise_situacao" class="tabnav-item active">Análise de Situação</a>
+  <a href="/guarani/templates/acao_suporte" class="tabnav-item">Ação Suporte</a>
+</nav>
+
+<div class="state-banner state-loading hidden" id="bannerLoading"><div class="box">Carregando dados do Jira…</div></div>
+<div class="state-banner state-error hidden" id="bannerError"><div class="box" id="bannerErrorMsg"></div></div>
+
+<main class="wrap" id="dashboard" style="opacity:0; transition:opacity .2s;">
+
+  <section class="row-top">
+    <div class="saude-card">
+      <div class="saude-title">SAÚDE DO CLIENTE</div>
+      <div class="gauge-wrap"><canvas id="chartGauge"></canvas><div class="gauge-pct" id="gaugePct">—</div></div>
+      <div class="gauge-label" id="gaugeLabel">—</div>
+      <div class="saude-desc" id="gaugeDesc">—</div>
+    </div>
+
+    <div class="kpi-grid" id="kpiGrid"></div>
+  </section>
+
+  <section class="row-charts">
+    <div class="card">
+      <div class="card-title">Distribuição por Status</div>
+      <div style="display:flex; gap:14px; align-items:center;">
+        <div style="position:relative; width:120px; height:120px; flex-shrink:0;">
+          <canvas id="chartStatus"></canvas>
+          <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none;">
+            <div style="font-size:22px; font-weight:900;" id="statusTotal">0</div>
+            <div style="font-size:9px; color:var(--muted); font-weight:700; letter-spacing:.04em;">TOTAL</div>
+          </div>
+        </div>
+        <div class="legend-list" id="statusLegend" style="flex:1;"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Tempo em Aberto (dias)</div>
+      <div style="height:150px;"><canvas id="chartTempo"></canvas></div>
+      <div class="thresh-legend">
+        <span><i class="dot" style="background:var(--red)"></i>&gt; 90 dias</span>
+        <span><i class="dot" style="background:var(--orange)"></i>60-90 dias</span>
+        <span><i class="dot" style="background:var(--amber)"></i>30-60 dias</span>
+        <span><i class="dot" style="background:var(--green)"></i>0-30 dias</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Chamados por Responsável</div>
+      <div style="height:180px;"><canvas id="chartResp"></canvas></div>
+    </div>
+  </section>
+
+  <section class="row-panels">
+    <div class="card">
+      <div class="card-title">🎯 Ações Prioritárias</div>
+      <div id="acoesList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">💬 Últimas Interações</div>
+      <div id="interacoesList"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📌 Observações Estratégicas</div>
+      <div class="obs-list" id="obsList"></div>
+    </div>
+  </section>
+
+  <section class="row-tabela">
+    <div class="card table-wrap">
+      <div class="card-title" style="display:flex; align-items:center; justify-content:space-between;">
+        <span>Chamados</span>
+        <span style="display:flex; align-items:center; gap:10px; text-transform:none; font-weight:600; font-size:11.5px; color:var(--muted);">
+          <span id="contadorFiltro"></span>
+          <button type="button" id="btnLimparFiltros" class="btn-limpar-filtro">Limpar filtros</button>
+        </span>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Chave</th><th>Cliente</th><th>Contato</th><th>Tipo</th><th>Status</th>
+              <th>Responsável</th><th>Resumo</th><th>Última Interação</th>
+              <th>Desde a Última Interação</th><th>O que foi dito</th>
+            </tr>
+            <tr class="filtro-row">
+              <th><input type="text" id="filtroChave" class="filtro-input filtro-texto" placeholder="Buscar…"></th>
+              <th><input type="text" id="filtroCliente" class="filtro-input filtro-texto" placeholder="Buscar…"></th>
+              <th><input type="text" id="filtroContato" class="filtro-input filtro-texto" placeholder="Buscar…"></th>
+              <th><select id="filtroTipo" class="filtro-input filtro-select"><option value="">Todos</option></select></th>
+              <th><select id="filtroStatus" class="filtro-input filtro-select"><option value="">Todos</option></select></th>
+              <th><select id="filtroResponsavel" class="filtro-input filtro-select"><option value="">Todos</option></select></th>
+              <th><input type="text" id="filtroResumo" class="filtro-input filtro-texto" placeholder="Buscar…"></th>
+              <th><input type="text" id="filtroUltimaInteracao" class="filtro-input filtro-texto" placeholder="Buscar…"></th>
+              <th>
+                <select id="filtroDias" class="filtro-input filtro-select">
+                  <option value="">Todos</option>
+                  <option value="0-4">0-4 dias</option>
+                  <option value="5-14">5-14 dias</option>
+                  <option value="15-29">15-29 dias</option>
+                  <option value="30+">30+ dias</option>
+                </select>
+              </th>
+              <th><input type="text" id="filtroDito" class="filtro-input filtro-texto" placeholder="Buscar…"></th>
+            </tr>
+          </thead>
+          <tbody id="tabelaBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="row-comercial">
+    <div class="card">
+      <div class="card-title">💼 Propostas Comerciais Recusadas — Ano Corrente (<span id="comAno">—</span>)</div>
+      <div class="comercial-grid" style="grid-template-columns: 1fr;">
+        <div class="comercial-stat">
+          <div class="cs-num" id="comRecusadas" style="color:var(--red)">—</div>
+          <div class="cs-label">Total de Recusas</div>
+        </div>
+      </div>
+      <div class="comercial-subtitulo">Por motivo</div>
+      <div class="comercial-motivos" id="comMotivos"></div>
+      <div class="comercial-subtitulo">Por responsável</div>
+      <div class="comercial-motivos" id="comResponsaveis"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📅 Volume de Chamados — Ano Corrente (<span id="volAno">—</span>)</div>
+      <div class="comercial-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="comercial-stat">
+          <div class="cs-num" id="volTotal">—</div>
+          <div class="cs-label">Total Aberto no Ano</div>
+        </div>
+        <div class="comercial-stat">
+          <div class="cs-num" id="volEncerrados" style="color:var(--green)">—</div>
+          <div class="cs-label">Encerrados</div>
+        </div>
+        <div class="comercial-stat">
+          <div class="cs-num" id="volAbertos" style="color:var(--orange)">—</div>
+          <div class="cs-label">Ainda em Aberto</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row-modulo">
+    <div class="card">
+      <div class="card-title">🧩 Chamados por Módulo — Ano Corrente (<span id="modAno">—</span>)</div>
+      <div class="modulo-total">Total de itens: <span id="modTotal">—</span></div>
+      <div class="modulo-lista" id="moduloLista"></div>
+    </div>
+  </section>
+
+  <section class="row-encerrados">
+    <div class="card table-wrap">
+      <div class="card-title" style="display:flex; align-items:center; justify-content:space-between;">
+        <span>Chamados Encerrados (Últimos 30 dias)</span>
+        <span id="encerradosResumo" style="text-transform:none; font-weight:600; font-size:11.5px; color:var(--muted);"></span>
+      </div>
+      <div class="table-scroll" style="max-height:380px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Chave</th><th>Contato</th><th>Tipo</th><th>Status</th><th>Resolução</th>
+              <th>Responsável</th><th>Aberto em</th><th>Encerrado em</th><th>Dias Total</th>
+            </tr>
+          </thead>
+          <tbody id="encerradosBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-metric"><div class="fm-label">Chamados Totais</div><div class="fm-value" id="fChamados">—</div></div>
+  <div class="footer-divider"></div>
+  <div class="footer-metric"><div class="fm-label">Maior Tempo em Aberto</div><div class="fm-value" id="fMaior">—</div></div>
+  <div class="footer-divider"></div>
+  <div class="footer-metric"><div class="fm-label">Tempo Médio em Aberto</div><div class="fm-value" id="fMedia">—</div></div>
+  <div class="footer-divider"></div>
+  <div class="footer-metric"><div class="fm-label">Saúde do Cliente</div><div class="fm-value" id="fSaude">—</div></div>
+  <div class="footer-check" id="fIntervencoes"></div>
+</footer>
+
+<div class="balao-tooltip" id="balaoTooltip"></div>
+
+<script>
+Chart.register(ChartDataLabels);
+
+const CORES = { verde: '#16A34A', amarelo: '#F59E0B', vermelho: '#DC2626' };
+const STATUS_PALETTE = ['#2563EB', '#7C3AED', '#0891B2', '#F97316', '#DB2777', '#16A34A', '#F59E0B', '#64748B', '#DC2626'];
+const NIVEL_COR = { CRITICO: '#DC2626', ALTO: '#F97316', MEDIA: '#F59E0B' };
+
+let chartGauge, chartStatus, chartTempo, chartResp;
+let reqAtual = 0;
+let ticketsAtuais = [];
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function corPorDias(dias) {
+  if (dias > 90) return '#DC2626';
+  if (dias > 60) return '#F97316';
+  if (dias > 30) return '#F59E0B';
+  return '#16A34A';
+}
+function corPorInteracao(dias) {
+  if (dias >= 30) return '#DC2626';
+  if (dias >= 15) return '#F97316';
+  if (dias >= 5) return '#F59E0B';
+  return '#16A34A';
+}
+function badgeBg(cor) { return `background:${cor}1F; color:${cor};`; }
+
+function atualizarLinksAbas(orgId) {
+  document.querySelectorAll('.tabnav-item').forEach(a => {
+    const url = new URL(a.getAttribute('href'), window.location.origin);
+    if (orgId) url.searchParams.set('org_id', orgId);
+    a.href = url.pathname + url.search;
+  });
+}
+
+function atualizarUrlOrg(orgId) {
+  const url = new URL(window.location);
+  url.searchParams.set('org_id', orgId);
+  history.replaceState(null, '', url);
+  atualizarLinksAbas(orgId);
+}
+
+async function carregarOrganizacoes() {
+  const sel = document.getElementById('orgSelect');
+  try {
+    const resp = await fetch('/api/analise-situacao/organizacoes');
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.erro || 'Falha ao listar organizações.');
+    const orgs = data.organizacoes || [];
+    sel.innerHTML = orgs.map(o => `<option value="${o.id}">${escapeHtml(o.nome)}</option>`).join('');
+
+    const orgDaUrl = new URLSearchParams(window.location.search).get('org_id');
+    let orgInicial = orgDaUrl && orgs.some(o => o.id === orgDaUrl) ? orgDaUrl : null;
+    if (!orgInicial) {
+      const preferida = orgs.find(o => o.nome.toLowerCase().includes('classhome'));
+      orgInicial = preferida ? preferida.id : (orgs[0] ? orgs[0].id : '');
+    }
+    sel.value = orgInicial;
+    atualizarUrlOrg(orgInicial);
+
+    sel.addEventListener('change', () => {
+      atualizarUrlOrg(sel.value);
+      carregarDashboard(sel.value);
+    });
+    if (sel.value) carregarDashboard(sel.value);
+  } catch (e) {
+    mostrarErro('Não foi possível carregar a lista de organizações: ' + e.message);
+  }
+}
+
+function mostrarCarregando(mostrar) {
+  document.getElementById('bannerLoading').classList.toggle('hidden', !mostrar);
+}
+function mostrarErro(msg) {
+  document.getElementById('bannerError').classList.remove('hidden');
+  document.getElementById('bannerErrorMsg').textContent = msg;
+}
+function limparErro() {
+  document.getElementById('bannerError').classList.add('hidden');
+}
+
+async function carregarDashboard(orgId) {
+  const minhaReq = ++reqAtual;
+  limparErro();
+  mostrarCarregando(true);
+  document.getElementById('orgSelect').disabled = true;
+  try {
+    const resp = await fetch(`/api/analise-situacao?org_id=${encodeURIComponent(orgId)}`);
+    const data = await resp.json();
+    if (minhaReq !== reqAtual) return; // resposta obsoleta (usuário trocou de novo)
+    if (!resp.ok) throw new Error(data.erro || 'Falha ao consultar o Jira.');
+    render(data);
+    document.getElementById('dashboard').style.opacity = 1;
+  } catch (e) {
+    mostrarErro('Erro ao carregar dados: ' + e.message);
+  } finally {
+    if (minhaReq === reqAtual) {
+      mostrarCarregando(false);
+      document.getElementById('orgSelect').disabled = false;
+    }
+  }
+}
+
+function render(d) {
+  document.getElementById('fldResponsavel').textContent = d.responsavel_comercial || '—';
+  document.getElementById('fldData').textContent = d.data_referencia || '—';
+
+  renderKpis(d.kpis);
+  renderGauge(d.saude_cliente);
+  renderStatusChart(d.distribuicao_status);
+  renderTempoChart(d.tempo_aberto);
+  renderRespChart(d.chamados_por_responsavel);
+
+  ticketsAtuais = d.tickets;
+  popularFiltros();
+  limparFiltros();
+
+  renderAcoes(d.acoes_prioritarias);
+  renderInteracoes(d.ultimas_interacoes);
+  renderObs(d.observacoes_estrategicas);
+  renderFooter(d.resumo_executivo);
+  renderIndicadorComercial(d.indicador_comercial);
+  renderVolumeAnual(d.volume_anual);
+  renderRankingModulo(d.ranking_modulo);
+  renderEncerrados(d.chamados_encerrados_30d);
+  renderResumoEncerrados(d.resumo_encerrados);
+}
+
+function renderKpis(k) {
+  const itens = [
+    { label: 'TOTAL DE\nCHAMADOS', val: k.total_chamados, cor: '#2563EB', icon: 'layers' },
+    { label: 'MAIOR TEMPO\nEM ABERTO (DIAS)', val: k.maior_tempo_aberto_dias, cor: '#DC2626', icon: 'calendar' },
+    { label: 'MÉDIA DE TEMPO\nEM ABERTO (DIAS)', val: k.media_tempo_aberto_dias, cor: '#0891B2', icon: 'clock' },
+    { label: 'CHAMADOS\nCOMERCIAIS', val: k.chamados_comerciais, cor: '#7C3AED', icon: 'handshake' },
+    { label: 'EM EXECUÇÃO /\nDESENVOLVIMENTO', val: k.em_execucao_desenvolvimento, cor: '#F97316', icon: 'gear' },
+    { label: 'ALTO RISCO\nSEM EVOLUÇÃO', val: k.alto_risco_sem_evolucao, cor: '#DC2626', icon: 'alert' },
+  ];
+  const icones = {
+    layers: '<path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>',
+    calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',
+    handshake: '<path d="M8 12l3 3 6-6"/><circle cx="12" cy="12" r="9"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
+    alert: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/>',
+  };
+  document.getElementById('kpiGrid').innerHTML = itens.map(it => `
+    <div class="kpi">
+      <div class="kpi-icon" style="background:${it.cor}1F; color:${it.cor};">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icones[it.icon]}</svg>
+      </div>
+      <div class="kpi-num" style="color:${it.cor}">${it.val}</div>
+      <div class="kpi-label">${escapeHtml(it.label).replace('\n','<br>')}</div>
+      <div class="kpi-bar" style="background:${it.cor}"></div>
+    </div>
+  `).join('');
+}
+
+function renderGauge(s) {
+  const cor = CORES[s.cor] || CORES.amarelo;
+  if (chartGauge) chartGauge.destroy();
+  chartGauge = new Chart(document.getElementById('chartGauge'), {
+    type: 'doughnut',
+    data: { datasets: [{ data: [s.percentual, 100 - s.percentual], backgroundColor: [cor, 'rgba(255,255,255,.14)'], borderWidth: 0 }] },
+    options: {
+      rotation: -90, circumference: 180, cutout: '72%',
+      plugins: { legend: { display: false }, tooltip: { enabled: false }, datalabels: { display: false } },
+      animation: { duration: 400 },
+    },
+  });
+  document.getElementById('gaugePct').textContent = s.percentual + '%';
+  document.getElementById('gaugePct').style.color = cor;
+  document.getElementById('gaugeLabel').textContent = s.label;
+  document.getElementById('gaugeLabel').style.color = cor;
+  const descs = {
+    'CRÍTICO': 'Há chamados antigos e/ou pendências comerciais em aberto que exigem atenção imediata.',
+    'ATENÇÃO': 'Alguns chamados exigem acompanhamento próximo para evitar atrasos.',
+    'SAUDÁVEL': 'Chamados em dia, sem pendências críticas identificadas.',
+  };
+  document.getElementById('gaugeDesc').textContent = descs[s.label] || '';
+}
+
+function renderStatusChart(lista) {
+  const total = lista.reduce((a, b) => a + b.total, 0);
+  document.getElementById('statusTotal').textContent = total;
+  const cores = lista.map((_, i) => STATUS_PALETTE[i % STATUS_PALETTE.length]);
+  if (chartStatus) chartStatus.destroy();
+  chartStatus = new Chart(document.getElementById('chartStatus'), {
+    type: 'doughnut',
+    data: { labels: lista.map(x => x.status), datasets: [{ data: lista.map(x => x.total), backgroundColor: cores, borderWidth: 2, borderColor: '#fff' }] },
+    options: { cutout: '68%', plugins: { legend: { display: false }, datalabels: { display: false } } },
+  });
+  document.getElementById('statusLegend').innerHTML = lista.map((x, i) => `
+    <div class="legend-item">
+      <i class="dot" style="background:${cores[i]}"></i>
+      <span>${escapeHtml(x.status)}</span>
+      <span class="li-count">${x.total} (${total ? Math.round(x.total / total * 100) : 0}%)</span>
+    </div>
+  `).join('') || '<div class="empty-note">Sem chamados abertos.</div>';
+}
+
+function renderTempoChart(lista) {
+  const top = lista.slice(0, 15);
+  if (chartTempo) chartTempo.destroy();
+  chartTempo = new Chart(document.getElementById('chartTempo'), {
+    type: 'bar',
+    data: { labels: top.map(x => x.chave), datasets: [{ data: top.map(x => x.dias), backgroundColor: top.map(x => corPorDias(x.dias)), borderRadius: 4 }] },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'end', font: { size: 10, weight: '700' }, color: '#334155' } },
+      scales: { x: { display: false }, y: { ticks: { font: { size: 10.5 } }, grid: { display: false } } },
+      layout: { padding: { right: 22 } },
+    },
+  });
+}
+
+function renderRespChart(lista) {
+  if (chartResp) chartResp.destroy();
+  chartResp = new Chart(document.getElementById('chartResp'), {
+    type: 'bar',
+    data: { labels: lista.map(x => x.nome), datasets: [{ data: lista.map(x => x.total), backgroundColor: '#2563EB', borderRadius: 4 }] },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'end', font: { size: 10, weight: '700' }, color: '#334155' } },
+      scales: { x: { display: false, beginAtZero: true }, y: { ticks: { font: { size: 10.5 } }, grid: { display: false } } },
+      layout: { padding: { right: 22 } },
+    },
+  });
+}
+
+function truncarTexto(txt, max) {
+  txt = (txt || '').trim();
+  return txt.length > max ? txt.slice(0, max).trimEnd() + '…' : txt;
+}
+
+function celulaBalao(texto, max, vazio) {
+  const t = (texto || '').trim();
+  if (!t) return `<span class="empty-note">${escapeHtml(vazio || '—')}</span>`;
+  if (t.length <= max) return escapeHtml(t);
+  return `<span class="balao-trunc" data-full="${escapeHtml(t)}">${escapeHtml(truncarTexto(t, max))}</span>`;
+}
+
+function renderTabela(tickets) {
+  document.getElementById('tabelaBody').innerHTML = tickets.map(t => `
+    <tr>
+      <td class="chave-cell"><a class="chave-link" href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(t.chave)}</a></td>
+      <td class="nowrap">${escapeHtml(t.organizacao)}</td>
+      <td class="nowrap">${escapeHtml(t.cliente)}</td>
+      <td class="nowrap">${escapeHtml(t.tipo)}</td>
+      <td><span class="badge" style="background:#2563EB1F; color:#2563EB;">${escapeHtml(t.status)}</span></td>
+      <td class="nowrap">${escapeHtml(t.responsavel)}</td>
+      <td class="resumo-cell">${celulaBalao(t.resumo, 46, '—')}</td>
+      <td class="nowrap">${escapeHtml(t.ultima_interacao_autor)}<br><span style="color:var(--sub)">${escapeHtml(t.ultima_interacao_data || '—')}</span></td>
+      <td><span class="badge" style="${badgeBg(corPorInteracao(t.dias_desde_ultima_interacao))}">${t.dias_desde_ultima_interacao} dias</span></td>
+      <td class="dito-cell">${celulaBalao(t.o_que_foi_dito, 60, 'sem comentários')}</td>
+    </tr>
+  `).join('') || `<tr><td colspan="10"><span class="empty-note">Nenhum chamado em aberto para esta organização.</span></td></tr>`;
+}
+
+/* ── Filtros por coluna ─────────────────────────────────────────── */
+function valoresUnicos(campo) {
+  return [...new Set(ticketsAtuais.map(t => t[campo]).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+}
+
+function popularSelect(id, valores) {
+  const sel = document.getElementById(id);
+  const atual = sel.value;
+  sel.innerHTML = '<option value="">Todos</option>' + valores.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+  if (valores.includes(atual)) sel.value = atual;
+}
+
+function popularFiltros() {
+  popularSelect('filtroTipo', valoresUnicos('tipo'));
+  popularSelect('filtroStatus', valoresUnicos('status'));
+  popularSelect('filtroResponsavel', valoresUnicos('responsavel'));
+}
+
+function limparFiltros() {
+  document.querySelectorAll('.filtro-input').forEach(el => { el.value = ''; });
+  aplicarFiltros();
+}
+
+function faixaDias(dias) {
+  if (dias >= 30) return '30+';
+  if (dias >= 15) return '15-29';
+  if (dias >= 5) return '5-14';
+  return '0-4';
+}
+
+function atualizarContadorFiltro(mostrando, total) {
+  const el = document.getElementById('contadorFiltro');
+  el.textContent = total === 0 ? '' : (mostrando === total ? `${total} chamado(s)` : `${mostrando} de ${total} chamado(s)`);
+}
+
+function aplicarFiltros() {
+  const f = {
+    chave: document.getElementById('filtroChave').value.trim().toLowerCase(),
+    cliente: document.getElementById('filtroCliente').value.trim().toLowerCase(),
+    contato: document.getElementById('filtroContato').value.trim().toLowerCase(),
+    tipo: document.getElementById('filtroTipo').value,
+    status: document.getElementById('filtroStatus').value,
+    responsavel: document.getElementById('filtroResponsavel').value,
+    resumo: document.getElementById('filtroResumo').value.trim().toLowerCase(),
+    ultimaInteracao: document.getElementById('filtroUltimaInteracao').value.trim().toLowerCase(),
+    faixa: document.getElementById('filtroDias').value,
+    dito: document.getElementById('filtroDito').value.trim().toLowerCase(),
+  };
+
+  const filtrados = ticketsAtuais.filter(t => {
+    if (f.chave && !t.chave.toLowerCase().includes(f.chave)) return false;
+    if (f.cliente && !(t.organizacao || '').toLowerCase().includes(f.cliente)) return false;
+    if (f.contato && !(t.cliente || '').toLowerCase().includes(f.contato)) return false;
+    if (f.tipo && t.tipo !== f.tipo) return false;
+    if (f.status && t.status !== f.status) return false;
+    if (f.responsavel && t.responsavel !== f.responsavel) return false;
+    if (f.resumo && !(t.resumo || '').toLowerCase().includes(f.resumo)) return false;
+    if (f.ultimaInteracao) {
+      const alvo = `${t.ultima_interacao_autor || ''} ${t.ultima_interacao_data || ''}`.toLowerCase();
+      if (!alvo.includes(f.ultimaInteracao)) return false;
+    }
+    if (f.faixa && faixaDias(t.dias_desde_ultima_interacao) !== f.faixa) return false;
+    if (f.dito && !(t.o_que_foi_dito || '').toLowerCase().includes(f.dito)) return false;
+    return true;
+  });
+
+  renderTabela(filtrados);
+  atualizarContadorFiltro(filtrados.length, ticketsAtuais.length);
+}
+
+function debounce(fn, ms) {
+  let timer;
+  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+}
+
+function ajustarStickyFiltro() {
+  const th1 = document.querySelector('thead tr:first-child th');
+  if (!th1) return;
+  const altura = th1.getBoundingClientRect().height;
+  document.querySelectorAll('.filtro-row th').forEach(th => { th.style.top = altura + 'px'; });
+}
+
+function renderAcoes(lista) {
+  document.getElementById('acoesList').innerHTML = lista.map(a => `
+    <div class="acao-item">
+      <span class="acao-nivel" style="background:${NIVEL_COR[a.nivel]}">${a.nivel}</span>
+      <div style="flex:1; min-width:0;">
+        <div class="acao-desc">${escapeHtml(a.descricao)}</div>
+        <div class="acao-meta"><span>${escapeHtml(a.responsavel)}</span><span class="acao-prazo" style="color:${NIVEL_COR[a.nivel]}">${a.prazo}</span></div>
+      </div>
+    </div>
+  `).join('') || '<div class="empty-note">Nenhuma ação prioritária identificada.</div>';
+}
+
+function renderInteracoes(lista) {
+  document.getElementById('interacoesList').innerHTML = lista.map(t => `
+    <div class="interacao-item">
+      <div class="interacao-head"><a class="chave-link" href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(t.chave)}</a><span class="interacao-data">${escapeHtml(t.ultima_interacao_data)}</span></div>
+      <div class="interacao-autor">${escapeHtml(t.ultima_interacao_autor)}</div>
+      <div class="interacao-texto">${escapeHtml((t.o_que_foi_dito || '').slice(0, 140))}${(t.o_que_foi_dito || '').length > 140 ? '…' : ''}</div>
+    </div>
+  `).join('') || '<div class="empty-note">Sem interações recentes.</div>';
+}
+
+function renderObs(lista) {
+  document.getElementById('obsList').innerHTML = lista.map(txt => `
+    <div class="obs-item"><i class="dot"></i><span>${escapeHtml(txt)}</span></div>
+  `).join('') || '<div class="empty-note">Nenhuma observação relevante no momento.</div>';
+}
+
+function renderFooter(r) {
+  document.getElementById('fChamados').textContent = r.chamados_totais;
+  document.getElementById('fMaior').textContent = r.maior_tempo_aberto_dias + ' dias';
+  document.getElementById('fMedia').textContent = r.tempo_medio_aberto_dias + ' dias';
+  const fs = document.getElementById('fSaude');
+  fs.textContent = r.saude_percentual + '% ' + r.saude_label;
+  document.getElementById('fIntervencoes').innerHTML = (r.intervencoes.length ? r.intervencoes : ['Nenhuma intervenção pendente']).map(txt => `
+    <div class="footer-check-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+      <span>${escapeHtml(txt)}</span>
+    </div>
+  `).join('');
+}
+
+function chipsChaves(tickets) {
+  return `<div class="motivo-chaves">${tickets.map(t =>
+    `<a href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(t.chave)}</a>`
+  ).join('')}</div>`;
+}
+
+function renderIndicadorComercial(ind) {
+  document.getElementById('comAno').textContent = ind.ano;
+  document.getElementById('comRecusadas').textContent = ind.total_recusadas;
+  document.getElementById('comMotivos').innerHTML = ind.por_motivo.map(m => `
+    <div class="motivo-item">
+      <div><span>${escapeHtml(m.motivo)}</span>${chipsChaves(m.tickets)}</div>
+      <span class="mi-total">${m.total}</span>
+    </div>
+  `).join('') || '<div class="empty-note">Nenhuma proposta recusada no período.</div>';
+
+  document.getElementById('comResponsaveis').innerHTML = ind.por_responsavel.map(r => `
+    <div class="motivo-item">
+      <div>
+        <span>${escapeHtml(r.nome)}${r.equipe_comercial ? ' <span class="badge" style="background:#7C3AED1F; color:#7C3AED;">Comercial</span>' : ''}</span>
+        ${chipsChaves(r.tickets)}
+      </div>
+      <span class="mi-total">${r.total}</span>
+    </div>
+  `).join('') || '<div class="empty-note">Nenhuma proposta recusada no período.</div>';
+}
+
+function renderVolumeAnual(v) {
+  document.getElementById('volAno').textContent = v.ano;
+  document.getElementById('volTotal').textContent = v.total_abertos;
+  document.getElementById('volEncerrados').textContent = v.encerrados;
+  document.getElementById('volAbertos').textContent = v.em_aberto;
+}
+
+function renderRankingModulo(r) {
+  document.getElementById('modAno').textContent = r.ano;
+  document.getElementById('modTotal').textContent = r.total;
+  document.getElementById('moduloLista').innerHTML = r.ranking.map((m, i) => `
+    <div class="modulo-item">
+      <i class="dot" style="background:${STATUS_PALETTE[i % STATUS_PALETTE.length]}"></i>
+      <span>${escapeHtml(m.modulo)}</span>
+      <span class="mod-total">${m.total}</span>
+    </div>
+  `).join('') || '<div class="empty-note">Nenhum chamado no período.</div>';
+}
+
+function renderEncerrados(lista) {
+  document.getElementById('encerradosBody').innerHTML = lista.map(t => {
+    let corResolucao = '#64748B';
+    if (t.classificacao_comercial === 'aprovado') corResolucao = '#16A34A';
+    else if (t.classificacao_comercial === 'recusado') corResolucao = '#DC2626';
+    const responsavelHtml = t.fechamento_equipe_comercial
+      ? `${escapeHtml(t.responsavel)} <span class="badge" style="background:#7C3AED1F; color:#7C3AED;">Comercial</span>`
+      : escapeHtml(t.responsavel);
+    return `
+    <tr>
+      <td class="chave-cell"><a class="chave-link" href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(t.chave)}</a></td>
+      <td class="nowrap">${escapeHtml(t.cliente)}</td>
+      <td class="nowrap">${escapeHtml(t.tipo)}</td>
+      <td class="nowrap">${escapeHtml(t.status)}</td>
+      <td><span class="badge" style="${badgeBg(corResolucao)}">${celulaBalao(t.resolucao, 34, '—')}</span></td>
+      <td class="nowrap">${responsavelHtml}</td>
+      <td class="nowrap">${escapeHtml(t.criado_em)}</td>
+      <td class="nowrap">${escapeHtml(t.encerrado_em || '—')}</td>
+      <td class="nowrap">${t.dias_total ?? '—'}</td>
+    </tr>
+  `;
+  }).join('') || `<tr><td colspan="9"><span class="empty-note">Nenhum chamado encerrado nos últimos 30 dias.</span></td></tr>`;
+}
+
+function renderResumoEncerrados(r) {
+  document.getElementById('encerradosResumo').textContent =
+    r.total === 0 ? '' : `${r.pela_equipe_comercial} de ${r.total} fechados pela equipe comercial (Paulo/Rayssa)`;
+}
+
+document.getElementById('btnExportar').addEventListener('click', () => window.print());
+
+/* ── Balão de texto longo (hover/click em .balao-trunc, qualquer tabela) ── */
+const balaoEl = document.getElementById('balaoTooltip');
+let balaoAberto = null;
+
+function posicionarBalao(trigger) {
+  balaoEl.textContent = trigger.dataset.full;
+  balaoEl.classList.remove('pos-top', 'pos-bottom');
+  balaoEl.classList.add('show');
+
+  const r = trigger.getBoundingClientRect();
+  const bw = balaoEl.offsetWidth, bh = balaoEl.offsetHeight;
+
+  let top = r.top - bh - 10;
+  let posClasse = 'pos-top';
+  if (top < 8) { top = r.bottom + 10; posClasse = 'pos-bottom'; }
+
+  let left = r.left + r.width / 2 - bw / 2;
+  left = Math.max(8, Math.min(left, window.innerWidth - bw - 8));
+
+  balaoEl.style.left = left + 'px';
+  balaoEl.style.top = top + 'px';
+  balaoEl.classList.add(posClasse);
+}
+
+function esconderBalao() {
+  balaoEl.classList.remove('show');
+  balaoAberto = null;
+}
+
+document.addEventListener('mouseover', e => {
+  const trigger = e.target.closest('.balao-trunc');
+  if (trigger) { balaoAberto = trigger; posicionarBalao(trigger); }
+});
+document.addEventListener('mouseout', e => {
+  const trigger = e.target.closest('.balao-trunc');
+  if (trigger) esconderBalao();
+});
+document.addEventListener('click', e => {
+  const trigger = e.target.closest('.balao-trunc');
+  if (!trigger) { esconderBalao(); return; }
+  e.stopPropagation();
+  if (balaoAberto === trigger && balaoEl.classList.contains('show')) esconderBalao();
+  else { balaoAberto = trigger; posicionarBalao(trigger); }
+});
+window.addEventListener('scroll', esconderBalao, true);
+window.addEventListener('resize', esconderBalao);
+
+/* ── Wiring dos filtros ─────────────────────────────────────────── */
+const aplicarFiltrosDebounced = debounce(aplicarFiltros, 200);
+document.querySelectorAll('.filtro-texto').forEach(el => el.addEventListener('input', aplicarFiltrosDebounced));
+document.querySelectorAll('.filtro-select').forEach(el => el.addEventListener('change', aplicarFiltros));
+document.getElementById('btnLimparFiltros').addEventListener('click', limparFiltros);
+window.addEventListener('resize', ajustarStickyFiltro);
+window.addEventListener('load', ajustarStickyFiltro);
+ajustarStickyFiltro();
+
+carregarOrganizacoes();
+</script>
+</body>
+</html>

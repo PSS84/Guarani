@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ação Suporte — Guarani</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:      #10233F;
+  --bg:        #EEF2F6;
+  --surface:   #FFFFFF;
+  --border:    #E2E8F0;
+  --text:      #0F172A;
+  --label:     #334155;
+  --muted:     #64748B;
+  --sub:       #94A3B8;
+
+  --blue:      #2563EB;
+  --red:       #DC2626;
+  --orange:    #F97316;
+  --amber:     #F59E0B;
+  --green:     #16A34A;
+
+  --shadow: 0 1px 2px rgba(15,23,42,.04), 0 6px 20px rgba(15,23,42,.06);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── HEADER ─────────────────────────────────────────────── */
+.topbar {
+  background: var(--navy);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 16px 28px;
+  flex-wrap: wrap;
+}
+.topbar-brand { display: flex; align-items: center; gap: 14px; margin-right: auto; }
+.topbar-brand .icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: rgba(255,255,255,0.12);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.topbar-brand .icon svg { width: 24px; height: 24px; }
+.topbar-brand h1 { font-size: 17px; font-weight: 800; letter-spacing: .02em; line-height: 1.3; }
+.topbar-brand small { display: block; font-size: 11px; font-weight: 500; color: rgba(255,255,255,.55); letter-spacing: .04em; }
+
+.topbar-field { min-width: 150px; }
+.topbar-field .tf-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.5); letter-spacing: .06em; margin-bottom: 4px; }
+.topbar-field .tf-value { font-size: 15px; font-weight: 700; }
+
+#orgSelect {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  padding-right: 22px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right center;
+  background-size: 16px;
+}
+#orgSelect option { color: #0F172A; font-weight: 500; }
+
+.topbar-export {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.18);
+  color: #fff; font-family: inherit; font-size: 13px; font-weight: 700;
+  padding: 10px 16px; border-radius: 10px; cursor: pointer;
+  letter-spacing: .03em;
+}
+.topbar-export:hover { background: rgba(255,255,255,.2); }
+
+/* ── ABAS ───────────────────────────────────────────────── */
+.tabnav {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; gap: 4px; padding: 0 28px;
+}
+.tabnav-item {
+  display: inline-block; padding: 12px 16px; font-size: 13px; font-weight: 700;
+  color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent;
+}
+.tabnav-item.active { color: var(--navy); border-bottom-color: var(--blue); }
+.tabnav-item:hover { color: var(--text); }
+
+/* ── ESTADOS ────────────────────────────────────────────── */
+.state-banner { max-width: 1600px; margin: 0 auto; padding: 14px 28px 0; }
+.state-banner .box { border-radius: 10px; padding: 12px 16px; font-size: 13px; font-weight: 600; }
+.state-loading .box { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.state-error .box { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+.hidden { display: none !important; }
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.wrap { padding: 20px 28px 40px; max-width: 1600px; margin: 0 auto; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 18px 20px;
+}
+.card-title {
+  font-size: 12px; font-weight: 700; color: var(--label);
+  letter-spacing: .05em; text-transform: uppercase; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* KPIs */
+.kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+.kpi {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: var(--shadow); padding: 20px 16px;
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
+}
+.kpi .kpi-num { font-size: 34px; font-weight: 900; line-height: 1; }
+.kpi .kpi-label { font-size: 11.5px; font-weight: 700; color: var(--muted); letter-spacing: .03em; }
+.kpi .kpi-bar { width: 36px; height: 3px; border-radius: 2px; margin-top: 2px; }
+
+/* Row de 3 gráficos */
+.row-charts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.legend-list { display: flex; flex-direction: column; gap: 8px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--label); }
+.legend-item .dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.legend-item .li-count { margin-left: auto; font-weight: 700; }
+.thresh-legend { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 10px; font-size: 11px; color: var(--muted); }
+.thresh-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.thresh-legend .dot { width: 9px; height: 9px; border-radius: 50%; }
+
+/* Tabela */
+.table-wrap { display: flex; flex-direction: column; min-height: 0; }
+.table-scroll { overflow: auto; max-height: 480px; border-radius: 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+thead th {
+  position: sticky; top: 0; z-index: 2;
+  text-align: left; font-size: 10.5px; font-weight: 700; color: var(--muted);
+  letter-spacing: .04em; text-transform: uppercase; padding: 8px 10px;
+  background: var(--surface); box-shadow: 0 2px 0 var(--border); white-space: nowrap;
+}
+tbody td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tbody tr:hover { background: #F8FAFC; }
+.chave-cell { white-space: nowrap; }
+.chave-link { font-weight: 700; color: var(--blue); text-decoration: none; }
+.chave-link:hover { text-decoration: underline; }
+.badge {
+  display: inline-block; padding: 3px 9px; border-radius: 20px;
+  font-size: 10.5px; font-weight: 700; white-space: nowrap;
+}
+.nowrap { white-space: nowrap; }
+.empty-note { font-size: 12px; color: var(--sub); font-style: italic; }
+
+@media (max-width: 1100px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .row-charts { grid-template-columns: 1fr; }
+}
+
+@media print {
+  .topbar-export, #orgSelect, .tabnav { display: none !important; }
+  body { background: #fff; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-brand">
+    <div class="icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-6 0v4"/><rect x="4" y="9" width="16" height="12" rx="2"/></svg>
+    </div>
+    <div>
+      <h1>AÇÃO SUPORTE</h1>
+      <small>RELATÓRIO OPERACIONAL</small>
+    </div>
+  </div>
+
+  <div class="topbar-field">
+    <div class="tf-label">CLIENTE</div>
+    <select id="orgSelect"><option>Carregando…</option></select>
+  </div>
+
+  <div class="topbar-field">
+    <div class="tf-label">DATA DE REFERÊNCIA</div>
+    <div class="tf-value" id="fldData">—</div>
+  </div>
+
+  <button class="topbar-export" id="btnExportar" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="width:15px;height:15px"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+    EXPORTAR
+  </button>
+</header>
+
+<nav class="tabnav">
+  <a href="/guarani/templates/analise_situacao" class="tabnav-item">Análise de Situação</a>
+  <a href="/guarani/templates/acao_suporte" class="tabnav-item active">Ação Suporte</a>
+</nav>
+
+<div class="state-banner state-loading hidden" id="bannerLoading"><div class="box">Carregando dados do Jira…</div></div>
+<div class="state-banner state-error hidden" id="bannerError"><div class="box" id="bannerErrorMsg"></div></div>
+
+<main class="wrap" id="dashboard" style="opacity:0; transition:opacity .2s;">
+
+  <section class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-num" style="color:var(--blue)" id="kpiTotal">—</div>
+      <div class="kpi-label">TOTAL DE CHAMADOS EM ABERTO</div>
+      <div class="kpi-bar" style="background:var(--blue)"></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-num" style="color:#0891B2" id="kpiMedia">—</div>
+      <div class="kpi-label">TEMPO MÉDIO EM ABERTO (DIAS)</div>
+      <div class="kpi-bar" style="background:#0891B2"></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-num" style="color:var(--red)" id="kpiParados">—</div>
+      <div class="kpi-label">PARADOS HÁ MAIS DE 90 DIAS</div>
+      <div class="kpi-bar" style="background:var(--red)"></div>
+    </div>
+  </section>
+
+  <section class="row-charts">
+    <div class="card">
+      <div class="card-title">Ranking por Módulo</div>
+      <div style="font-size:12px; color:var(--muted); font-weight:700; margin-bottom:10px;">Total de itens: <span id="modTotal">—</span></div>
+      <div class="legend-list" id="moduloLegenda"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Tempo em Aberto (dias)</div>
+      <div style="height:220px;"><canvas id="chartTempo"></canvas></div>
+      <div class="thresh-legend">
+        <span><i class="dot" style="background:var(--red)"></i>&gt; 90 dias</span>
+        <span><i class="dot" style="background:var(--orange)"></i>60-90 dias</span>
+        <span><i class="dot" style="background:var(--amber)"></i>30-60 dias</span>
+        <span><i class="dot" style="background:var(--green)"></i>0-30 dias</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Chamados por Responsável</div>
+      <div style="height:220px;"><canvas id="chartResp"></canvas></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card table-wrap">
+      <div class="card-title">Chamados em Aberto</div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Chave</th><th>Módulo</th><th>Tipo</th><th>Status</th><th>Dias em Aberto</th><th>Responsável</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+Chart.register(ChartDataLabels);
+
+const STATUS_PALETTE = ['#2563EB', '#7C3AED', '#0891B2', '#F97316', '#DB2777', '#16A34A', '#F59E0B', '#64748B', '#DC2626'];
+
+let chartTempo, chartResp;
+let reqAtual = 0;
+
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function corPorDias(dias) {
+  if (dias > 90) return '#DC2626';
+  if (dias > 60) return '#F97316';
+  if (dias > 30) return '#F59E0B';
+  return '#16A34A';
+}
+function badgeBg(cor) { return `background:${cor}1F; color:${cor};`; }
+
+function atualizarLinksAbas(orgId) {
+  document.querySelectorAll('.tabnav-item').forEach(a => {
+    const url = new URL(a.getAttribute('href'), window.location.origin);
+    if (orgId) url.searchParams.set('org_id', orgId);
+    a.href = url.pathname + url.search;
+  });
+}
+
+function atualizarUrlOrg(orgId) {
+  const url = new URL(window.location);
+  url.searchParams.set('org_id', orgId);
+  history.replaceState(null, '', url);
+  atualizarLinksAbas(orgId);
+}
+
+async function carregarOrganizacoes() {
+  const sel = document.getElementById('orgSelect');
+  try {
+    const resp = await fetch('/api/analise-situacao/organizacoes');
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.erro || 'Falha ao listar organizações.');
+    const orgs = data.organizacoes || [];
+    sel.innerHTML = orgs.map(o => `<option value="${o.id}">${escapeHtml(o.nome)}</option>`).join('');
+
+    const orgDaUrl = new URLSearchParams(window.location.search).get('org_id');
+    let orgInicial = orgDaUrl && orgs.some(o => o.id === orgDaUrl) ? orgDaUrl : null;
+    if (!orgInicial) {
+      const preferida = orgs.find(o => o.nome.toLowerCase().includes('classhome'));
+      orgInicial = preferida ? preferida.id : (orgs[0] ? orgs[0].id : '');
+    }
+    sel.value = orgInicial;
+    atualizarUrlOrg(orgInicial);
+
+    sel.addEventListener('change', () => {
+      atualizarUrlOrg(sel.value);
+      carregarDashboard(sel.value);
+    });
+    if (sel.value) carregarDashboard(sel.value);
+  } catch (e) {
+    mostrarErro('Não foi possível carregar a lista de organizações: ' + e.message);
+  }
+}
+
+function mostrarCarregando(mostrar) {
+  document.getElementById('bannerLoading').classList.toggle('hidden', !mostrar);
+}
+function mostrarErro(msg) {
+  document.getElementById('bannerError').classList.remove('hidden');
+  document.getElementById('bannerErrorMsg').textContent = msg;
+}
+function limparErro() {
+  document.getElementById('bannerError').classList.add('hidden');
+}
+
+async function carregarDashboard(orgId) {
+  const minhaReq = ++reqAtual;
+  limparErro();
+  mostrarCarregando(true);
+  document.getElementById('orgSelect').disabled = true;
+  try {
+    const resp = await fetch(`/api/analise-situacao?org_id=${encodeURIComponent(orgId)}`);
+    const data = await resp.json();
+    if (minhaReq !== reqAtual) return;
+    if (!resp.ok) throw new Error(data.erro || 'Falha ao consultar o Jira.');
+    render(data);
+    document.getElementById('dashboard').style.opacity = 1;
+  } catch (e) {
+    mostrarErro('Erro ao carregar dados: ' + e.message);
+  } finally {
+    if (minhaReq === reqAtual) {
+      mostrarCarregando(false);
+      document.getElementById('orgSelect').disabled = false;
+    }
+  }
+}
+
+function render(d) {
+  document.getElementById('fldData').textContent = d.data_referencia || '—';
+
+  const parados90 = d.tickets.filter(t => t.dias_aberto > 90).length;
+  document.getElementById('kpiTotal').textContent = d.kpis.total_chamados;
+  document.getElementById('kpiMedia').textContent = d.kpis.media_tempo_aberto_dias;
+  document.getElementById('kpiParados').textContent = parados90;
+
+  renderModulo(d.ranking_modulo);
+  renderTempoChart(d.tempo_aberto);
+  renderRespChart(d.chamados_por_responsavel);
+  renderTabela(d.tickets);
+}
+
+function renderModulo(r) {
+  document.getElementById('modTotal').textContent = r.total;
+  document.getElementById('moduloLegenda').innerHTML = r.ranking.map((m, i) => `
+    <div class="legend-item">
+      <i class="dot" style="background:${STATUS_PALETTE[i % STATUS_PALETTE.length]}"></i>
+      <span>${escapeHtml(m.modulo)}</span>
+      <span class="li-count">${m.total}</span>
+    </div>
+  `).join('') || '<div class="empty-note">Nenhum chamado no período.</div>';
+}
+
+function renderTempoChart(lista) {
+  const top = lista.slice(0, 15);
+  if (chartTempo) chartTempo.destroy();
+  chartTempo = new Chart(document.getElementById('chartTempo'), {
+    type: 'bar',
+    data: { labels: top.map(x => x.chave), datasets: [{ data: top.map(x => x.dias), backgroundColor: top.map(x => corPorDias(x.dias)), borderRadius: 4 }] },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'end', font: { size: 10, weight: '700' }, color: '#334155' } },
+      scales: { x: { display: false }, y: { ticks: { font: { size: 10.5 } }, grid: { display: false } } },
+      layout: { padding: { right: 22 } },
+    },
+  });
+}
+
+function renderRespChart(lista) {
+  if (chartResp) chartResp.destroy();
+  chartResp = new Chart(document.getElementById('chartResp'), {
+    type: 'bar',
+    data: { labels: lista.map(x => x.nome), datasets: [{ data: lista.map(x => x.total), backgroundColor: '#2563EB', borderRadius: 4 }] },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'end', font: { size: 10, weight: '700' }, color: '#334155' } },
+      scales: { x: { display: false, beginAtZero: true }, y: { ticks: { font: { size: 10.5 } }, grid: { display: false } } },
+      layout: { padding: { right: 22 } },
+    },
+  });
+}
+
+function renderTabela(tickets) {
+  const ordenados = [...tickets].sort((a, b) => b.dias_aberto - a.dias_aberto);
+  document.getElementById('tabelaBody').innerHTML = ordenados.map(t => `
+    <tr>
+      <td class="chave-cell"><a class="chave-link" href="${escapeHtml(t.url)}" target="_blank" rel="noopener">${escapeHtml(t.chave)}</a></td>
+      <td class="nowrap">${escapeHtml(t.modulo)}</td>
+      <td class="nowrap">${escapeHtml(t.tipo)}</td>
+      <td class="nowrap">${escapeHtml(t.status)}</td>
+      <td><span class="badge" style="${badgeBg(corPorDias(t.dias_aberto))}">${t.dias_aberto} dias</span></td>
+      <td class="nowrap">${escapeHtml(t.responsavel)}</td>
+    </tr>
+  `).join('') || `<tr><td colspan="6"><span class="empty-note">Nenhum chamado em aberto para esta organização.</span></td></tr>`;
+}
+
+document.getElementById('btnExportar').addEventListener('click', () => window.print());
+
+carregarOrganizacoes();
+</script>
+</body>
+</html>
