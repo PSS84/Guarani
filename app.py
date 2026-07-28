@@ -25,7 +25,13 @@ DADOS_DIR = Path(_dados_env) if _dados_env else BASE_DIR / "dados"
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.append(str(SCRIPT_DIR))
 
+API_DIR = BASE_DIR / "api"
+if str(API_DIR) not in sys.path:
+    sys.path.append(str(API_DIR))
+
 from precos_2026 import carregar_precos_2026  # noqa: E402
+from jira_conexao import JiraError  # noqa: E402
+from analise_situacao import listar_organizacoes, montar_dashboard  # noqa: E402
 
 app = Flask(__name__, template_folder=str(TEMPLATE_DIR))
 
@@ -1031,6 +1037,35 @@ def manual_vendedor():
 @app.route("/guarani/templates/arvore_produto")
 def arvore_produto():
     return send_from_directory(str(BASE_DIR / "guarani" / "templates"), "arvore_produto.html")
+
+
+@app.route("/guarani/templates/analise_situacao")
+def analise_situacao_pagina():
+    return send_from_directory(str(BASE_DIR / "guarani" / "templates"), "analise_situacao.html")
+
+
+@app.route("/guarani/templates/acao_suporte")
+def acao_suporte_pagina():
+    return send_from_directory(str(BASE_DIR / "guarani" / "templates"), "acao_suporte.html")
+
+
+@app.route("/api/analise-situacao/organizacoes")
+def api_analise_situacao_organizacoes():
+    try:
+        return jsonify({"organizacoes": listar_organizacoes()})
+    except JiraError as exc:
+        return jsonify({"erro": str(exc)}), 502
+
+
+@app.route("/api/analise-situacao")
+def api_analise_situacao():
+    org_id = request.args.get("org_id")
+    if not org_id:
+        return jsonify({"erro": "Parâmetro org_id é obrigatório."}), 400
+    try:
+        return jsonify(montar_dashboard(org_id))
+    except JiraError as exc:
+        return jsonify({"erro": str(exc)}), 502
 
 
 @app.route("/guarani/mapa-mental")
