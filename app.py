@@ -1049,6 +1049,11 @@ def acao_suporte_pagina():
     return send_from_directory(str(BASE_DIR / "guarani" / "templates"), "acao_suporte.html")
 
 
+@app.route("/guarani/campanhas/iara")
+def iara_apresentacao_recursos():
+    return send_from_directory(str(BASE_DIR / "guarani" / "campanhas"), "iara_apresentacao_recursos.html")
+
+
 @app.route("/api/analise-situacao/organizacoes")
 def api_analise_situacao_organizacoes():
     try:
@@ -1066,6 +1071,167 @@ def api_analise_situacao():
         return jsonify(montar_dashboard(org_id))
     except JiraError as exc:
         return jsonify({"erro": str(exc)}), 502
+
+
+SITUACAO_CLIENTES_FILE = BASE_DIR / "dados" / "situacao_clientes.json"
+TEMPERATURAS_VALIDAS = {"frio", "morno", "quente", "critico"}
+STATUS_ACAO_VALIDOS = {"pendente", "em_andamento", "concluida"}
+
+
+def _ler_situacao_clientes():
+    if not SITUACAO_CLIENTES_FILE.exists():
+        return {}
+    try:
+        return json.loads(SITUACAO_CLIENTES_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _salvar_situacao_clientes(dados):
+    SITUACAO_CLIENTES_FILE.parent.mkdir(parents=True, exist_ok=True)
+    SITUACAO_CLIENTES_FILE.write_text(json.dumps(dados, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _situacao_org(dados, org_id):
+    return dados.setdefault(org_id, {
+        "temperatura": None,
+        "temperatura_em": None,
+        "historico_temperatura": [],
+        "registros": [],
+    })
+
+
+@app.route("/api/situacao-cliente")
+def api_situacao_cliente_get():
+    org_id = request.args.get("org_id")
+    if not org_id:
+        return jsonify({"erro": "Parâmetro org_id é obrigatório."}), 400
+    dados = _ler_situacao_clientes()
+    return jsonify(_situacao_org(dados, org_id))
+
+
+@app.route("/api/situacao-cliente/temperatura", methods=["POST"])
+def api_situacao_cliente_temperatura():
+    body = request.get_json() or {}
+    org_id = body.get("org_id")
+    valor = body.get("temperatura")
+    if not org_id:
+        return jsonify({"erro": "org_id é obrigatório."}), 400
+    if valor not in TEMPERATURAS_VALIDAS:
+        return jsonify({"erro": f"temperatura inválida. Use uma de: {sorted(TEMPERATURAS_VALIDAS)}"}), 400
+
+    dados = _ler_situacao_clientes()
+    org = _situacao_org(dados, org_id)
+    if org["temperatura"]:
+        org["historico_temperatura"].append({"valor": org["temperatura"], "em": org["temperatura_em"]})
+    org["temperatura"] = valor
+    org["temperatura_em"] = datetime.now().isoformat()
+    _salvar_situacao_clientes(dados)
+    return jsonify(org)
+
+
+@app.route("/api/situacao-cliente/registros", methods=["POST"])
+def api_situacao_cliente_novo_registro():
+    body = request.get_json() or {}
+    org_id = body.get("org_id")
+    resumo = (body.get("resumo") or "").strip()
+    if not org_id or not resumo:
+        return jsonify({"erro": "org_id e resumo são obrigatórios."}), 400
+
+    dados = _ler_situacao_clientes()
+    org = _situacao_org(dados, org_id)
+    registro = {
+        "id": str(uuid.uuid4()),
+        "resumo": resumo,
+        "criado_em": datetime.now().isoformat(),
+        "acoes": [],
+    }
+    org["registros"].append(registro)
+    _salvar_situacao_clientes(dados)
+    return jsonify(registro), 201
+
+
+@app.route("/api/situacao-cliente/registros/<registro_id>", methods=["PATCH"])
+def api_situacao_cliente_editar_registro(registro_id):
+    body = request.get_json() or {}
+    org_id = body.get("org_id")
+    resumo = (body.get("resumo") or "").strip()
+    if not org_id or not resumo:
+        return jsonify({"erro": "org_id e resumo são obrigatórios."}), 400
+
+    dados = _ler_situacao_clientes()
+    org = _situacao_org(dados, org_id)
+    registro = next((r for r in org["registros"] if r["id"] == registro_id), None)
+    if registro is None:
+        return jsonify({"erro": "Registro não encontrado."}), 404
+
+    registro["resumo"] = resumo
+    _salvar_situacao_clientes(dados)
+    return jsonify(registro)
+
+
+@app.route("/api/situacao-cliente/registros/<registro_id>/acoes", methods=["POST"])
+def api_situacao_cliente_nova_acao(registro_id):
+    body = request.get_json() or {}
+    org_id = body.get("org_id")
+    descricao = (body.get("descricao") or "").strip()
+    if not org_id or not descricao:
+        return jsonify({"erro": "org_id e descricao são obrigatórios."}), 400
+
+    dados = _ler_situacao_clientes()
+    org = _situacao_org(dados, org_id)
+    registro = next((r for r in org["registros"] if r["id"] == registro_id), None)
+    if registro is None:
+        return jsonify({"erro": "Registro não encontrado."}), 404
+
+    acao = {
+        "id": str(uuid.uuid4()),
+        "descricao": descricao,
+        "responsavel": body.get("responsavel") or "Paulo",
+        "prazo": body.get("prazo") or None,
+        "status": "pendente",
+        "criado_em": datetime.now().isoformat(),
+        "evolucao": [],
+    }
+    registro["acoes"].append(acao)
+    _salvar_situacao_clientes(dados)
+    return jsonify(acao), 201
+
+
+@app.route("/api/situacao-cliente/acoes/<acao_id>", methods=["PATCH"])
+def api_situacao_cliente_atualizar_acao(acao_id):
+    body = request.get_json() or {}
+    org_id = body.get("org_id")
+    if not org_id:
+        return jsonify({"erro": "org_id é obrigatório."}), 400
+
+    dados = _ler_situacao_clientes()
+    org = _situacao_org(dados, org_id)
+    acao = next((a for r in org["registros"] for a in r["acoes"] if a["id"] == acao_id), None)
+    if acao is None:
+        return jsonify({"erro": "Ação não encontrada."}), 404
+
+    status = body.get("status")
+    if status is not None:
+        if status not in STATUS_ACAO_VALIDOS:
+            return jsonify({"erro": f"status inválido. Use um de: {sorted(STATUS_ACAO_VALIDOS)}"}), 400
+        acao["status"] = status
+
+    if "descricao" in body:
+        descricao = (body.get("descricao") or "").strip()
+        if descricao:
+            acao["descricao"] = descricao
+    if "responsavel" in body:
+        acao["responsavel"] = (body.get("responsavel") or "").strip() or acao["responsavel"]
+    if "prazo" in body:
+        acao["prazo"] = body.get("prazo") or None
+
+    nota = (body.get("nota") or "").strip()
+    if nota:
+        acao["evolucao"].append({"id": str(uuid.uuid4()), "nota": nota, "em": datetime.now().isoformat()})
+
+    _salvar_situacao_clientes(dados)
+    return jsonify(acao)
 
 
 @app.route("/guarani/mapa-mental")
